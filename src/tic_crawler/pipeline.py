@@ -282,3 +282,13 @@ class RawDownloadPipeline(TocCrawlPipeline):
 
 def _now() -> str:
     return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+class ProbePipeline(TocCrawlPipeline):
+    """Fetch, parse and validate a TOC without checking MRF URLs (for payer requests)."""
+
+    def is_unchanged(self, ctx: CrawlContext) -> bool:
+        return False
+
+    async def check_mrfs(self, ctx: CrawlContext) -> None:
+        return None

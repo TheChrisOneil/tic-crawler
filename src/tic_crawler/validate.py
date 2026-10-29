@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import re
 from functools import cache
 from importlib import resources
 from typing import Any
@@ -14,6 +15,9 @@ from jsonschema import Draft7Validator, FormatChecker
 from .models import ValidationReport
 
 TOC_SCHEMA = "table-of-contents.json"
+MAX_KINDS = 200
+_INDEX = re.compile(r"\[\d+\]")
+_QUOTED_URL = re.compile(r"'https?://[^']*'")
 
 
 @cache
@@ -47,21 +51,37 @@ class TocValidator:
         self._header = Draft7Validator(header, format_checker=fc)
         self.report = ValidationReport(pinned_version=version)
         self._seen: set[bytes] = set()
+        self._kinds: dict[str, dict] = {}
 
     def _add(self, msg: str) -> None:
         self.report.error_count += 1
         self.report.valid = False
         if len(self.report.errors) < self.max_errors:
             self.report.errors.append(msg[:300])
+        location, _, detail = msg.partition(": ")
+        kind = f"{_INDEX.sub('[*]', location)}: {_QUOTED_URL.sub("'<url>'", detail)}"[:240]
+        entry = self._kinds.get(kind)
+        if entry is None:
+            if len(self._kinds) >= MAX_KINDS:
+                kind = "(other errors)"
+                entry = self._kinds.setdefault(kind, {"kind": kind, "count": 0, "examples": []})
+            else:
+                entry = self._kinds[kind] = {"kind": kind, "count": 0, "examples": []}
+        entry["count"] += 1
+        if len(entry["examples"]) < 5:
+            entry["examples"].append(location)
 
     def validate_item(self, index: int, item: Any) -> None:
         self.report.item_count += 1
+        before = self.report.error_count
         digest = hashlib.sha256(json.dumps(item, sort_keys=True, default=str).encode()).digest()
         if digest in self._seen:
             self._add(f"reporting_structure[{index}]: duplicate item (uniqueItems)")
         self._seen.add(digest)
         for err in sorted(self._item.iter_errors(item), key=lambda e: list(e.absolute_path)):
             self._add(f"reporting_structure[{index}]{_path(err.absolute_path)}: {err.message}")
+        if self.report.error_count > before:
+            self.report.invalid_items += 1
 
     def validate_header(self, header: dict) -> None:
         top_type = header.get("_top_level_type")
@@ -83,6 +103,7 @@ class TocValidator:
             self._add("reporting_structure: [] should be non-empty")
 
     def finish(self) -> ValidationReport:
+        self.report.error_kinds = sorted(self._kinds.values(), key=lambda k: (-k["count"], k["kind"]))
         return self.report
 
 

@@ -133,3 +133,28 @@ def test_numeric_version_recorded_as_string():
 def test_unknown_schema_version():
     with pytest.raises(FileNotFoundError):
         load_schema("9.9.9")
+
+
+def test_error_kinds_group_by_path_without_indices():
+    items = []
+    for i in range(3):
+        it = copy.deepcopy(ITEM)
+        it["reporting_plans"][0]["plan_id_type"] = "HIOS"
+        items.append(dict(it, n=i))
+    items.append(ITEM)
+    r = run(items, HEADER)
+    assert r.invalid_items == 3
+    top = r.error_kinds[0]
+    assert top["count"] == 3
+    assert top["kind"].startswith("reporting_structure[*].reporting_plans[*].plan_id_type: 'HIOS'")
+    assert top["examples"][0] == "reporting_structure[0].reporting_plans[0].plan_id_type"
+
+
+def test_error_kinds_cap():
+    v = TocValidator("2.2.1")
+    v.validate_header(dict(HEADER))
+    for i in range(250):
+        v._add(f"x{i}: boom")
+    kinds = v.finish().error_kinds
+    assert len(kinds) == 201
+    assert any(k["kind"] == "(other errors)" and k["count"] == 51 for k in kinds)

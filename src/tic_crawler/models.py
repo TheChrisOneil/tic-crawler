@@ -64,6 +64,9 @@ class ValidationReport:
     error_count: int = 0
     errors: list[str] = field(default_factory=list)
     item_count: int = 0
+    invalid_items: int = 0
+    # Errors grouped by kind (indices replaced by [*]): {"kind", "count", "examples"}.
+    error_kinds: list[dict] = field(default_factory=list)
 
 
 @dataclass

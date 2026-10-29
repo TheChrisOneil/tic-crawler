@@ -16,7 +16,7 @@ from .config import Settings, load_settings
 from .discovery import DiscoveryRegistry, load_seed_file
 from .fetch import HttpClient
 from .models import Payer, PayerResult, RegistryRow, render_toc_urls
-from .pipeline import RawDownloadPipeline, TocCrawlPipeline
+from .pipeline import ProbePipeline, RawDownloadPipeline, TocCrawlPipeline
 from .state import StateStore, utcnow
 from .storage import (
     DriveAdapter,
@@ -245,6 +245,139 @@ def verify_seeds(config: ConfigOpt = None) -> None:
         w.writerows(rows)
     good = sum(1 for r in rows if not r[6])
     typer.echo(f"checked {len(rows)} urls, {good} ok; report {path}")
+
+
+def _audit_targets(settings: Settings, payers: list[Payer], mrf_samples: int) -> list[tuple]:
+    today = _today()
+    targets: list[tuple[str, str, str]] = []
+    for p in payers:
+        if p.landing_url:
+            targets.append((p.payer_id, "landing", p.landing_url))
+        for u in render_toc_urls(p.toc_url, today)[:1]:
+            targets.append((p.payer_id, "toc", u))
+        man_dir = Path(settings.local_dir) / "manifests" / p.payer_id
+        files = sorted(man_dir.glob("*.csv")) if man_dir.exists() else []
+        if files and mrf_samples:
+            seen_hosts: set[str] = set()
+            with files[-1].open(newline="", encoding="utf-8") as fh:
+                for row in csv.DictReader(fh):
+                    url = row.get("url", "")
+                    host = url.split("/")[2] if url.startswith("https://") else ""
+                    if host and host not in seen_hosts and len(seen_hosts) < mrf_samples:
+                        seen_hosts.add(host)
+                        targets.append((p.payer_id, "mrf_sample", url))
+    return targets
+
+
+@app.command("audit-access")
+def audit_access(
+    mrf_samples: Annotated[int, typer.Option(help="MRF hosts to sample per payer")] = 2,
+    config: ConfigOpt = None,
+) -> None:
+    """Record robots.txt rules and bot walls for every seed payer host."""
+    from .audit import audit, to_dict
+
+    settings = _settings(config)
+    state = StateStore(settings.state_db)
+    payers = _payers(state, settings)
+    targets = _audit_targets(settings, payers, mrf_samples)
+
+    async def go():
+        async with HttpClient(settings) as http:
+            return await audit(http, targets)
+
+    robots, probes = asyncio.run(go())
+    data = {"audited_at": utcnow(), "user_agent": settings.user_agent, **to_dict(robots, probes)}
+    path = Path(settings.local_dir) / "access_audit.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2))
+    verdicts: dict[str, int] = {}
+    for p in probes:
+        verdicts[p.verdict] = verdicts.get(p.verdict, 0) + 1
+    typer.echo(f"origins {len(robots)}, urls {len(probes)}: {verdicts}; report {path}")
+
+
+@app.command("export-dashboard")
+def export_dashboard(config: ConfigOpt = None) -> None:
+    """Write dashboard JSON (data.json and per-payer detail) under out/dashboard/."""
+    from .export import build
+
+    settings = _settings(config)
+    state = StateStore(settings.state_db)
+    payers = {p.payer_id: p for p in _payers(state, settings)}
+    dest = build(settings, state, payers, _today())
+    typer.echo(f"dashboard data written to {dest}")
+
+
+@app.command()
+def probe(
+    toc_url: Annotated[str, typer.Option(help="TOC URL to test")] = "",
+    landing_url: Annotated[str, typer.Option(help="Landing page URL")] = "",
+    name: Annotated[str, typer.Option(help="Payer name")] = "Requested payer",
+    markdown: Annotated[Path | None, typer.Option(help="Write a Markdown report here")] = None,
+    config: ConfigOpt = None,
+) -> None:
+    """Check a requested payer: robots, bot walls, and (if reachable) TOC parse + validation."""
+    import tempfile
+
+    from .audit import audit
+    from .discovery import slugify
+
+    settings = _settings(config)
+    pid = slugify(name)
+    targets = [(pid, "landing", landing_url)] if landing_url else []
+    if toc_url:
+        targets.append((pid, "toc", toc_url))
+
+    async def go():
+        async with HttpClient(settings) as http:
+            robots, probes = await audit(http, targets)
+            result = None
+            if toc_url:
+                with tempfile.TemporaryDirectory() as tmp, StateStoreCtx(tmp) as st:
+                    pipe = ProbePipeline(settings, http, st, Path(tmp) / "out")
+                    result = await pipe.run(Payer(pid, name, toc_url=toc_url, landing_url=landing_url))
+            return robots, probes, result
+
+    robots, probes, result = asyncio.run(go())
+    lines = [f"## Probe: {name}", "", "| Role | URL | robots.txt allows us | Status | Verdict |",
+             "| --- | --- | --- | --- | --- |"]
+    for p in probes:
+        lines.append(f"| {p.role} | {p.url} | {p.robots_allows_us} | {p.status or ''} | "
+                     f"{p.verdict}{' (' + p.wall + ')' if p.wall else ''} |")
+    for r in robots:
+        lines.append(f"\nrobots.txt at {r.origin}: status {r.status}, policy {r.policy}"
+                     f"{', wall ' + r.wall if r.wall else ''}")
+    if result is not None:
+        v = result.validation
+        lines += ["", f"**TOC:** {result.status}; {result.toc_bytes} bytes; "
+                  f"{result.mrf_count} unique MRF URLs; schema valid: {result.schema_valid}"
+                  + (f"; {v.error_count} errors" if v else "")]
+        if result.error:
+            lines.append(f"**Error:** {result.error}")
+        for k in (v.error_kinds if v else [])[:10]:
+            lines.append(f"- {k['count']} x `{k['kind']}`")
+        if result.status == "ok":
+            lines += ["", "Suggested seed entry:", "```yaml",
+                      f"  - payer_id: {pid}", f"    legal_name: {name}",
+                      f"    landing_url: {landing_url}", f"    toc_url: {toc_url}",
+                      f"    verified_on: {_today().isoformat()}", "    verified_by: http", "```"]
+    text = "\n".join(lines)
+    if markdown:
+        markdown.write_text(text)
+    typer.echo(text)
+
+
+class StateStoreCtx:
+    def __init__(self, tmp: str):
+        self.path = Path(tmp) / "probe.sqlite"
+
+    def __enter__(self) -> StateStore:
+        self.store = StateStore(self.path)
+        return self.store
+
+    def __exit__(self, *exc) -> None:
+        self.store.close()
 
 
 @app.command("sync-drive")
