@@ -207,3 +207,17 @@ async def test_toc_link_pattern_scrapes_landing_page(settings, state, tmp_path, 
         r = await TocCrawlPipeline(settings, http, state, tmp_path, today=TODAY).run(p)
     assert r.status == "ok", r.error
     assert r.toc_url == "https://mrf.example.com/json/2026-09-28_x_index.json"
+
+
+@respx.mock
+async def test_non_https_locations_are_not_requested(settings, state, tmp_path):
+    body = (b'{"reporting_entity_name":"a","reporting_entity_type":"b","last_updated_on":"2026-10-01",'
+            b'"version":"2.0.0","reporting_structure":[{"reporting_plans":[{"plan_name":"A",'
+            b'"issuer_name":"A","plan_id_type":"hios","plan_id":"1","plan_market_type":"group"}],'
+            b'"allowed_amount_file":{"description":"aa","location":"Missing file"}}]}')
+    mock_site(b"", toc_body=body)
+    async with HttpClient(settings, sleep=no_sleep) as http:
+        r = await TocCrawlPipeline(settings, http, state, tmp_path, today=TODAY).run(payer())
+    assert r.status == "ok"
+    rows = list(csv.DictReader((tmp_path / "manifests/acme/2026-10-29.csv").open()))
+    assert rows[0]["check_error"] == "invalid_url" and rows[0]["http_status"] == ""

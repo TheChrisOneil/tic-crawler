@@ -19,7 +19,7 @@ from urllib.parse import urljoin
 
 from .config import Settings
 from .fetch import FetchError, HttpClient, RobotsDisallowed
-from .models import MrfEntry, Payer, PayerResult, ValidationReport, render_toc_urls
+from .models import MrfEntry, Payer, PayerResult, UrlCheck, ValidationReport, render_toc_urls
 from .parse import MrfCollector, iter_toc, open_json, sha256_of_json, write_gzip_copy
 from .state import StateStore
 from .storage import RawStore
@@ -186,6 +186,10 @@ class TocCrawlPipeline(CrawlPipeline):
         entries = list(ctx.collector.entries.values())
 
         async def check(entry: MrfEntry) -> None:
+            if not entry.url.lower().startswith("https://"):
+                # Placeholders like "Missing file" appear in real TOCs; never request them.
+                entry.check = UrlCheck(error="invalid_url")
+                return
             entry.check = await self.http.head_or_range(entry.url)
 
         await asyncio.gather(*(check(e) for e in entries))

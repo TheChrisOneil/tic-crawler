@@ -25,7 +25,7 @@ class RobotsDisallowed(Exception):
 
 class FetchError(Exception):
     def __init__(self, url: str, status: int | None, message: str = ""):
-        super().__init__(f"{status or 'error'} {url} {message}".strip())
+        super().__init__(f"{status or 'error'} {url}" + (f" ({message})" if message else ""))
         self.url = url
         self.status = status
 
