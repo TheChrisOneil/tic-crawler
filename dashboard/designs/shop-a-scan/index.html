@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop One Scan</title>
+<meta name="description" content="Design concept: compare what you would pay for one service at nearby in-network sites.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../patient.css">
+<style>
+.results { display: flex; flex-direction: column; gap: 12px; }
+.site { display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; align-items: start; }
+.site .cost { font-family: var(--display); font-size: 1.6rem; font-weight: 700; text-align: right; }
+.site .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 0.86rem; color: var(--muted); }
+.site.best { border-color: var(--accent); }
+.bar { height: 6px; background: var(--line); border-radius: 3px; grid-column: 1 / -1; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--accent); }
+.summary { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="concept-bar"><span><a href="../">← User designs</a> · Design concept with example data</span><span>Rates and sites below are made up for illustration</span></div>
+
+  <header style="display:flex;flex-direction:column;gap:8px">
+    <h1>What will my scan cost?</h1>
+    <p class="muted">Pick your plan and the service your doctor ordered. We compare in-network sites near you using the rates your insurer publishes, then apply your deductible.</p>
+  </header>
+
+  <form class="panel" id="form" autocomplete="off">
+    <div class="fields">
+      <label for="plan">Your plan
+        <select id="plan"><option>BCBS Michigan PPO (example)</option><option>BCBS Michigan HMO (example)</option></select>
+      </label>
+      <label for="service">Service
+        <select id="service"></select>
+      </label>
+      <label for="zip">Your ZIP
+        <input id="zip" inputmode="numeric" value="48084">
+      </label>
+      <label for="radius">Within
+        <select id="radius"><option value="10">10 miles</option><option value="25" selected>25 miles</option><option value="50">50 miles</option></select>
+      </label>
+    </div>
+    <div class="fields">
+      <label for="ded">Deductible left this year ($)
+        <input id="ded" type="number" min="0" step="50" value="2000">
+      </label>
+      <label for="coins">Coinsurance after deductible (%)
+        <input id="coins" type="number" min="0" max="100" value="20">
+      </label>
+      <label for="oop">Out-of-pocket max left ($)
+        <input id="oop" type="number" min="0" step="50" value="5000">
+      </label>
+    </div>
+    <p class="small muted">Your deductible numbers stay in this browser. Find them on your insurer's member site or your latest Explanation of Benefits.</p>
+  </form>
+
+  <section style="display:flex;flex-direction:column;gap:12px">
+    <div class="summary" id="summary"></div>
+    <div class="results" id="results"></div>
+  </section>
+
+  <div class="callout">
+    <h3>Before you book</h3>
+    <p class="small">Call the site and your insurer to confirm they are in network for your plan. Hospital sites may also bill a separate radiologist fee, which we add where the insurer publishes it. This is an estimate, not a guarantee.</p>
+  </div>
+</div>
+
+<script>
+const SERVICES = [
+  {code: "73721", name: "MRI of the knee (no contrast)"},
+  {code: "74177", name: "CT of abdomen and pelvis (with contrast)"},
+  {code: "45378", name: "Colonoscopy (diagnostic)"},
+  {code: "80061", name: "Cholesterol panel (lab)"}
+];
+// Example sites and rates. A real build would read these from the plan x code x NPI index.
+const SITES = [
+  {name: "Lakeside Imaging Center", type: "Freestanding imaging", miles: 3.2, quality: "Accredited (ACR)", rates: {"73721": 455, "74177": 520}},
+  {name: "Northfield Open MRI", type: "Freestanding imaging", miles: 8.9, quality: "Accredited (ACR)", rates: {"73721": 398, "74177": 610}},
+  {name: "Riverbend Medical Center", type: "Hospital outpatient", miles: 4.1, quality: "Leapfrog grade A", rates: {"73721": 1820, "74177": 2240, "45378": 2650, "80061": 62}, extra: {"73721": 110, "74177": 140}},
+  {name: "St. Clement Hospital", type: "Hospital outpatient", miles: 14.6, quality: "Leapfrog grade B", rates: {"73721": 2480, "74177": 2910, "45378": 3120, "80061": 88}, extra: {"73721": 125, "74177": 150}},
+  {name: "Oakview Endoscopy Center", type: "Ambulatory surgery center", miles: 6.7, quality: "Medicare-certified ASC", rates: {"45378": 1040}},
+  {name: "Metro Lab Services", type: "Independent lab", miles: 2.0, quality: "CLIA-certified", rates: {"80061": 14}},
+  {name: "Valley Diagnostic Labs", type: "Independent lab", miles: 21.3, quality: "CLIA-certified", rates: {"80061": 11}}
+];
+const $ = (id) => document.getElementById(id);
+const fmt = (n) => "$" + Math.round(n).toLocaleString("en-US");
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+$("service").innerHTML = SERVICES.map((s) => `<option value="${s.code}">${esc(s.name)} · CPT ${s.code}</option>`).join("");
+
+function owe(rate, ded, coins, oop) {
+  const dedPart = Math.min(rate, ded);
+  return Math.min(dedPart + coins * (rate - dedPart), oop);
+}
+function render() {
+  const code = $("service").value, radius = +$("radius").value;
+  const ded = Math.max(0, +$("ded").value || 0), coins = Math.min(100, Math.max(0, +$("coins").value || 0)) / 100, oop = Math.max(0, +$("oop").value || 0);
+  const rows = SITES.filter((s) => s.rates[code] && s.miles <= radius).map((s) => {
+    const rate = s.rates[code] + (s.extra?.[code] || 0);
+    return {...s, rate, cost: owe(rate, ded, coins, oop)};
+  }).sort((a, b) => a.cost - b.cost);
+  if (!rows.length) {
+    $("summary").innerHTML = "";
+    $("results").innerHTML = `<div class="panel"><p>No in-network sites with a published rate within ${radius} miles. Try a wider distance.</p></div>`;
+    return;
+  }
+  const max = Math.max(...rows.map((r) => r.cost)) || 1, lo = rows[0].cost, hi = rows[rows.length - 1].cost;
+  $("summary").innerHTML = `<p><strong>${rows.length}</strong> sites within ${radius} miles</p><p>You would pay <strong class="num">${fmt(lo)}</strong> to <strong class="num">${fmt(hi)}</strong></p>` +
+    (hi - lo > 0 ? `<p class="yes">Choosing the lowest saves you <strong class="num">${fmt(hi - lo)}</strong></p>` : "");
+  $("results").innerHTML = rows.map((r, i) => `
+    <article class="panel site${i === 0 ? " best" : ""}">
+      <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+        <h3>${esc(r.name)} ${i === 0 ? '<span class="pill yes">Lowest cost</span>' : ""}</h3>
+        <div class="meta"><span>${esc(r.type)}</span><span>·</span><span>${r.miles} mi</span><span>·</span><span>${esc(r.quality)}</span></div>
+        <div class="meta"><span class="num">Plan rate ${fmt(r.rate)}</span>${r.extra?.[code] ? `<span>(includes ${fmt(r.extra[code])} radiologist fee)</span>` : ""}</div>
+      </div>
+      <div><div class="cost num">${fmt(r.cost)}</div><div class="small muted" style="text-align:right">you pay</div></div>
+      <div class="bar" aria-hidden="true"><div class="bar-fill" style="width:${(r.cost / max * 100).toFixed(1)}%"></div></div>
+    </article>`).join("");
+}
+$("form").addEventListener("input", render);
+$("form").addEventListener("submit", (e) => e.preventDefault());
+render();
+</script>
+</body>
+</html>

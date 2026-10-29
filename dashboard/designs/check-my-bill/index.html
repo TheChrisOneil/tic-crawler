@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Check My Bill</title>
+<meta name="description" content="Design concept: compare your Explanation of Benefits with your insurer's published rate.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../patient.css">
+<style>
+.verdict { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.stat { display: flex; flex-direction: column; gap: 2px; }
+.stat .v { font-family: var(--display); font-size: 1.7rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+textarea { min-height: 190px; font-family: var(--body); line-height: 1.5; }
+.row-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="concept-bar"><span><a href="../">← User designs</a> · Design concept with example data</span><span>Claim and rate below are made up for illustration</span></div>
+
+  <header style="display:flex;flex-direction:column;gap:8px">
+    <h1>Was I charged the right amount?</h1>
+    <p class="muted">Copy a line from your Explanation of Benefits (EOB). We look up the rate your insurer published for that service and provider, and tell you if they match.</p>
+  </header>
+
+  <form class="panel" id="form" autocomplete="off">
+    <h2>From your EOB</h2>
+    <div class="fields">
+      <label for="plan">Plan <select id="plan"><option>BCBS Michigan PPO (example)</option></select></label>
+      <label for="provider">Provider name <input id="provider" value="Riverbend Medical Center"></label>
+      <label for="date">Date of service <input id="date" type="date" value="2026-09-14"></label>
+    </div>
+    <div class="fields">
+      <label for="code">Service code (CPT/HCPCS) <input id="code" value="73721"></label>
+      <label for="allowed">"Allowed amount" on EOB ($) <input id="allowed" type="number" min="0" value="2140"></label>
+      <label for="paid">"You may owe" on EOB ($) <input id="paid" type="number" min="0" value="2028"></label>
+    </div>
+  </form>
+
+  <section class="panel" id="result" aria-live="polite"></section>
+
+  <section class="panel">
+    <div class="row-actions"><h2 style="flex:1">Message to your insurer</h2><button type="button" id="copy">Copy message</button><span id="copied" class="small muted"></span></div>
+    <label for="msg">Edit before sending through your insurer's member portal or by mail.
+      <textarea id="msg"></textarea>
+    </label>
+  </section>
+
+  <div class="callout">
+    <h3>Why the numbers can differ for good reasons</h3>
+    <p class="small">The published rate may change mid-year, a modifier on the claim can change the price, and hospital visits often include a separate facility or reading fee under another code. A mismatch is a reason to ask, not proof of an error.</p>
+  </div>
+</div>
+
+<script>
+// Example published rates (plan x provider x code). A real build reads the slim rate index.
+const RATES = {"73721": {rate: 1820, extra: 110, name: "MRI of the knee (no contrast)", file: "2026-10 in-network file, BCBS Michigan PPO"}};
+const $ = (id) => document.getElementById(id);
+const fmt = (n) => "$" + Math.round(n).toLocaleString("en-US");
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function render() {
+  const code = $("code").value.trim(), allowed = +$("allowed").value || 0, owe = +$("paid").value || 0;
+  const r = RATES[code];
+  if (!r) {
+    $("result").innerHTML = `<h2>No published rate found</h2><p class="muted">We could not find code ${esc(code)} for this provider in your plan's file. In this example only 73721 is loaded.</p>`;
+    $("msg").value = "";
+    return;
+  }
+  const expected = r.rate + r.extra, diff = allowed - expected;
+  const tone = Math.abs(diff) < 5 ? "yes" : diff > 0 ? "no" : "part";
+  const label = tone === "yes" ? "Matches the published rate" : diff > 0 ? `Allowed amount is ${fmt(diff)} higher than published` : `Allowed amount is ${fmt(-diff)} lower than published`;
+  $("result").innerHTML = `
+    <div class="row-actions"><h2 style="flex:1">${esc(r.name)} · CPT ${esc(code)}</h2><span class="pill ${tone}">${esc(label)}</span></div>
+    <div class="verdict">
+      <div class="stat"><span class="small muted">Allowed on your EOB</span><span class="v">${fmt(allowed)}</span></div>
+      <div class="stat"><span class="small muted">Published rate</span><span class="v">${fmt(expected)}</span><span class="small muted">${fmt(r.rate)} facility + ${fmt(r.extra)} reading fee</span></div>
+      <div class="stat"><span class="small muted">Difference</span><span class="v ${tone}">${diff >= 0 ? "+" : "−"}${fmt(Math.abs(diff))}</span></div>
+    </div>
+    <p class="small muted">Source: ${esc(r.file)}. If your deductible was not met, most of any overcharge comes out of your pocket.</p>`;
+  $("msg").value = tone === "yes" ? "" :
+`Hello,
+
+I am writing about a claim for ${$("provider").value} on ${$("date").value}, service code ${code} (${r.name}).
+
+My Explanation of Benefits shows an allowed amount of ${fmt(allowed)} and says I may owe ${fmt(owe)}. The in-network rate you published for this provider and service under my plan is ${fmt(expected)} (${r.file}).
+
+Please review the claim and tell me why the allowed amount differs from the published rate, and correct it if it was processed incorrectly.
+
+Thank you.`;
+}
+$("form").addEventListener("input", render);
+$("form").addEventListener("submit", (e) => e.preventDefault());
+$("copy").addEventListener("click", () => {
+  navigator.clipboard.writeText($("msg").value).then(() => { $("copied").textContent = "Copied"; })
+    .catch(() => { $("msg").select(); $("copied").textContent = "Selected. Press Ctrl+C or ⌘C to copy."; });
+});
+render();
+</script>
+</body>
+</html>
