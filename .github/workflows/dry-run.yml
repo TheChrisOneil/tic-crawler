@@ -11,6 +11,12 @@ on:
   push:
     branches: [main]
     paths: [".github/workflows/dry-run.yml"]
+  # Monthly hands-free check on the first Monday.
+  schedule:
+    - cron: "41 7 1-7 * 1"
+
+permissions:
+  contents: write
 
 jobs:
   dry-run:
@@ -36,7 +42,7 @@ jobs:
       - name: Summary
         if: always()
         run: |
-          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          python - <<'PY' | tee out/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
           import csv, glob, json, collections
           for f in glob.glob("out/runs/*.json"):
               log = json.load(open(f))
@@ -59,3 +65,17 @@ jobs:
         with:
           name: dry-run-out
           path: out/
+      - name: Publish results to the dry-run-results branch
+        if: always()
+        run: |
+          set -e
+          mkdir -p /tmp/results && cp -r out/. /tmp/results/
+          # Keep the branch small: drop any stored TOC over 50 MB.
+          find /tmp/results -name '*.json.gz' -size +50M -print -delete
+          cd /tmp/results
+          git init -q -b dry-run-results
+          git config user.name "tic-crawler bot"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -q -m "Dry run ${{ github.run_id }}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" dry-run-results
