@@ -100,6 +100,25 @@ body { margin: 0; }
 </section>
 
 <section>
+  <div class="eyebrow">First audience · added 29 Oct</div>
+  <h2>Starting with Borislow's clients</h2>
+  <p>The first rollout is for people covered through employers that Borislow Insurance advises. Borislow is an employee-benefits broker in Methuen, Massachusetts, working mainly with employers in Massachusetts and New Hampshire. So the "patient" here is an employee or family member on an employer group plan, and the broker and HR team are the way to reach them. That changes what to build first.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>What changes</th><th>Why</th><th>What to do</th></tr></thead>
+    <tbody>
+      <tr><td>Find plans by employer, not by payer</td><td>Group plans in the files are tagged with the employer's EIN, which tic-crawler already records in the manifest.</td><td>Ask Borislow for its client list with EINs (business data, not member data) and match each client to its in-network files.</td></tr>
+      <tr><td>Crawl New England carriers first</td><td>Clients are mostly on Massachusetts and New Hampshire plans. Only BCBS Massachusetts is in the seed list today, and it is unverified.</td><td>Have Borislow confirm the carrier mix, then add and verify seeds for those carriers (for example BCBS Massachusetts, Point32Health, and Anthem in New Hampshire).</td></tr>
+      <tr><td>Self-funded clients need separate handling</td><td>A self-funded employer is responsible for its own files, usually posted by its administrator. They may not appear in a carrier's main table of contents.</td><td>For each self-funded client, get the file location from the administrator through the broker.</td></tr>
+      <tr><td>Plan picker moves to first place</td><td>Brokers already run open enrollment with their clients. A plan comparison priced at each plan's real rates fits that work directly.</td><td>Pilot the plan picker with one or two clients at their next renewal, then add "Shop one scan" to the client's benefits portal.</td></tr>
+      <tr><td>Medicare is out of scope</td><td>Borislow also advises on Medicare, but these rules do not cover Medicare Advantage or traditional Medicare.</td><td>Leave Medicare clients out of the first rollout.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout">
+    <p><strong>Revised cheapest test:</strong> pick one Borislow client on a fully insured BCBS Massachusetts plan, find its plan in the table of contents by EIN, and pull rates for about ten imaging and lab codes near the client's main office. This replaces the BCBS Michigan test, which would not tell us anything about these members.</p>
+  </div>
+</section>
+
+<section>
   <div class="eyebrow">Patient questions</div>
   <h2>What the files can and can't answer</h2>
   <p>Each row is a question a patient actually asks. The verdict is about TiC data alone, before joining anything else.</p>
@@ -260,7 +279,7 @@ patient_owes     = min(patient_owes, out_of_pocket_max_remaining)</div>
     </tbody>
   </table></div>
   <div class="callout">
-    <p><strong>Cheapest real test:</strong> take one BCBS Michigan in-network file, extract rates for about ten imaging and lab codes, join NPPES, and see whether the price spread across Michigan sites is large and believable. That single file answers whether the "Shop one scan" idea is worth building, for the cost of one download.</p>
+    <p><strong>Cheapest real test:</strong> take one BCBS Michigan in-network file, extract rates for about ten imaging and lab codes, join NPPES, and see whether the price spread across Michigan sites is large and believable. That single file answers whether the "Shop one scan" idea is worth building, for the cost of one download. For the first rollout, run this test on a Borislow client's plan instead (see above).</p>
   </div>
 </section>
 
