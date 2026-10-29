@@ -106,6 +106,8 @@ payers:
     verified_on: 2026-10-29
     verified_by: page_fetch
     notes: TOC link is rendered by JavaScript ("Error fetching MRF link" in static HTML). Needs the link from a browser.
+    cohorts: [borislow]
+    priority: 10
 
   - payer_id: elevance-anthem
     legal_name: Elevance Health, Inc. (Anthem)
@@ -113,6 +115,8 @@ payers:
     landing_url: https://www.anthem.com/ca/machine-readable-file/search
     verified_by: none
     notes: anthem.com robots.txt disallowed the page fetch on 2026-10-29. The crawler honors robots.txt, so this needs a TOC URL on an allowed host.
+    cohorts: [borislow]
+    priority: 10
 
   - payer_id: molina
     legal_name: Molina Healthcare, Inc.
@@ -134,12 +138,16 @@ payers:
     aliases: [UnitedHealthcare, UMR]
     verified_by: none
     notes: Landing URL not yet confirmed. Also covers UMR (TPA).
+    cohorts: [borislow]
+    priority: 10
 
   - payer_id: aetna
     legal_name: Aetna Life Insurance Company
     aliases: [Aetna, Aetna Inc., Meritain Health]
     verified_by: none
     notes: Landing URL not yet confirmed. Also covers Meritain Health (TPA).
+    cohorts: [borislow]
+    priority: 10
 
   - payer_id: humana
     legal_name: Humana Insurance Company
@@ -180,7 +188,7 @@ payers:
   - {payer_id: independence-blue-cross, legal_name: Independence Hospital Indemnity Plan (Independence Blue Cross), aliases: [Independence Blue Cross], states: [PA], verified_by: none}
   - {payer_id: bcbs-kansas-city, legal_name: Blue Cross and Blue Shield of Kansas City (Blue KC), aliases: [Blue KC], states: [KS, MO], verified_by: none}
   - {payer_id: bcbs-louisiana, legal_name: Louisiana Health Service & Indemnity Company (Blue Cross and Blue Shield of Louisiana), aliases: [Blue Cross and Blue Shield of Louisiana], states: [LA], verified_by: none}
-  - {payer_id: bcbs-massachusetts, legal_name: Blue Cross and Blue Shield of Massachusetts, Inc., states: [MA], verified_by: none}
+  - {payer_id: bcbs-massachusetts, legal_name: Blue Cross and Blue Shield of Massachusetts, Inc., states: [MA], cohorts: [borislow], priority: 10, verified_by: none}
   - {payer_id: bcbs-minnesota, legal_name: BCBSM, Inc. (Blue Cross and Blue Shield of Minnesota), aliases: [Blue Cross and Blue Shield of Minnesota], states: [MN], verified_by: none}
   - {payer_id: bcbs-nebraska, legal_name: Blue Cross and Blue Shield of Nebraska, states: [NE], verified_by: none}
   - {payer_id: bcbs-north-dakota, legal_name: Noridian Mutual Insurance Company (Blue Cross Blue Shield of North Dakota), aliases: [Blue Cross Blue Shield of North Dakota], states: [ND], verified_by: none}
@@ -194,3 +202,67 @@ payers:
   - {payer_id: wellmark, legal_name: Wellmark, Inc. (Wellmark Blue Cross and Blue Shield), aliases: [Wellmark Blue Cross and Blue Shield], states: [IA, SD], verified_by: none}
   - {payer_id: bcbs-wyoming, legal_name: Blue Cross Blue Shield of Wyoming, states: [WY], verified_by: none}
   - {payer_id: bcbs-western-ny, legal_name: Highmark Western and Northeastern New York, states: [NY], verified_by: none}
+
+  # Borislow phase 1: carriers common in the MA/NH employer market (Borislow Insurance, Methuen MA).
+  # Carrier list is an assumption until Borislow confirms which carriers its clients use.
+  - payer_id: fallon-health
+    legal_name: Fallon Community Health Plan, Inc. (Fallon Health)
+    aliases: [Fallon Health]
+    states: [MA]
+    landing_url: https://fallon.sapphiremrfhub.com
+    toc_link_pattern: '/tocs/\d{6}/\d{4}-\d{2}-\d{2}_fallon-health_index\.json'
+    cohorts: [borislow]
+    priority: 10
+    verified_on: 2026-10-29
+    verified_by: page_fetch
+    notes: Linked from fallonhealth.org. Hosted on Sapphire MRF Hub; 2026-10 TOC was /tocs/202610/2026-10-01_fallon-health_index.json.
+
+  - payer_id: wellsense
+    legal_name: Boston Medical Center Health Plan, Inc. (WellSense Health Plan)
+    aliases: [WellSense Health Plan, WellSense]
+    states: [MA, NH]
+    landing_url: https://www.wellsense.org/about-us/interoperability
+    toc_url: https://connect.wellsense.org:8443/mrf-files/MH5IA40DR6M47R9LANI5YN4SHMB822S2HKKXJ9NV594MNUOYJ3TOVC0VVQXO7RCJJJAHXX5QSDX5F779MFG2OUAHSXUGOJPWPGNFWNP33D59DR5OPXDWFQIO2MOFWM3RSUDMJJ8DDGUCR1V3VH0M3C1IDCE2VPYNGY59NCHY47A92LU9LJ7HXJ6XUBKSQ2D3MYN9SK33
+    cohorts: [borislow]
+    priority: 10
+    verified_on: 2026-10-29
+    verified_by: page_fetch
+    notes: '"Download TOC Index File" link on the interoperability page. Contact ITOpsSupport@wellsense.org.'
+
+  - payer_id: mgb-health-plan
+    legal_name: Mass General Brigham Health Plan
+    aliases: [Mass General Brigham Health Plan, AllWays Health Partners]
+    states: [MA, NH]
+    landing_url: https://massgeneralbrighamhealthplan.org/pricetransparency/MRF/Base
+    cohorts: [borislow]
+    priority: 10
+    verified_by: none
+    notes: Landing link read from /meet-us/transparency-regulations on 2026-10-29; TOC link not yet read. Contact HealthPlanCustomerService-Members@mgb.org.
+
+  - payer_id: tufts-health-plan
+    legal_name: Tufts Health Plan (Point32Health)
+    aliases: [Tufts Health Plan, Point32Health]
+    states: [MA, NH, RI]
+    landing_url: https://tuftshealthplan.com/legal-notices/machine-readable-files
+    cohorts: [borislow]
+    priority: 10
+    verified_by: none
+    notes: Page links a plan list on eusprdtransparencymrfp32.z13.web.core.windows.net/thp rather than a TOC; files are current month only.
+
+  - payer_id: harvard-pilgrim
+    legal_name: Harvard Pilgrim Health Care, Inc. (Point32Health)
+    aliases: [Harvard Pilgrim Health Care, Point32Health]
+    states: [MA, NH, ME, CT]
+    cohorts: [borislow]
+    priority: 10
+    verified_by: none
+    notes: MRF page not yet found; check whether it shares the Point32Health host used by Tufts.
+
+  - payer_id: health-new-england
+    legal_name: Health New England, Inc.
+    aliases: [Health New England, HNE]
+    states: [MA]
+    cohorts: [borislow]
+    priority: 10
+    verified_by: none
+    notes: www.hne.com refused our research fetcher on robots.txt grounds on 2026-10-29; needs a check from the crawler host.
