@@ -22,7 +22,7 @@ jobs:
       TIC_DRIVE_FOLDER_ID: ${{ secrets.TIC_DRIVE_FOLDER_ID }}
       TIC_CONTACT_EMAIL: ${{ secrets.TIC_CONTACT_EMAIL }}
       TIC_RAW_STORE: ${{ secrets.TIC_RAW_STORE }}
-      GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
+      GOOGLE_APPLICATION_CREDENTIALS: /tmp/tic-sa.json
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
