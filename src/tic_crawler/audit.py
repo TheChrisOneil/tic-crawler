@@ -10,11 +10,11 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass, field
 from urllib.parse import urlsplit
-from urllib.robotparser import RobotFileParser
 
 import httpx
 
 from .fetch import HttpClient, detect_wall
+from .robots import RobotsRules
 
 ROBOTS_TEXT_CAP = 8000
 BODY_SNIFF_BYTES = 4096
@@ -64,7 +64,7 @@ async def audit(http: HttpClient, targets: Iterable[tuple[str, str, str]]
     """targets: (payer_id, role, url). Each origin's robots.txt is fetched once."""
     targets = [t for t in targets if t[2].lower().startswith(("https://", "http://"))]
     robots: dict[str, RobotsResult] = {}
-    parsers: dict[str, RobotFileParser | None] = {}
+    parsers: dict[str, RobotsRules | None] = {}
     client = http._client
     for _, _, url in targets:
         p = urlsplit(url)
@@ -81,17 +81,13 @@ async def audit(http: HttpClient, targets: Iterable[tuple[str, str, str]]
             if resp.status_code < 400 and not rr.wall:
                 full = await client.get(f"{origin}/robots.txt")
                 rr.text = full.text[:ROBOTS_TEXT_CAP]
-                rp = RobotFileParser()
-                rp.parse(full.text.splitlines())
-                parsers[origin] = rp
+                parsers[origin] = RobotsRules.parse(full.text)
                 rr.policy = "rules"
             elif resp.status_code >= 500:
                 parsers[origin] = None
                 rr.policy = "disallow_all"
             else:
-                rp = RobotFileParser()
-                rp.parse([])
-                parsers[origin] = rp
+                parsers[origin] = RobotsRules(allow_all=True)
                 rr.policy = "allow_all"
         except httpx.HTTPError as e:
             rr.error = f"{type(e).__name__}: {e}"[:200]

@@ -10,12 +10,12 @@ import time
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from urllib.parse import urlsplit
-from urllib.robotparser import RobotFileParser
 
 import httpx
 
 from .config import Settings
 from .models import UrlCheck
+from .robots import RobotsRules
 
 RETRY_STATUSES = {408, 425, 429, 500, 502, 503, 504}
 
@@ -104,7 +104,7 @@ class HttpClient:
         )
         self._client.headers["User-Agent"] = settings.user_agent
         self.limiter = HostRateLimiter(settings.requests_per_second_per_host, sleep=sleep)
-        self._robots: dict[str, RobotFileParser | None] = {}
+        self._robots: dict[str, RobotsRules | None] = {}
         self.robots_status: dict[str, str] = {}
         self._robots_locks: dict[str, asyncio.Lock] = {}
         self._sem = asyncio.Semaphore(max(1, settings.concurrency))
@@ -134,9 +134,8 @@ class HttpClient:
         parts = urlsplit(url)
         return self.robots_status.get(f"{parts.scheme}://{parts.netloc}", "")
 
-    async def _load_robots(self, origin: str) -> RobotFileParser | None:
+    async def _load_robots(self, origin: str) -> RobotsRules | None:
         """Fetch robots.txt with retries. Only a persistent 5xx/429/network failure disallows."""
-        rp = RobotFileParser()
         resp = None
         problem = ""
         for attempt in range(self.settings.max_retries + 1):
@@ -156,10 +155,8 @@ class HttpClient:
             return None
         self.robots_status[origin] = f"robots.txt {resp.status_code}"
         if resp.status_code >= 400:
-            rp.parse([])
-        else:
-            rp.parse(resp.text.splitlines())
-        return rp
+            return RobotsRules(allow_all=True)
+        return RobotsRules.parse(resp.text)
 
     def _backoff(self, attempt: int) -> float:
         base = self.settings.backoff_base_seconds * (2**attempt)
