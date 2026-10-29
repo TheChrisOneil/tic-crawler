@@ -97,6 +97,8 @@ def load_seed_file(path: Path) -> list[Payer]:
                 aliases=list(entry.get("aliases", [])),
                 sources=["seed"],
                 notes=entry.get("notes", ""),
+                cohorts=list(entry.get("cohorts", [])),
+                priority=int(entry.get("priority", 100)),
             )
         )
     return payers
@@ -265,7 +267,8 @@ def dedupe_payers(payers: list[Payer]) -> list[Payer]:
             for f in ("landing_url", "toc_url", "toc_link_pattern", "toc_file", "notes"):
                 if not getattr(base, f) and getattr(other, f):
                     setattr(base, f, getattr(other, f))
-            for f in ("hios_ids", "states", "aliases", "sources"):
+            base.priority = min(base.priority, other.priority)
+            for f in ("hios_ids", "states", "aliases", "sources", "cohorts"):
                 cur = getattr(base, f)
                 cur.extend(v for v in getattr(other, f) if v not in cur)
             if normalize_name(other.legal_name) != normalize_name(base.legal_name):

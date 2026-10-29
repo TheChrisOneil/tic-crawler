@@ -120,6 +120,7 @@ def build(settings: Settings, state: StateStore, payers: dict[str, Payer], today
         status = r.get("status", "never")
         rows.append({
             "payer_id": pid, "legal_name": p.legal_name, "kind": p.kind, "states": p.states,
+            "cohorts": p.cohorts, "priority": p.priority,
             "landing_url": p.landing_url, "toc_url": r.get("toc_url") or p.toc_url,
             "has_toc_source": bool(p.toc_url or p.toc_link_pattern),
             "status": status, "access_status": r.get("access_status", ""),
@@ -164,6 +165,7 @@ def build(settings: Settings, state: StateStore, payers: dict[str, Payer], today
             "mrf_bytes": sum(r["total_bytes"] for r in rows),
             "schema_invalid": sum(1 for r in rows if r["schema_valid"] is False),
         },
+        "cohorts": sorted({c for r in rows for c in r["cohorts"]}),
         "payers": rows,
         "errors": errors,
         "access_audit": access,

@@ -119,11 +119,14 @@ async function overview() {
         <option value="">All statuses</option><option value="crawled">Crawled</option><option value="ok">OK</option>
         <option value="failed">Failed or skipped</option><option value="never">Not crawled</option><option value="stale">Stale</option>
       </select>
+      <select id="co" aria-label="Filter by rollout group">
+        <option value="">All rollout groups</option>${(d.cohorts || []).map((c) => `<option value="${esc(c)}">${esc(c)}</option>`).join("")}
+      </select>
     </div>
     <div id="tbl"></div>
     <p class="note">Freshness is the TOC's own <code>last_updated_on</code>. Bytes are the sum of Content-Length from HEAD checks; raw files are not downloaded.</p>`;
   const cols = [
-    { key: "legal_name", label: "Payer", render: (p) => `<a href="#/payer/${encodeURIComponent(p.payer_id)}">${esc(p.legal_name)}</a><div class="muted mono">${esc(p.payer_id)}</div>` },
+    { key: "legal_name", label: "Payer", render: (p) => `<a href="#/payer/${encodeURIComponent(p.payer_id)}">${esc(p.legal_name)}</a><div class="muted mono">${esc(p.payer_id)}${(p.cohorts || []).map((c) => ` <span class="badge b-idle">${esc(c)}</span>`).join("")}</div>` },
     { key: "status", label: "Status", render: (p) => statusBadge(p.status) },
     { key: "toc_last_updated_on", label: "TOC updated", render: fresh, sort: (p) => p.age_days },
     { key: "last_crawled", label: "Last crawled", render: (p) => esc((p.last_crawled || "").slice(0, 10)) },
@@ -138,7 +141,9 @@ async function overview() {
   const apply = () => {
     const q = document.getElementById("q").value.toLowerCase();
     const st = document.getElementById("st").value;
+    const co = document.getElementById("co").value;
     tb.update(d.payers.filter((p) => {
+      if (co && !(p.cohorts || []).includes(co)) return false;
       const hay = `${p.legal_name} ${p.payer_id} ${(p.states || []).join(" ")} ${p.toc_url} ${p.landing_url}`.toLowerCase();
       if (q && !hay.includes(q)) return false;
       if (st === "crawled") return p.status !== "never";
@@ -151,6 +156,7 @@ async function overview() {
   };
   document.getElementById("q").oninput = apply;
   document.getElementById("st").onchange = apply;
+  document.getElementById("co").onchange = apply;
 }
 
 async function payerView(id) {

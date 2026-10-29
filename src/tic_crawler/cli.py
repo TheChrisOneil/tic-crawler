@@ -95,7 +95,8 @@ def crawl(
         if toc_file:
             targets[0].toc_file = str(toc_file)
     else:
-        targets = [p for p in known.values() if p.toc_url or p.toc_link_pattern or p.toc_file]
+        targets = sorted((p for p in known.values() if p.toc_url or p.toc_link_pattern or p.toc_file),
+                         key=lambda p: (p.priority, p.payer_id))
     run_args = {"payers": sorted(p.payer_id for p in targets), "raw": download_raw, "force": force}
     run_id, resumed = state.open_run(run_args)
     done = state.done_payers(run_id)

@@ -4,6 +4,7 @@
 #         toc_url (literal, or a pattern like https://x/{date:%Y-%m}-01_index.json),
 #         toc_link_pattern (regex for TOC links on landing_url when names change monthly),
 #         toc_file (a TOC saved by hand under manual_tocs/, for sites that block bots),
+#         cohorts (rollout groups, e.g. [borislow]), priority (lower crawls first; default 100),
 #         verified_on, verified_by, notes.
 #
 # verified_by:

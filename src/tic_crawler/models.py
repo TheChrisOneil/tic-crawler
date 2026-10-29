@@ -23,6 +23,9 @@ class Payer:
     aliases: list[str] = field(default_factory=list)
     sources: list[str] = field(default_factory=list)
     notes: str = ""
+    # Rollout groups this payer matters to (e.g. "borislow"); lower priority crawls first.
+    cohorts: list[str] = field(default_factory=list)
+    priority: int = 100
 
     def to_dict(self) -> dict:
         return asdict(self)
