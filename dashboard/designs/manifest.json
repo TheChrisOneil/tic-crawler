@@ -1,1 +1,6 @@
-[]
+[
+  {"slug": "patient-report", "title": "Shopping care with TiC rates", "summary": "Research report: which patient questions the price files can answer, use cases, existing tools, product concepts, and what the crawler would need next.", "path": "patient-report/"},
+  {"slug": "shop-a-scan", "title": "Shop one scan", "summary": "Concept: pick your plan, a service and your ZIP, enter your deductible, and see nearby in-network sites ranked by what you would pay.", "path": "shop-a-scan/"},
+  {"slug": "check-my-bill", "title": "Check my bill", "summary": "Concept: compare the allowed amount on your Explanation of Benefits with the rate your insurer posted, and get a ready-to-send question if they differ.", "path": "check-my-bill/"},
+  {"slug": "plan-picker", "title": "Open enrollment plan picker", "summary": "Concept: estimate a full year's cost for each plan your employer offers, using your own doctors' rates and the care you expect.", "path": "plan-picker/"}
+]

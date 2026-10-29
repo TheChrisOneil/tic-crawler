@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open Enrollment Plan Picker</title>
+<meta name="description" content="Design concept: estimate a full year's cost for each plan using your own doctors' rates.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../patient.css">
+<style>
+.plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.plan.best { border-color: var(--accent); }
+.plan .total { font-family: var(--display); font-size: 2rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.split { display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: var(--line); }
+.split .prem { background: var(--muted); }
+.split .care { background: var(--accent); }
+.kv { display: flex; justify-content: space-between; gap: 12px; font-size: 0.88rem; border-bottom: 1px dashed var(--line); padding-block: 3px; }
+.kv span:last-child { font-family: var(--mono); }
+td input { width: 5em; padding: 4px 6px; }
+.legend { display: flex; gap: 16px; font-size: 0.8rem; color: var(--muted); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="concept-bar"><span><a href="../">← User designs</a> · Design concept with example data</span><span>Plans, premiums and rates below are made up for illustration</span></div>
+
+  <header style="display:flex;flex-direction:column;gap:8px">
+    <h1>Which plan costs me least next year?</h1>
+    <p class="muted">Your employer offers three plans. Tell us the care you expect. We price it at each plan's published rates for your doctors, apply each plan's deductible and coinsurance, and add the premium.</p>
+  </header>
+
+  <section class="panel">
+    <h2>Care you expect next year</h2>
+    <div class="tbl" style="border:0">
+      <table>
+        <thead><tr><th>Service</th><th>Your provider</th><th>Times</th><th class="num">PPO rate</th><th class="num">HMO rate</th><th class="num">HDHP rate</th></tr></thead>
+        <tbody id="care"></tbody>
+      </table>
+    </div>
+    <p class="small muted">Rates come from each plan's in-network file for the provider you picked. A dash means the provider is not in that plan's network, so you would pay the full billed price.</p>
+  </section>
+
+  <div class="legend"><span><i style="background:var(--muted)"></i>Premiums you pay</span><span><i style="background:var(--accent)"></i>Your share of care</span></div>
+  <section class="plans" id="plans"></section>
+
+  <div class="callout">
+    <h3>What this leaves out</h3>
+    <p class="small">Prescription costs, an HSA employer contribution beyond what is shown, and surprises you can't plan for. Compare the out-of-pocket maximum if a bad year worries you more than an average one.</p>
+  </div>
+</div>
+
+<script>
+const PLANS = [
+  {id: "ppo", name: "PPO 1000", premium: 2340, ded: 1000, coins: 0.2, oop: 4500, hsa: 0, note: "Broad network"},
+  {id: "hmo", name: "HMO 500", premium: 1560, ded: 500, coins: 0.1, oop: 3500, hsa: 0, note: "Referrals needed"},
+  {id: "hdhp", name: "HDHP 3300 + HSA", premium: 780, ded: 3300, coins: 0.2, oop: 6600, hsa: 750, note: "Employer adds $750 to HSA"}
+];
+// Example care plan; billed is the out-of-network list price used when a provider is out of network.
+const CARE = [
+  {svc: "Primary care visit (99214)", prov: "Dr. A. Patel, Family Medicine", n: 3, billed: 310, rates: {ppo: 142, hmo: 128, hdhp: 142}},
+  {svc: "Specialist visit (99214)", prov: "Dr. L. Moreno, Rheumatology", n: 4, billed: 380, rates: {ppo: 168, hmo: null, hdhp: 168}},
+  {svc: "Knee MRI (73721)", prov: "Lakeside Imaging Center", n: 1, billed: 2900, rates: {ppo: 455, hmo: 430, hdhp: 455}},
+  {svc: "Physical therapy (97110)", prov: "Core PT Studio", n: 12, billed: 120, rates: {ppo: 38, hmo: 34, hdhp: 38}},
+  {svc: "Lab panel (80053)", prov: "Metro Lab Services", n: 2, billed: 95, rates: {ppo: 12, hmo: 10, hdhp: 12}}
+];
+const $ = (id) => document.getElementById(id);
+const fmt = (n) => "$" + Math.round(n).toLocaleString("en-US");
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+$("care").innerHTML = CARE.map((c, i) => `<tr>
+  <td>${esc(c.svc)}</td><td>${esc(c.prov)}</td>
+  <td><label class="small" for="n${i}" style="display:none">Times for ${esc(c.svc)}</label><input id="n${i}" type="number" min="0" value="${c.n}"></td>
+  ${PLANS.map((p) => `<td class="num">${c.rates[p.id] == null ? '<span class="no">—</span>' : fmt(c.rates[p.id])}</td>`).join("")}
+</tr>`).join("");
+
+function yearCost(p) {
+  let inNet = 0, outNet = 0;
+  CARE.forEach((c, i) => {
+    const n = Math.max(0, +$("n" + i).value || 0), r = c.rates[p.id];
+    if (r == null) outNet += n * c.billed; else inNet += n * r;
+  });
+  const dedPart = Math.min(inNet, p.ded);
+  const care = Math.min(dedPart + p.coins * (inNet - dedPart), p.oop) + outNet;
+  return {inNet, outNet, care, total: p.premium + care - p.hsa};
+}
+function render() {
+  const rows = PLANS.map((p) => ({p, ...yearCost(p)}));
+  const best = Math.min(...rows.map((r) => r.total)), max = Math.max(...rows.map((r) => r.gross = r.p.premium + r.care));
+  $("plans").innerHTML = rows.map((r) => `
+    <article class="panel plan${r.total === best ? " best" : ""}">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:start"><h2>${esc(r.p.name)}</h2>${r.total === best ? '<span class="pill yes">Lowest for you</span>' : ""}</div>
+      <p class="small muted">${esc(r.p.note)}</p>
+      <div><div class="total">${fmt(r.total)}</div><div class="small muted">estimated total for the year</div></div>
+      <div class="split" aria-hidden="true" style="width:${(r.gross / max * 100).toFixed(1)}%"><div class="prem" style="flex:${r.p.premium}"></div><div class="care" style="flex:${r.care}"></div></div>
+      <div>
+        <div class="kv"><span>Premiums</span><span>${fmt(r.p.premium)}</span></div>
+        <div class="kv"><span>Your share of care</span><span>${fmt(r.care)}</span></div>
+        ${r.p.hsa ? `<div class="kv"><span>Employer HSA deposit</span><span class="yes">−${fmt(r.p.hsa)}</span></div>` : ""}
+        ${r.outNet ? `<div class="kv"><span class="no">Out of network</span><span class="no">${fmt(r.outNet)}</span></div>` : ""}
+        <div class="kv"><span>Deductible · coinsurance</span><span>${fmt(r.p.ded)} · ${r.p.coins * 100}%</span></div>
+        <div class="kv"><span>Worst case (OOP max + premium)</span><span>${fmt(r.p.oop + r.p.premium - r.p.hsa)}</span></div>
+      </div>
+    </article>`).join("");
+}
+document.querySelector("table").addEventListener("input", render);
+render();
+</script>
+</body>
+</html>

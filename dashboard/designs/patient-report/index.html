@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shopping Care With TiC Rates</title>
+<meta name="description" content="How patients could use Transparency in Coverage rate files to choose care.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single readable column, like a well-made explainer, with wide tables and the worked example set off as "claim forms". */
+:root {
+  --bg: #f6f8f8;
+  --surface: #ffffff;
+  --fg: #172426;
+  --muted: #55686b;
+  --line: #d5dfe0;
+  --accent: #0b6870;
+  --accent-soft: #e1f0f0;
+  --yes: #1d7a3f;
+  --part: #9a6a00;
+  --no: #a8322d;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1718; --surface: #162123; --fg: #e3ecec; --muted: #9db0b2; --line: #2a3a3c;
+  --accent: #5cc3c9; --accent-soft: #173638; --yes: #6fcf8d; --part: #e3b44f; --no: #f08a83; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1718; --surface: #162123; --fg: #e3ecec; --muted: #9db0b2; --line: #2a3a3c;
+  --accent: #5cc3c9; --accent-soft: #173638; --yes: #6fcf8d; --part: #e3b44f; --no: #f08a83; color-scheme: dark }
+
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 48px 80px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 56px; }
+section { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.6rem; font-weight: 700; }
+h3 { font-size: 1.1rem; font-weight: 500; }
+p, ul, ol { margin: 0; max-width: 68ch; }
+ul, ol { padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+.eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.lede { font-size: 1.15rem; color: var(--fg); }
+.meta { color: var(--muted); font-size: 0.9rem; }
+a { color: var(--accent); }
+code, .mono { font-family: var(--mono); font-size: 0.88em; }
+.callout { background: var(--accent-soft); border-radius: 6px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+.callout p, .callout ul { max-width: none; }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 0.93rem; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { font-family: var(--mono); font-weight: 500; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+.pill { display: inline-block; font-family: var(--mono); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+.yes { color: var(--yes); } .part { color: var(--part); } .no { color: var(--no); }
+.claim { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+.claim > div { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.row { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px dashed var(--line); padding-block: 4px; font-variant-numeric: tabular-nums; }
+.row span:last-child { font-family: var(--mono); }
+.row.total { border-bottom: 0; font-weight: 600; color: var(--accent); }
+.note { font-size: 0.85rem; color: var(--muted); }
+.concepts { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+.concept { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 18px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.concept p { font-size: 0.93rem; }
+.concept .tag { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
+.formula { font-family: var(--mono); font-size: 0.92rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; overflow-x: auto; white-space: pre; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 0; }
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+.backbar { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+<div class="backbar"><a href="../">← User designs</a> · <a href="../../">Payer registry</a></div>
+
+<header style="display:flex;flex-direction:column;gap:14px">
+  <div class="eyebrow">Exploration · Transparency in Coverage</div>
+  <h1>Can patients use insurer price files to pick their own care?</h1>
+  <p class="lede">Yes, for a narrow and valuable slice of care, but not from the raw files. A patient needs one plan, one service, and a short list of nearby providers, translated into what they will owe. The files hold the hardest ingredient, the negotiated rate. Everything else has to be added.</p>
+  <p class="meta">Prepared 29 Oct 2026 for the tic-crawler project. Grounded in the 29 Oct dry run (BCBS Michigan, BCBS Mississippi) and in published CMS rules. Market and tool details reflect public knowledge as of mid-2026 and were not re-checked live. Dollar figures in the worked example are illustrative.</p>
+</header>
+
+<section>
+  <div class="eyebrow">Bottom line</div>
+  <h2>What this data is good for</h2>
+  <div class="callout">
+    <ul>
+      <li><strong>Best fit:</strong> planned, shoppable services where prices vary a lot between nearby providers and the patient has time to choose. Think MRI and CT scans, lab panels, colonoscopy, sleep studies, physical therapy, and outpatient surgeries such as knee arthroscopy or cataract removal.</li>
+      <li><strong>Biggest win:</strong> patients on high-deductible plans, and anyone who has not met their deductible, because they pay close to the full negotiated rate. A $450 versus $2,100 MRI is the patient's own money.</li>
+      <li><strong>Hard limits:</strong> the files say nothing about quality, wait times, or whether a doctor is taking patients. Rates are per billing code, while real episodes involve several codes and several bills. Emergencies are not shoppable.</li>
+      <li><strong>Product shape:</strong> a patient tool runs on a small, pre-built index (plan × service × provider), not on the multi-terabyte files. tic-crawler already does the first step that index needs: finding the right files for each plan.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Patient questions</div>
+  <h2>What the files can and can't answer</h2>
+  <p>Each row is a question a patient actually asks. The verdict is about TiC data alone, before joining anything else.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Patient question</th><th>TiC alone</th><th>What fills the gap</th></tr></thead>
+    <tbody>
+      <tr><td>Which in-network imaging center near me charges my plan least for a knee MRI?</td><td><span class="pill yes">Yes</span></td><td>Provider address and specialty from NPPES (the NPI registry); distance from the patient's ZIP.</td></tr>
+      <tr><td>How much will I actually pay?</td><td><span class="pill part">Partly</span></td><td>The patient's deductible, coinsurance, copay, and how much they have met so far. Only the insurer or the patient knows this.</td></tr>
+      <tr><td>Is this doctor in my network?</td><td><span class="pill part">Partly</span></td><td>A rate listed for an NPI suggests a contract, but files list NPIs under a tax ID (TIN) and can include clinicians who no longer practice there. Check the insurer's provider directory.</td></tr>
+      <tr><td>What does the whole episode cost (surgeon, facility, anesthesia, imaging)?</td><td><span class="pill part">Partly</span></td><td>An episode definition: which codes usually go together. Some contracts are bundled and appear as a single rate; most are not.</td></tr>
+      <tr><td>Which plan should I pick at open enrollment if I care about my own doctors?</td><td><span class="pill part">Partly</span></td><td>Each plan's benefit design (premium, deductible, coinsurance) from the plan's Summary of Benefits; the patient's expected services.</td></tr>
+      <tr><td>Is this provider any good?</td><td><span class="pill no">No</span></td><td>CMS Care Compare, Leapfrog safety grades, state outcome reports, specialty registries. Coverage is uneven outside hospitals.</td></tr>
+      <tr><td>Can I get an appointment soon?</td><td><span class="pill no">No</span></td><td>Scheduling data from the provider. Not public.</td></tr>
+      <tr><td>Was my bill right?</td><td><span class="pill yes">Yes</span></td><td>The patient's own Explanation of Benefits. Compare its allowed amount to the posted rate for that code and provider.</td></tr>
+      <tr><td>What will out-of-network care cost me?</td><td><span class="pill part">Partly</span></td><td>Allowed-amount files show historical out-of-network payments, but only where a payer had 20 or more claims for that code and provider, so most are near-empty.</td></tr>
+      <tr><td>Is paying cash cheaper than using insurance?</td><td><span class="pill part">Partly</span></td><td>The provider's cash price, from hospital price transparency files or by asking. Cash payments may not count toward the deductible.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <div class="eyebrow">The core calculation</div>
+  <h2>From negotiated rate to “what I'll pay”</h2>
+  <p>The number in the file is what the insurer and provider agreed the service is worth. The patient's bill depends on where they are in their plan year. A tool has to do this math, and has to be honest that it is an estimate.</p>
+  <div class="formula">deductible_part = min(rate, deductible_remaining)
+after_deductible = rate − deductible_part
+patient_owes     = deductible_part + coinsurance × after_deductible   (or the copay, if the service has one)
+patient_owes     = min(patient_owes, out_of_pocket_max_remaining)</div>
+  <div class="claim">
+    <div>
+      <h3>Knee MRI, CPT 73721 · Imaging center A</h3>
+      <div class="row"><span>Negotiated rate</span><span>$450</span></div>
+      <div class="row"><span>Deductible remaining</span><span>$2,000</span></div>
+      <div class="row"><span>Applied to deductible</span><span>$450</span></div>
+      <div class="row total"><span>Patient pays</span><span>$450</span></div>
+    </div>
+    <div>
+      <h3>Same scan · Hospital outpatient B</h3>
+      <div class="row"><span>Negotiated rate</span><span>$2,100</span></div>
+      <div class="row"><span>Deductible remaining</span><span>$2,000</span></div>
+      <div class="row"><span>Deductible + 20% of $100</span><span>$2,000 + $20</span></div>
+      <div class="row total"><span>Patient pays</span><span>$2,020</span></div>
+    </div>
+  </div>
+  <p class="note">Illustrative figures, not taken from the BCBS files. The gap between freestanding imaging centers and hospital outpatient departments for the same scan is one of the most consistent patterns in published price-transparency research. Once the deductible is met, the same choice saves this patient 20% of the difference instead of all of it, which is why the tool matters most early in the plan year.</p>
+</section>
+
+<section>
+  <div class="eyebrow">Use cases</div>
+  <h2>Where patients would use it</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Moment</th><th>Who</th><th>What the tool does</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Referred for imaging, labs, or a scope</td><td>Anyone with a deductible</td><td>Lists in-network sites within N miles, sorted by estimated out-of-pocket cost, with a quality flag where one exists.</td><td><span class="pill yes">High</span></td></tr>
+      <tr><td>Planning a surgery or a birth</td><td>HDHP and HSA holders</td><td>Builds an episode estimate from the usual codes; shows which parts can be chosen (facility, anesthesia group) and which can't.</td><td><span class="pill yes">High</span></td></tr>
+      <tr><td>Open enrollment</td><td>Employees choosing between 2–4 plans</td><td>Takes "my doctors and my likely services" and estimates total yearly cost per plan: premium plus expected out-of-pocket.</td><td><span class="pill yes">High</span></td></tr>
+      <tr><td>A bill arrives</td><td>Anyone</td><td>Checks the EOB allowed amount against the posted rate and drafts an appeal or a question to the insurer when they differ.</td><td><span class="pill part">Medium</span></td></tr>
+      <tr><td>Choosing ongoing care (PT, therapy, dialysis)</td><td>Chronic and repeat users</td><td>Compares per-visit rates, which multiply over many visits.</td><td><span class="pill part">Medium</span></td></tr>
+      <tr><td>Emergency or urgent care</td><td>Anyone</td><td>Little. The No Surprises Act already limits what patients owe for emergency and certain out-of-network care.</td><td><span class="pill no">Low</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <div class="eyebrow">From the dry run</div>
+  <h2>What the files look like up close</h2>
+  <p>The 29 Oct crawl gives a feel for the raw material. BCBS Michigan's two tables of contents pointed to <span class="mono">812</span> files totaling about <span class="mono">188 GB</span> (518 files in the employer TOC, 294 in the group TOC). Run 1 also catalogued BCBS Mississippi, bringing the referenced in-network data to roughly 293 GB for just two Blues plans. A national carrier is far larger.</p>
+  <ul>
+    <li><strong>Scale is the first problem.</strong> No patient app can read these files live. They have to be parsed once per month into a compact index. Most of the bytes are repeated provider lists and rates for codes a patient would never shop for.</li>
+    <li><strong>Plans are grouped coarsely.</strong> One in-network file covers many plans (the manifest keeps up to 50 plan names per file). A patient knows their plan's name or the ID on their card; matching that to a file is a real UX step, and tic-crawler's manifest is the lookup table for it.</li>
+    <li><strong>Payers bend the spec.</strong> BCBS Michigan writes <span class="mono">HIOS</span>, <span class="mono">EIN</span> and <span class="mono">Group</span> where the schema requires lower case, which failed validation 43 and 10 times. Harmless here, but a sign that every payer will need its own cleanup rules.</li>
+    <li><strong>Out-of-network data is thin.</strong> The BCBS Michigan PPO allowed-amounts file is 170 KB against tens of gigabytes of in-network rates, because of the 20-claim reporting threshold.</li>
+    <li><strong>Some files are off limits.</strong> BCBS Mississippi's TOCs are disallowed by robots.txt and BCBS Kansas returned 403. A patient product needs a coverage map so it can say "we don't have your plan" instead of showing nothing.</li>
+  </ul>
+  <h3>Known quality hazards inside the rates</h3>
+  <ul>
+    <li><strong>Ghost rates:</strong> contracts list every code for every clinician under a tax ID, so a dermatologist may "have" a rate for cardiac surgery. Filter rates by the provider's specialty and by codes they plausibly bill.</li>
+    <li><strong>Non-dollar arrangements:</strong> some rates are a percent of billed charges or "derived" amounts, which can't be turned into a patient price without the provider's chargemaster.</li>
+    <li><strong>Place of service:</strong> the same code has different professional and facility rates. An estimate for a hospital visit must add the facility fee.</li>
+    <li><strong>Freshness:</strong> files are monthly. CMS-9882-F adds quarterly update requirements from March 2027, which helps with directory churn.</li>
+  </ul>
+</section>
+
+<section>
+  <div class="eyebrow">Landscape</div>
+  <h2>What already exists</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Tool</th><th>What it is</th><th>Gap a new tool could fill</th></tr></thead>
+    <tbody>
+      <tr><td>Insurer cost estimators</td><td>Required by the TiC rule for all covered items and services since 1 Jan 2024. They know the member's deductible status.</td><td>Hidden behind a member login, one payer at a time, often hard to use, and no help comparing plans at open enrollment.</td></tr>
+      <tr><td>Turquoise Health</td><td>Search across hospital and payer price files, with a free consumer site and paid data products.</td><td>Mostly shows rates, not a personal out-of-pocket estimate, and is built around facilities.</td></tr>
+      <tr><td>Healthcare Bluebook, other employer navigators</td><td>Sold to employers; steers members to "fair price" providers, sometimes with rewards.</td><td>Only for people whose employer buys it.</td></tr>
+      <tr><td>Data vendors (Serif Health, Payerset and similar)</td><td>Clean, normalized TiC datasets for analysts and companies.</td><td>Business-facing. They show the cleanup is possible, and may be cheaper to license than to rebuild.</td></tr>
+      <tr><td>Hospital price transparency files</td><td>A separate CMS rule: hospitals post negotiated rates and cash prices.</td><td>Hospitals only, uneven compliance. Useful for the cash-price comparison.</td></tr>
+      <tr><td>Good Faith Estimates</td><td>Under the No Surprises Act, uninsured and self-pay patients can get a written estimate in advance.</td><td>The Advanced EOB for insured patients is still not in force, so insured patients have no equivalent.</td></tr>
+      <tr><td>Care Compare, Leapfrog</td><td>Public quality ratings for hospitals, some clinicians and facilities.</td><td>Not joined to price anywhere a patient would naturally look.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <div class="eyebrow">Product concepts</div>
+  <h2>Five ideas, most feasible first</h2>
+  <div class="concepts">
+    <div class="concept">
+      <h3>Shop one scan</h3>
+      <span class="tag">Feasible now · narrow scope</span>
+      <p>Pick your plan, ZIP, and one of ~30 shoppable services. See in-network sites ranked by estimated cost after you enter your deductible. Start with one state and imaging plus labs, where ghost rates are rare and savings are large.</p>
+    </div>
+    <div class="concept">
+      <h3>Check my bill</h3>
+      <span class="tag">Feasible now · small data need</span>
+      <p>Type or photograph the codes and allowed amounts from an EOB; the tool compares them to the posted rate for that provider and drafts a question to the insurer. Needs only the rate lookup, not distance or quality.</p>
+    </div>
+    <div class="concept">
+      <h3>Open enrollment calculator</h3>
+      <span class="tag">Medium · seasonal, high value</span>
+      <p>For an employer with several plans: "my doctors plus a typical year for me" gives a total-cost estimate per plan. Needs plan-to-file matching (tic-crawler's manifest) and benefit details from each plan's Summary of Benefits.</p>
+    </div>
+    <div class="concept">
+      <h3>Referral helper for clinicians</h3>
+      <span class="tag">Medium · reaches patients at the decision</span>
+      <p>The patient often picks where to go at the moment a doctor writes the referral. A list of lower-cost in-network sites for the patient's plan, handed over at that point, reaches more people than a website they have to find.</p>
+    </div>
+    <div class="concept">
+      <h3>Price plus quality map</h3>
+      <span class="tag">Harder · biggest promise</span>
+      <p>Join rates to Care Compare and Leapfrog so patients see cost and quality together. Quality data covers hospitals well and outpatient clinics poorly, so this works first for surgery and childbirth.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Design principles</div>
+  <h2>UX lessons for a patient-facing tool</h2>
+  <ul>
+    <li>Ask for the plan first, in the patient's words: insurer, plan name from the card, or employer. Everything else depends on it.</li>
+    <li>Use plain service names ("MRI of the knee") and map them to codes behind the scenes. Patients don't know CPT codes, and many shoppable services span several.</li>
+    <li>Show a range and a confidence level, never a single precise dollar figure. Say what is included and what is not, such as facility fees.</li>
+    <li>Keep deductible and spending inputs on the patient's device. That keeps the tool free of member data, which matches tic-crawler's own rule.</li>
+    <li>Tell the patient to confirm network status with the insurer before booking, and say plainly when their plan isn't covered.</li>
+    <li>Lead with a cheaper option that is close and well rated. Price alone pushes people toward places they don't trust.</li>
+  </ul>
+</section>
+
+<section>
+  <div class="eyebrow">Where tic-crawler fits</div>
+  <h2>What it would take from here</h2>
+  <p>tic-crawler today answers "which files cover which plans, and are they reachable." A patient tool needs four more layers. None of them are built, and each would need the owner's sign-off because they mean new storage and more than 10 GB per run.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Layer</th><th>Job</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Discovery and manifest</td><td>Find TOCs, map plans to in-network files, track changes.</td><td><span class="pill yes">Exists</span></td></tr>
+      <tr><td>Streaming parser and slim index</td><td>Read each in-network file once a month and keep only shoppable codes, as plan × code × NPI × rate. Raw files go to GCS, never Drive.</td><td><span class="pill no">Not built</span></td></tr>
+      <tr><td>Provider enrichment</td><td>Join NPPES for name, address, specialty; drop ghost rates by specialty.</td><td><span class="pill no">Not built</span></td></tr>
+      <tr><td>Quality join</td><td>Attach Care Compare and Leapfrog where they exist.</td><td><span class="pill no">Not built</span></td></tr>
+      <tr><td>Estimate engine and UI</td><td>Deterministic cost math from patient-entered benefits; plain-language service picker.</td><td><span class="pill no">Not built</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout">
+    <p><strong>Cheapest real test:</strong> take one BCBS Michigan in-network file, extract rates for about ten imaging and lab codes, join NPPES, and see whether the price spread across Michigan sites is large and believable. That single file answers whether the "Shop one scan" idea is worth building, for the cost of one download.</p>
+  </div>
+</section>
+
+<hr>
+<p class="meta">Sources: CMS Transparency in Coverage final rule (CMS-9915-F) and price-transparency-guide v2.2.1; CMS-9882-F as noted in the project's CLAUDE.md; No Surprises Act provisions on Good Faith Estimates; tic-crawler dry-run outputs from 29 Oct 2026. Product descriptions of third-party tools are general and should be checked before any decision.</p>
+
+</div>
+
+</body>
+</html>
