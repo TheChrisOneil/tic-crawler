@@ -7,7 +7,6 @@ CAPTCHA pages). Results feed the dashboard and the robots/accessibility assessme
 
 from __future__ import annotations
 
-import re
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass, field
 from urllib.parse import urlsplit
@@ -15,17 +14,10 @@ from urllib.robotparser import RobotFileParser
 
 import httpx
 
-from .fetch import HttpClient
+from .fetch import HttpClient, detect_wall
 
 ROBOTS_TEXT_CAP = 8000
 BODY_SNIFF_BYTES = 4096
-WALL_MARKERS = (
-    ("cloudflare_challenge",
-     re.compile(r"attention required!? \| cloudflare|just a moment\.\.\.|cf-chl", re.I)),
-    ("akamai_block", re.compile(r"access denied.*reference #|errors\.edgesuite\.net", re.I | re.S)),
-    ("captcha", re.compile(r"captcha|are you a robot|verify you are human", re.I)),
-    ("incapsula", re.compile(r"incapsula|_incap_", re.I)),
-)
 OTHER_AGENTS = ("*", "Googlebot", "GPTBot", "CCBot")
 
 
@@ -54,18 +46,6 @@ class UrlProbe:
     wall: str = ""
     error: str = ""
     verdict: str = ""  # accessible | robots_blocked | bot_wall | http_error | unreachable
-
-
-def detect_wall(resp: httpx.Response, body: bytes) -> str:
-    if resp.headers.get("cf-mitigated", "").lower() == "challenge":
-        return "cloudflare_challenge"
-    text = body[:BODY_SNIFF_BYTES].decode("utf-8", "replace")
-    for name, rx in WALL_MARKERS:
-        if rx.search(text):
-            return name
-    if resp.status_code in (403, 429) and "cloudflare" in resp.headers.get("server", "").lower():
-        return "cloudflare_block"
-    return ""
 
 
 async def _get_sniff(client: httpx.AsyncClient, url: str, headers: dict | None = None

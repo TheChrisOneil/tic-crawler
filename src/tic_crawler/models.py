@@ -17,6 +17,8 @@ class Payer:
     toc_url: str = ""
     # Regex for TOC links on landing_url, for payers whose TOC name changes each month.
     toc_link_pattern: str = ""
+    # A TOC saved by hand (repo-relative path) for payers whose site blocks automated access.
+    toc_file: str = ""
     kind: str = "issuer"  # issuer | tpa
     aliases: list[str] = field(default_factory=list)
     sources: list[str] = field(default_factory=list)
@@ -72,7 +74,10 @@ class ValidationReport:
 @dataclass
 class PayerResult:
     payer_id: str
-    status: str = "pending"  # ok | unchanged | failed | skipped
+    status: str = "pending"  # ok | unchanged | failed | skipped | deferred (retry next run)
+    # ok | manual | robots_disallow | robots_unreachable | waf_blocked | http_error | network_error
+    # | no_toc_url | too_large | parse_error
+    access_status: str = ""
     toc_url: str = ""
     toc_sha256: str = ""
     toc_bytes: int = 0

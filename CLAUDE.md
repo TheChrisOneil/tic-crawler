@@ -45,6 +45,11 @@ Read this before changing the code.
   `dashboard/app.js` together.
 - robots.txt: retried with backoff; only a persistent 5xx/429/network failure counts as disallow
   (RFC 9309), and the reason is recorded so the dashboard can tell "unreachable" from "disallowed".
+- Access outcomes are typed (`PayerResult.access_status`): ok, manual, robots_disallow,
+  robots_unreachable, waf_blocked, http_error, network_error, no_toc_url, too_large. Unreachable
+  robots.txt, network errors, 408/429 and 5xx set status `deferred` (retried next run, previous
+  counts kept); explicit disallow and WAF blocks fail. Never try to get past a WAF or challenge;
+  use a hand-saved TOC (`toc_file`, `verified_by: manual`) instead.
 - Payer requests are GitHub issues (template `payer-request.yml`); the probe workflow only reads
   public URLs and comments. It never edits seeds.
 

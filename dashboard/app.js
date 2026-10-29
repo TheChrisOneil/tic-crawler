@@ -7,6 +7,11 @@ const app = document.getElementById("app");
 const cache = { data: null, payers: {} };
 
 // ---------- helpers ----------
+const ACCESS = {
+  ok: "OK", manual: "Manual TOC", robots_disallow: "robots.txt disallows", robots_unreachable: "robots.txt unreachable",
+  waf_blocked: "Bot wall / WAF", http_error: "HTTP error", network_error: "Network error", no_toc_url: "No TOC URL known",
+  too_large: "TOC too large", invalid_url: "Not a URL",
+};
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const num = (n) => (n == null || n === "" ? "" : Number(n).toLocaleString());
 function bytes(n) {
@@ -17,8 +22,8 @@ function bytes(n) {
   return `${v.toFixed(v >= 100 || i === 0 ? 0 : 1)} ${u[i]}`;
 }
 const statusBadge = (s) => {
-  const cls = { ok: "b-ok", unchanged: "b-ok", failed: "b-bad", skipped: "b-warn", never: "b-idle" }[s] || "b-idle";
-  const label = s === "never" ? "not crawled" : s;
+  const cls = { ok: "b-ok", unchanged: "b-ok", failed: "b-bad", skipped: "b-warn", deferred: "b-warn", never: "b-idle" }[s] || "b-idle";
+  const label = s === "never" ? "not crawled" : s === "deferred" ? "retry next run" : s;
   return `<span class="badge ${cls}">${esc(label)}</span>`;
 };
 const verdictBadge = (v) => {
@@ -102,7 +107,7 @@ async function overview() {
   const t = d.totals;
   const tiles = [
     ["Payers tracked", num(t.payers)], ["With a TOC source", num(t.with_toc_source)],
-    ["Crawled OK", num(t.ok)], ["Failed", num(t.failed)], ["Stale TOCs", num(t.stale)],
+    ["Crawled OK", num(t.ok)], ["Failed", num(t.failed)], ["Retry next run", num(t.deferred || 0)], ["Stale TOCs", num(t.stale)],
     ["MRF files", num(t.mrf_urls)], ["MRF bytes (HEAD)", bytes(t.mrf_bytes)], ["Schema-invalid TOCs", num(t.schema_invalid)],
   ];
   app.innerHTML = `
@@ -125,7 +130,7 @@ async function overview() {
     { key: "mrf_count", label: "MRF files", num: true, render: (p) => num(p.mrf_count) },
     { key: "total_bytes", label: "Bytes", num: true, render: (p) => bytes(p.total_bytes) },
     { key: "schema_valid", label: "Schema", render: validBadge, sort: (p) => p.validation_errors },
-    { key: "error", label: "Last error", render: (p) => `<div class="clip muted" title="${esc(p.error)}">${esc(p.error)}</div>` },
+    { key: "error", label: "Last error", render: (p) => `${p.access_status && p.access_status !== "ok" ? `<span class="badge b-idle">${esc(ACCESS[p.access_status] || p.access_status)}</span> ` : ""}<div class="clip muted" title="${esc(p.error)}">${esc(p.error)}</div>` },
   ];
   const tb = table(document.getElementById("tbl"), d.payers, cols, {
     sort: "total_bytes", dir: -1, onclick: (id) => location.hash = `#/payer/${encodeURIComponent(id)}`, rowId: (p) => p.payer_id,
@@ -138,7 +143,7 @@ async function overview() {
       if (q && !hay.includes(q)) return false;
       if (st === "crawled") return p.status !== "never";
       if (st === "ok") return p.status === "ok" || p.status === "unchanged";
-      if (st === "failed") return p.status === "failed" || p.status === "skipped";
+      if (st === "failed") return ["failed", "skipped", "deferred"].includes(p.status);
       if (st === "never") return p.status === "never";
       if (st === "stale") return p.stale;
       return true;
@@ -259,9 +264,14 @@ async function errorsView() {
   const payerName = Object.fromEntries(d.payers.map((p) => [p.payer_id, p.legal_name]));
   const byCause = {};
   acc.forEach((e) => {
-    const cause = /robots\.txt (unreachable|unavailable)/.test(e.error) ? "robots.txt unreachable"
-      : e.error.includes("robots") ? "robots.txt disallows" : /\b403\b|cloudflare/i.test(e.error) ? "HTTP 403 / bot wall"
-      : /404/.test(e.error) ? "HTTP 404" : e.error === "invalid_url" ? "Not a URL" : e.error === "no_toc_url" ? "No TOC URL known" : "Other";
+    let cause = e.access_status ? (ACCESS[e.access_status] || e.access_status) : null;
+    if (!cause) {
+      cause = /robots\.txt (unreachable|unavailable)/.test(e.error) ? ACCESS.robots_unreachable
+        : e.error.includes("robots") ? ACCESS.robots_disallow : /cloudflare|captcha|akamai/i.test(e.error) ? ACCESS.waf_blocked
+        : e.error === "invalid_url" ? ACCESS.invalid_url : e.error === "no_toc_url" ? ACCESS.no_toc_url
+        : /\b[45]\d\d\b/.test(String(e.status) + " " + e.error) ? ACCESS.http_error : "Other";
+    }
+    e.cause = cause;
     byCause[cause] = (byCause[cause] || 0) + 1;
   });
   app.innerHTML = `
@@ -276,8 +286,8 @@ async function errorsView() {
   const acols = [
     { key: "payer_id", label: "Payer", render: (e) => `<a href="#/payer/${encodeURIComponent(e.payer_id)}">${esc(payerName[e.payer_id] || e.payer_id)}</a>` },
     { key: "level", label: "Level", render: (e) => e.level === "payer" ? "Payer (TOC)" : `File (${esc(e.file_type)})` },
-    { key: "status", label: "Status", render: (e) => `<span class="badge b-bad">${esc(e.status ?? "")}</span>` },
-    { key: "error", label: "Error", render: (e) => `<div class="mono">${esc(e.error)}</div>` },
+    { key: "cause", label: "Cause", render: (e) => `<span class="badge ${e.status === "deferred" ? "b-warn" : "b-bad"}">${esc(e.cause)}</span>${e.status === "deferred" ? ` <span class="muted">retry next run</span>` : ""}` },
+    { key: "error", label: "Detail", render: (e) => `<div class="mono">${esc(e.error)}</div>` },
     { key: "url", label: "URL", render: (e) => `<div class="mono clip muted" title="${esc(e.url)}">${esc(e.url)}</div>` },
   ];
   const at = table(document.getElementById("atbl"), acc, acols, { sort: "level", dir: -1, empty: "No access errors." });

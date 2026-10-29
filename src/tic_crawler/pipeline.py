@@ -10,6 +10,7 @@ import asyncio
 import csv
 import hashlib
 import re
+import shutil
 import tempfile
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
@@ -36,6 +37,43 @@ MANIFEST_COLUMNS = (
 
 class SkipPayer(Exception):
     """Raised by a step to end the run for a payer without marking it failed."""
+
+    def __init__(self, message: str, access_status: str = ""):
+        super().__init__(message)
+        self.access_status = access_status
+
+
+class AccessProblem(Exception):
+    """The TOC could not be reached. `deferred` problems are retried on the next run."""
+
+    # Most specific first: when several candidate URLs fail, the first match here wins.
+    PRIORITY = ("robots_disallow", "waf_blocked", "robots_unreachable", "network_error", "http_error")
+    DEFERRED = {"robots_unreachable", "network_error"}
+
+    def __init__(self, access_status: str, message: str, http_status: int | None = None):
+        super().__init__(message)
+        self.access_status = access_status
+        self.http_status = http_status
+
+    @property
+    def deferred(self) -> bool:
+        if self.access_status in self.DEFERRED:
+            return True
+        return self.access_status == "http_error" and (self.http_status in (408, 429)
+                                                         or (self.http_status or 0) >= 500)
+
+
+def classify(exc: Exception) -> tuple[str, int | None]:
+    """Map a fetch exception to an access_status."""
+    if isinstance(exc, RobotsDisallowed):
+        return ("robots_unreachable" if exc.unreachable else "robots_disallow"), None
+    if isinstance(exc, FetchError):
+        if exc.wall:
+            return "waf_blocked", exc.status
+        if exc.status is None:
+            return "network_error", None
+        return "http_error", exc.status
+    return "network_error", None
 
 
 class TooLarge(Exception):
@@ -77,14 +115,21 @@ class CrawlPipeline:
                 if self.is_unchanged(ctx):
                     ctx.unchanged = True
                     result.status = "unchanged"
+                    result.access_status = result.access_status or "ok"
                     return result
                 await self.check_mrfs(ctx)
                 await self.after_checks(ctx)
                 self.write_outputs(ctx)
                 result.status = "ok"
+                result.access_status = result.access_status or "ok"
             except SkipPayer as e:
                 result.status = "skipped"
                 result.error = str(e)
+                result.access_status = e.access_status
+            except AccessProblem as e:
+                result.status = "deferred" if e.deferred else "failed"
+                result.access_status = e.access_status
+                result.error = str(e)[:500]
             except Exception as e:
                 result.status = "failed"
                 result.error = f"{type(e).__name__}: {e}"[:500]
@@ -111,12 +156,19 @@ class CrawlPipeline:
 
 class TocCrawlPipeline(CrawlPipeline):
     async def fetch_toc(self, ctx: CrawlContext) -> None:
+        if ctx.payer.toc_file:
+            self._use_manual_toc(ctx)
+            return
         candidates = render_toc_urls(ctx.payer.toc_url, self.today)
         if not candidates and ctx.payer.toc_link_pattern and ctx.payer.landing_url:
-            candidates = await self.scrape_toc_links(ctx.payer)
+            try:
+                candidates = await self.scrape_toc_links(ctx.payer)
+            except (RobotsDisallowed, FetchError) as e:
+                status, code = classify(e)
+                raise AccessProblem(status, f"landing page: {e}", code) from e
         if not candidates:
-            raise SkipPayer("no_toc_url")
-        errors: list[str] = []
+            raise SkipPayer("no_toc_url", "no_toc_url")
+        problems: list[AccessProblem] = []
         for url in candidates:
             path = ctx.work_dir / "toc.raw"
             try:
@@ -131,19 +183,35 @@ class TocCrawlPipeline(CrawlPipeline):
                             if size > self.settings.max_toc_bytes:
                                 raise TooLarge("TOC exceeded max_toc_bytes while streaming")
                             fh.write(chunk)
-            except RobotsDisallowed as e:
-                errors.append(f"robots_disallowed {e}")
-                continue
-            except FetchError as e:
-                errors.append(str(e))
+            except (RobotsDisallowed, FetchError) as e:
+                status, code = classify(e)
+                label = "robots_disallowed" if isinstance(e, RobotsDisallowed) else status
+                wall = f" [{e.wall}]" if isinstance(e, FetchError) and e.wall else ""
+                problems.append(AccessProblem(status, f"{label} {e}{wall}", code))
                 continue
             except TooLarge as e:
-                raise SkipPayer(f"toc_too_large: {e}") from e
+                raise SkipPayer(f"toc_too_large: {e}", "too_large") from e
             ctx.toc_path = path
             ctx.result.toc_url = url
             ctx.result.toc_bytes = size
             return
-        raise FetchError(candidates[0], None, "; ".join(errors)[:400])
+        problems.sort(key=lambda p: AccessProblem.PRIORITY.index(p.access_status))
+        top = problems[0]
+        raise AccessProblem(top.access_status, "; ".join(str(p) for p in problems)[:400], top.http_status)
+
+    def _use_manual_toc(self, ctx: CrawlContext) -> None:
+        src = Path(ctx.payer.toc_file)
+        if not src.is_file():
+            raise SkipPayer(f"manual TOC file not found: {src}", "no_toc_url")
+        size = src.stat().st_size
+        if size > self.settings.max_toc_bytes:
+            raise SkipPayer(f"toc_too_large: manual file is {size} bytes", "too_large")
+        path = ctx.work_dir / "toc.raw"
+        shutil.copyfile(src, path)
+        ctx.toc_path = path
+        ctx.result.toc_url = f"manual:{src.as_posix()}"
+        ctx.result.toc_bytes = size
+        ctx.result.access_status = "manual"
 
     async def scrape_toc_links(self, payer: Payer) -> list[str]:
         """Find TOC links on the landing page. Newest first, assuming dated names sort."""

@@ -173,3 +173,14 @@ def test_verify_seeds(env):
     assert "checked 2 urls, 1 ok" in r.output
     text = (env / "out" / "seed_verification.csv").read_text()
     assert "http_404" in text
+
+
+@respx.mock
+def test_crawl_with_manual_toc_file(env, cms_sample_bytes):
+    mock_site(cms_sample_bytes)
+    f = env / "manual.json"
+    f.write_bytes(cms_sample_bytes)
+    assert runner.invoke(cli.app, ["crawl", "--all", "--toc-file", str(f)]).exit_code != 0
+    r = runner.invoke(cli.app, ["crawl", "--payer", "nourl", "--toc-file", str(f)])
+    assert r.exit_code == 0, r.output
+    assert "1 ok" in r.output

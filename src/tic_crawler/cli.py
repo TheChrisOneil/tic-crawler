@@ -75,11 +75,15 @@ def crawl(
     all_: Annotated[bool, typer.Option("--all", help="Crawl every payer with a TOC URL")] = False,
     download_raw: Annotated[bool, typer.Option("--download-raw")] = False,
     force: Annotated[bool, typer.Option(help="Ignore TOC hash and recrawl window")] = False,
+    toc_file: Annotated[Path | None, typer.Option(
+        help="Use a TOC saved by hand instead of fetching it (one --payer only)")] = None,
     config: ConfigOpt = None,
 ) -> None:
     """Fetch, validate and catalog TOCs. Raw MRFs are only HEAD-checked unless --download-raw."""
     if not payer and not all_:
         raise typer.BadParameter("give --payer <id> or --all")
+    if toc_file and (all_ or not payer or len(payer) != 1):
+        raise typer.BadParameter("--toc-file needs exactly one --payer")
     settings = _settings(config)
     state = StateStore(settings.state_db)
     known = {p.payer_id: p for p in _payers(state, settings)}
@@ -88,8 +92,10 @@ def crawl(
         if missing:
             raise typer.BadParameter(f"unknown payer ids: {', '.join(missing)}")
         targets = [known[p] for p in payer]
+        if toc_file:
+            targets[0].toc_file = str(toc_file)
     else:
-        targets = [p for p in known.values() if p.toc_url or p.toc_link_pattern]
+        targets = [p for p in known.values() if p.toc_url or p.toc_link_pattern or p.toc_file]
     run_args = {"payers": sorted(p.payer_id for p in targets), "raw": download_raw, "force": force}
     run_id, resumed = state.open_run(run_args)
     done = state.done_payers(run_id)
@@ -128,7 +134,7 @@ async def _crawl(settings, state, targets, done, run_id, download_raw, force, al
 
 def _recent(state: StateStore, payer_id: str, days: int) -> bool:
     latest = state.latest(payer_id)
-    if not latest or latest.get("status") == "failed" or not latest.get("crawled_at"):
+    if not latest or latest.get("status") in ("failed", "deferred") or not latest.get("crawled_at"):
         return False
     crawled = datetime.strptime(latest["crawled_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
     return (datetime.now(UTC) - crawled).days < days
@@ -171,7 +177,8 @@ def registry_rows(state: StateStore, payers: dict[str, Payer]) -> list[RegistryR
             mrf_count=r.get("mrf_count") or 0,
             total_bytes=r.get("total_bytes") or 0,
             schema_valid="" if valid is None else str(bool(valid)).upper(),
-            last_error=r.get("error", "") if r.get("status") in ("failed", "skipped") else "",
+            last_error=(f"[{r.get('access_status', '')}] {r.get('error', '')}"
+                        if r.get("status") in ("failed", "skipped", "deferred") else ""),
         ))
     return rows
 

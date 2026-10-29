@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import email.utils
 import random
+import re
 import time
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
@@ -20,14 +21,40 @@ RETRY_STATUSES = {408, 425, 429, 500, 502, 503, 504}
 
 
 class RobotsDisallowed(Exception):
-    pass
+    def __init__(self, message: str, unreachable: bool = False):
+        super().__init__(message)
+        # True when robots.txt could not be read (5xx, 429, network), as opposed to a real Disallow.
+        self.unreachable = unreachable
 
 
 class FetchError(Exception):
-    def __init__(self, url: str, status: int | None, message: str = ""):
+    def __init__(self, url: str, status: int | None, message: str = "", wall: str = ""):
         super().__init__(f"{status or 'error'} {url}" + (f" ({message})" if message else ""))
         self.url = url
         self.status = status
+        self.wall = wall
+
+
+WALL_MARKERS = (
+    ("cloudflare_challenge",
+     re.compile(r"attention required!? \| cloudflare|just a moment\.\.\.|cf-chl", re.I)),
+    ("akamai_block", re.compile(r"access denied.*reference #|errors\.edgesuite\.net", re.I | re.S)),
+    ("captcha", re.compile(r"captcha|are you a robot|verify you are human", re.I)),
+    ("incapsula", re.compile(r"incapsula|_incap_", re.I)),
+)
+
+
+def detect_wall(resp: httpx.Response, body: bytes) -> str:
+    """Name the bot wall (WAF challenge or block page) a response shows, or ''."""
+    if resp.headers.get("cf-mitigated", "").lower() == "challenge":
+        return "cloudflare_challenge"
+    text = body[:4096].decode("utf-8", "replace")
+    for name, rx in WALL_MARKERS:
+        if rx.search(text):
+            return name
+    if resp.status_code in (403, 429) and "cloudflare" in resp.headers.get("server", "").lower():
+        return "cloudflare_block"
+    return ""
 
 
 class HostRateLimiter:
@@ -142,7 +169,9 @@ class HttpClient:
                     stream: bool = False) -> httpx.Response:
         """Send with robots check, rate limit and retries. Caller closes streamed responses."""
         if not await self.allowed(url):
-            raise RobotsDisallowed(f"{url} [{self.robots_reason(url)}]")
+            parts = urlsplit(url)
+            unreachable = self._robots.get(f"{parts.scheme}://{parts.netloc}") is None
+            raise RobotsDisallowed(f"{url} [{self.robots_reason(url)}]", unreachable=unreachable)
         last_exc: Exception | None = None
         for attempt in range(self.settings.max_retries + 1):
             await self.limiter.wait(_host(url))
@@ -169,7 +198,12 @@ class HttpClient:
             resp = await self._send("GET", url, stream=True)
             try:
                 if resp.status_code >= 400:
-                    raise FetchError(url, resp.status_code)
+                    body = b""
+                    async for chunk in resp.aiter_bytes():
+                        body += chunk
+                        if len(body) >= 4096:
+                            break
+                    raise FetchError(url, resp.status_code, wall=detect_wall(resp, body))
                 yield resp
             finally:
                 await resp.aclose()
@@ -178,7 +212,7 @@ class HttpClient:
         async with self._sem:
             resp = await self._send("GET", url)
         if resp.status_code >= 400:
-            raise FetchError(url, resp.status_code)
+            raise FetchError(url, resp.status_code, wall=detect_wall(resp, resp.content))
         return resp.text
 
     async def head_or_range(self, url: str) -> UrlCheck:

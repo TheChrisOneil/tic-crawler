@@ -122,7 +122,8 @@ def build(settings: Settings, state: StateStore, payers: dict[str, Payer], today
             "payer_id": pid, "legal_name": p.legal_name, "kind": p.kind, "states": p.states,
             "landing_url": p.landing_url, "toc_url": r.get("toc_url") or p.toc_url,
             "has_toc_source": bool(p.toc_url or p.toc_link_pattern),
-            "status": status, "last_crawled": r.get("crawled_at", ""),
+            "status": status, "access_status": r.get("access_status", ""),
+            "last_crawled": r.get("crawled_at", ""),
             "toc_last_updated_on": lu, "age_days": age,
             "stale": None if age is None else age > stale_days,
             "mrf_count": r.get("mrf_count") or 0, "total_bytes": r.get("total_bytes") or 0,
@@ -132,8 +133,9 @@ def build(settings: Settings, state: StateStore, payers: dict[str, Payer], today
             "url_status": dict(status_counts), "error": r.get("error", ""),
             "file_version": v.get("file_version", ""),
         })
-        if status in ("failed", "skipped"):
+        if status in ("failed", "skipped", "deferred"):
             errors["access"].append({"payer_id": pid, "level": "payer", "status": status,
+                                     "access_status": r.get("access_status", ""),
                                      "url": r.get("toc_url") or p.toc_url or p.landing_url,
                                      "error": r.get("error", "")})
         for x in mrows:
@@ -156,6 +158,7 @@ def build(settings: Settings, state: StateStore, payers: dict[str, Payer], today
             "crawled": len(crawled),
             "ok": sum(1 for r in rows if r["status"] in ("ok", "unchanged")),
             "failed": sum(1 for r in rows if r["status"] in ("failed", "skipped")),
+            "deferred": sum(1 for r in rows if r["status"] == "deferred"),
             "stale": sum(1 for r in rows if r["stale"]),
             "mrf_urls": sum(r["mrf_count"] for r in rows),
             "mrf_bytes": sum(r["total_bytes"] for r in rows),

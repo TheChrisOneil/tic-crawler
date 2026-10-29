@@ -221,3 +221,68 @@ async def test_non_https_locations_are_not_requested(settings, state, tmp_path):
     assert r.status == "ok"
     rows = list(csv.DictReader((tmp_path / "manifests/acme/2026-10-29.csv").open()))
     assert rows[0]["check_error"] == "invalid_url" and rows[0]["http_status"] == ""
+
+
+@respx.mock
+async def test_robots_unreachable_is_deferred(settings, state, tmp_path):
+    respx.get("https://mrf.example.com/robots.txt").mock(return_value=httpx.Response(503))
+    async with HttpClient(settings, sleep=no_sleep) as http:
+        r = await TocCrawlPipeline(settings, http, state, tmp_path, today=TODAY).run(payer())
+    assert r.status == "deferred" and r.access_status == "robots_unreachable"
+    state.record_result("r1", r)
+    assert state.latest("acme")["status"] == "deferred"
+
+
+@respx.mock
+async def test_explicit_disallow_fails(settings, state, tmp_path):
+    respx.get("https://mrf.example.com/robots.txt").mock(
+        return_value=httpx.Response(200, text="User-agent: *\nDisallow: /\n"))
+    async with HttpClient(settings, sleep=no_sleep) as http:
+        r = await TocCrawlPipeline(settings, http, state, tmp_path, today=TODAY).run(payer())
+    assert r.status == "failed" and r.access_status == "robots_disallow"
+
+
+@respx.mock
+async def test_cloudflare_block_is_waf(settings, state, tmp_path):
+    respx.get("https://mrf.example.com/robots.txt").mock(return_value=httpx.Response(200, text=""))
+    respx.get(TOC).mock(return_value=httpx.Response(
+        403, headers={"server": "cloudflare"}, text="<title>Attention Required! | Cloudflare</title>"))
+    async with HttpClient(settings, sleep=no_sleep) as http:
+        r = await TocCrawlPipeline(settings, http, state, tmp_path, today=TODAY).run(payer())
+    assert r.status == "failed" and r.access_status == "waf_blocked"
+    assert "cloudflare_challenge" in r.error
+
+
+@respx.mock
+async def test_server_error_is_deferred(settings, state, tmp_path):
+    respx.get("https://mrf.example.com/robots.txt").mock(return_value=httpx.Response(404))
+    respx.get(TOC).mock(return_value=httpx.Response(502))
+    async with HttpClient(settings, sleep=no_sleep) as http:
+        r = await TocCrawlPipeline(settings, http, state, tmp_path, today=TODAY).run(payer())
+    assert r.status == "deferred" and r.access_status == "http_error"
+
+
+@respx.mock
+async def test_manual_toc_file(settings, state, tmp_path, cms_sample_bytes):
+    mock_site(cms_sample_bytes)
+    f = tmp_path / "manual.json.gz"
+    f.write_bytes(gzip.compress(cms_sample_bytes))
+    p = Payer("acme", "Acme", toc_file=str(f))
+    async with HttpClient(settings, sleep=no_sleep) as http:
+        r = await TocCrawlPipeline(settings, http, state, tmp_path / "o", today=TODAY).run(p)
+    assert r.status == "ok" and r.access_status == "manual"
+    assert r.toc_url == f"manual:{f.as_posix()}" and r.mrf_count == 5
+    missing = Payer("acme", "Acme", toc_file=str(tmp_path / "nope.json"))
+    async with HttpClient(settings, sleep=no_sleep) as http:
+        r = await TocCrawlPipeline(settings, http, state, tmp_path / "o", today=TODAY).run(missing)
+    assert r.status == "skipped"
+
+
+@respx.mock
+async def test_landing_page_blocked_classified(settings, state, tmp_path):
+    respx.get("https://mrf.example.com/robots.txt").mock(
+        return_value=httpx.Response(200, text="User-agent: *\nDisallow: /tic\n"))
+    p = Payer("acme", "Acme", landing_url="https://mrf.example.com/tic", toc_link_pattern="x")
+    async with HttpClient(settings, sleep=no_sleep) as http:
+        r = await TocCrawlPipeline(settings, http, state, tmp_path, today=TODAY).run(p)
+    assert r.access_status == "robots_disallow" and r.error.startswith("landing page")

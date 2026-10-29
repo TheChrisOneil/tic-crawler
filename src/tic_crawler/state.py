@@ -122,7 +122,7 @@ class StateStore:
                 "INSERT OR REPLACE INTO run_payers(run_id, payer_id, status, result) VALUES (?,?,?,?)",
                 (run_id, result.payer_id, result.status, data),
             )
-            if result.status in ("ok", "unchanged", "failed", "skipped"):
+            if result.status in ("ok", "unchanged", "failed", "skipped", "deferred"):
                 prev = self.latest(result.payer_id)
                 sha = result.toc_sha256 or (prev or {}).get("toc_sha256")
                 merged = result.to_dict()

@@ -3,11 +3,13 @@
 # Fields: payer_id, legal_name, aliases, hios_ids, states, kind (issuer|tpa), landing_url,
 #         toc_url (literal, or a pattern like https://x/{date:%Y-%m}-01_index.json),
 #         toc_link_pattern (regex for TOC links on landing_url when names change monthly),
+#         toc_file (a TOC saved by hand under manual_tocs/, for sites that block bots),
 #         verified_on, verified_by, notes.
 #
 # verified_by:
 #   page_fetch  - landing page fetched on verified_on and the TOC link read from it.
 #   http        - URL checked by `tic-crawler verify-seeds` from the crawler host.
+#   manual      - TOC saved by hand into manual_tocs/ because the site blocks automated access.
 #   none        - not yet checked. Do not crawl until verified.
 # A payer that publishes several TOCs gets one entry per TOC.
 #
@@ -23,6 +25,7 @@ payers:
     toc_url: https://mrf.secure.bcbsks.com/api/filedownloadhttptrigger?name=table-of-contents&ext=json
     verified_on: 2026-10-29
     verified_by: page_fetch
+    notes: TOC endpoint returns a Cloudflare challenge (403) to automated clients (2026-10-29). Save it from a browser to manual_tocs/bcbs-kansas.json and set toc_file.
 
   - payer_id: bcbs-michigan-group
     legal_name: Blue Cross Blue Shield of Michigan Mutual Insurance Company
