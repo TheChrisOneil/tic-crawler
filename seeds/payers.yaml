@@ -1,0 +1,192 @@
+# TiC payer seed file. Maintained by hand.
+#
+# Fields: payer_id, legal_name, aliases, hios_ids, states, kind (issuer|tpa), landing_url,
+#         toc_url (literal, or a pattern like https://x/{date:%Y-%m}-01_index.json),
+#         toc_link_pattern (regex for TOC links on landing_url when names change monthly),
+#         verified_on, verified_by, notes.
+#
+# verified_by:
+#   page_fetch  - landing page fetched on verified_on and the TOC link read from it.
+#   http        - URL checked by `tic-crawler verify-seeds` from the crawler host.
+#   none        - not yet checked. Do not crawl until verified.
+# A payer that publishes several TOCs gets one entry per TOC.
+#
+# 2026-10-29: the build sandbox had no outbound access to payer hosts, so nothing here is
+# verified_by: http yet. Run `tic-crawler verify-seeds` and update this file.
+
+payers:
+  # --- BCBS plans with a TOC link read from the landing page --------------------------------
+  - payer_id: bcbs-kansas
+    legal_name: Blue Cross and Blue Shield of Kansas, Inc.
+    states: [KS]
+    landing_url: https://bcbsks.com/mrf
+    toc_url: https://mrf.secure.bcbsks.com/api/filedownloadhttptrigger?name=table-of-contents&ext=json
+    verified_on: 2026-10-29
+    verified_by: page_fetch
+
+  - payer_id: bcbs-michigan-group
+    legal_name: Blue Cross Blue Shield of Michigan Mutual Insurance Company
+    aliases: [Blue Cross Blue Shield of Michigan]
+    states: [MI]
+    landing_url: https://www.bcbsm.com/mrf
+    toc_url: https://bcbsm.sapphiremrfhub.com/tocs/current/blue_cross_blue_shield_of_michigan
+    verified_on: 2026-10-29
+    verified_by: page_fetch
+
+  - payer_id: bcbs-michigan-employer
+    legal_name: Blue Cross Blue Shield of Michigan (employee plan)
+    states: [MI]
+    landing_url: https://www.bcbsm.com/mrf
+    toc_url: https://bcbsm.sapphiremrfhub.com/tocs/current/blue_cross_blue_shield_of_michigan_employer
+    verified_on: 2026-10-29
+    verified_by: page_fetch
+
+  - payer_id: bcbs-mississippi
+    legal_name: Blue Cross & Blue Shield of Mississippi, A Mutual Insurance Company
+    aliases: [Blue Cross and Blue Shield of Mississippi]
+    states: [MS]
+    landing_url: https://www.bcbsms.com/about-us/transparency-in-coverage
+    toc_url: https://tcr.bcbsms.com/Table_of_Contents/Local_TOC.json
+    verified_on: 2026-10-29
+    verified_by: page_fetch
+
+  - payer_id: bcbs-mississippi-state-employees
+    legal_name: Mississippi State and School Employees' Life and Health Insurance Plan
+    kind: tpa
+    states: [MS]
+    landing_url: https://www.bcbsms.com/about-us/transparency-in-coverage
+    toc_url: https://tcr.bcbsms.com/Table_of_Contents/State_TOC.json
+    verified_on: 2026-10-29
+    verified_by: page_fetch
+    notes: Administered by BCBS Mississippi.
+
+  # --- National carriers ----------------------------------------------------------------------
+  - payer_id: centene-ambetter
+    legal_name: Centene Corporation (Ambetter)
+    aliases: [Ambetter Health]
+    landing_url: https://www.centene.com/price-transparency-files.html
+    toc_link_pattern: '/content/dam/centene/Centene%20Corporate/json/DOCUMENT/\d{4}-\d{2}-\d{2}_ambetter_index\.json'
+    verified_on: 2026-10-29
+    verified_by: page_fetch
+    notes: TOC file name carries the posting date (2026-09-28 at check time), so it is scraped.
+
+  - payer_id: centene-fidelis
+    legal_name: Centene Corporation (Fidelis Care)
+    landing_url: https://www.centene.com/price-transparency-files.html
+    toc_link_pattern: '/content/dam/centene/Centene%20Corporate/json/DOCUMENT/\d{4}-\d{2}-\d{2}_fidelis_index\.json'
+    verified_on: 2026-10-29
+    verified_by: page_fetch
+
+  - payer_id: centene-health-net
+    legal_name: Health Net, LLC
+    aliases: [Health Net]
+    landing_url: https://www.centene.com/price-transparency-files.html
+    toc_link_pattern: '/content/dam/centene/Centene%20Corporate/json/DOCUMENT/\d{4}-\d{2}-\d{2}_healthnet_index\.json'
+    verified_on: 2026-10-29
+    verified_by: page_fetch
+
+  - payer_id: qualchoice
+    legal_name: QualChoice Life and Health Insurance Company, Inc.
+    aliases: [QualChoice]
+    states: [AR]
+    landing_url: https://www.centene.com/price-transparency-files.html
+    toc_link_pattern: '/content/dam/centene/Centene%20Corporate/json/DOCUMENT/\d{4}-\d{2}-\d{2}_qualchoice_index\.json'
+    verified_on: 2026-10-29
+    verified_by: page_fetch
+    notes: Seven employer sub-index files are listed on the same page.
+
+  - payer_id: cigna
+    legal_name: Cigna Health and Life Insurance Company
+    aliases: [The Cigna Group, Cigna]
+    landing_url: https://www.cigna.com/legal/compliance/machine-readable-files
+    verified_on: 2026-10-29
+    verified_by: page_fetch
+    notes: TOC link is rendered by JavaScript ("Error fetching MRF link" in static HTML). Needs the link from a browser.
+
+  - payer_id: elevance-anthem
+    legal_name: Elevance Health, Inc. (Anthem)
+    aliases: [Anthem, Anthem Blue Cross, Anthem Blue Cross and Blue Shield]
+    landing_url: https://www.anthem.com/ca/machine-readable-file/search
+    verified_by: none
+    notes: anthem.com robots.txt disallowed the page fetch on 2026-10-29. The crawler honors robots.txt, so this needs a TOC URL on an allowed host.
+
+  - payer_id: molina
+    legal_name: Molina Healthcare, Inc.
+    landing_url: https://www.molinahealthcare.com/marketplace/oh/en-us/About/compinfo/PricingTransparency
+    verified_on: 2026-10-29
+    verified_by: page_fetch
+    notes: Per-state links read "Table of Contents Update will appear soon" at check time.
+
+  - payer_id: kaiser-colorado
+    legal_name: Kaiser Foundation Health Plan of Colorado
+    states: [CO]
+    landing_url: https://healthy.kaiserpermanente.org/front-door/machine-readable-co-federal
+    verified_on: 2026-10-29
+    verified_by: page_fetch
+    notes: No TOC link in static HTML; Kaiser says some regions have no TOC file.
+
+  - payer_id: unitedhealthcare
+    legal_name: UnitedHealthcare Insurance Company
+    aliases: [UnitedHealthcare, UMR]
+    verified_by: none
+    notes: Landing URL not yet confirmed. Also covers UMR (TPA).
+
+  - payer_id: aetna
+    legal_name: Aetna Life Insurance Company
+    aliases: [Aetna, Aetna Inc., Meritain Health]
+    verified_by: none
+    notes: Landing URL not yet confirmed. Also covers Meritain Health (TPA).
+
+  - payer_id: humana
+    legal_name: Humana Insurance Company
+    aliases: [Humana, Humana Inc.]
+    verified_by: none
+
+  # --- Other BCBS plans (landing page known, TOC not yet confirmed) --------------------------
+  - payer_id: bcbs-north-carolina
+    legal_name: Blue Cross and Blue Shield of North Carolina
+    states: [NC]
+    landing_url: https://www.bcbsnc.com/policies-best-practices/machine-readable-files
+    verified_on: 2026-10-29
+    verified_by: page_fetch
+    notes: TOC links appear only after choosing a group on the page.
+
+  - payer_id: hcsc
+    legal_name: Health Care Service Corporation, a Mutual Legal Reserve Company
+    aliases: [Blue Cross and Blue Shield of Illinois, Blue Cross and Blue Shield of Texas,
+              Blue Cross and Blue Shield of Oklahoma, Blue Cross and Blue Shield of New Mexico,
+              Blue Cross and Blue Shield of Montana, HCSC]
+    states: [IL, MT, NM, OK, TX]
+    landing_url: https://www.bcbsok.com/member/policy-forms/machine-readable-file
+    verified_by: none
+    notes: Landing URL from a BCBSOK provider notice; not fetched.
+
+  # --- Remaining BCBS companies: fill landing_url and toc_url after checking ------------------
+  - {payer_id: bcbs-alabama, legal_name: Blue Cross and Blue Shield of Alabama, states: [AL], verified_by: none}
+  - {payer_id: bcbs-arizona, legal_name: Blue Cross and Blue Shield of Arizona, Inc., states: [AZ], verified_by: none}
+  - {payer_id: arkansas-bcbs, legal_name: Arkansas Blue Cross and Blue Shield, states: [AR], verified_by: none}
+  - {payer_id: blue-shield-california, legal_name: California Physicians' Service (Blue Shield of California), aliases: [Blue Shield of California], states: [CA], verified_by: none}
+  - {payer_id: capital-blue-cross, legal_name: Capital Blue Cross, states: [PA], verified_by: none}
+  - {payer_id: carefirst, legal_name: CareFirst BlueCross BlueShield, aliases: [CareFirst], states: [DC, MD, VA], verified_by: none}
+  - {payer_id: excellus, legal_name: Excellus Health Plan, Inc. (Excellus BlueCross BlueShield), aliases: [Excellus BlueCross BlueShield], states: [NY], verified_by: none}
+  - {payer_id: florida-blue, legal_name: Blue Cross and Blue Shield of Florida, Inc. (Florida Blue), aliases: [Florida Blue], states: [FL], verified_by: none}
+  - {payer_id: highmark, legal_name: Highmark Inc., aliases: [Highmark Blue Cross Blue Shield], states: [DE, NY, PA, WV], verified_by: none}
+  - {payer_id: hmsa, legal_name: Hawaii Medical Service Association, aliases: [HMSA], states: [HI], verified_by: none}
+  - {payer_id: horizon-bcbsnj, legal_name: Horizon Healthcare Services, Inc. (Horizon Blue Cross Blue Shield of New Jersey), aliases: [Horizon Blue Cross Blue Shield of New Jersey], states: [NJ], verified_by: none}
+  - {payer_id: independence-blue-cross, legal_name: Independence Hospital Indemnity Plan (Independence Blue Cross), aliases: [Independence Blue Cross], states: [PA], verified_by: none}
+  - {payer_id: bcbs-kansas-city, legal_name: Blue Cross and Blue Shield of Kansas City (Blue KC), aliases: [Blue KC], states: [KS, MO], verified_by: none}
+  - {payer_id: bcbs-louisiana, legal_name: Louisiana Health Service & Indemnity Company (Blue Cross and Blue Shield of Louisiana), aliases: [Blue Cross and Blue Shield of Louisiana], states: [LA], verified_by: none}
+  - {payer_id: bcbs-massachusetts, legal_name: Blue Cross and Blue Shield of Massachusetts, Inc., states: [MA], verified_by: none}
+  - {payer_id: bcbs-minnesota, legal_name: BCBSM, Inc. (Blue Cross and Blue Shield of Minnesota), aliases: [Blue Cross and Blue Shield of Minnesota], states: [MN], verified_by: none}
+  - {payer_id: bcbs-nebraska, legal_name: Blue Cross and Blue Shield of Nebraska, states: [NE], verified_by: none}
+  - {payer_id: bcbs-north-dakota, legal_name: Noridian Mutual Insurance Company (Blue Cross Blue Shield of North Dakota), aliases: [Blue Cross Blue Shield of North Dakota], states: [ND], verified_by: none}
+  - {payer_id: premera, legal_name: Premera Blue Cross, states: [AK, WA], verified_by: none}
+  - {payer_id: regence, legal_name: Regence BlueShield, aliases: [Regence BlueCross BlueShield of Oregon, Regence BlueCross BlueShield of Utah, Regence BlueShield of Idaho], states: [ID, OR, UT, WA], verified_by: none}
+  - {payer_id: bcbs-rhode-island, legal_name: Blue Cross & Blue Shield of Rhode Island, states: [RI], verified_by: none}
+  - {payer_id: bcbs-south-carolina, legal_name: BlueCross BlueShield of South Carolina, states: [SC], verified_by: none}
+  - {payer_id: bcbs-tennessee, legal_name: BlueCross BlueShield of Tennessee, Inc., states: [TN], verified_by: none}
+  - {payer_id: triple-s, legal_name: Triple-S Salud, Inc., states: [PR], verified_by: none}
+  - {payer_id: bcbs-vermont, legal_name: Blue Cross and Blue Shield of Vermont, states: [VT], verified_by: none}
+  - {payer_id: wellmark, legal_name: Wellmark, Inc. (Wellmark Blue Cross and Blue Shield), aliases: [Wellmark Blue Cross and Blue Shield], states: [IA, SD], verified_by: none}
+  - {payer_id: bcbs-wyoming, legal_name: Blue Cross Blue Shield of Wyoming, states: [WY], verified_by: none}
+  - {payer_id: bcbs-western-ny, legal_name: Highmark Western and Northeastern New York, states: [NY], verified_by: none}

@@ -91,6 +91,7 @@ def load_seed_file(path: Path) -> list[Payer]:
                 states=list(entry.get("states", [])),
                 landing_url=entry.get("landing_url", ""),
                 toc_url=entry.get("toc_url", ""),
+                toc_link_pattern=entry.get("toc_link_pattern", ""),
                 kind=entry.get("kind", "issuer"),
                 aliases=list(entry.get("aliases", [])),
                 sources=["seed"],
@@ -260,7 +261,7 @@ def dedupe_payers(payers: list[Payer]) -> list[Payer]:
         group = groups[root]
         base = Payer.from_dict(group[0].to_dict())
         for other in group[1:]:
-            for f in ("landing_url", "toc_url", "notes"):
+            for f in ("landing_url", "toc_url", "toc_link_pattern", "notes"):
                 if not getattr(base, f) and getattr(other, f):
                     setattr(base, f, getattr(other, f))
             for f in ("hios_ids", "states", "aliases", "sources"):

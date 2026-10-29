@@ -1,0 +1,17 @@
+name: ci
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - run: ruff check src tests
+      - run: pytest --cov=tic_crawler --cov-report=term
+      - name: Coverage gate on parse and validate
+        run: pytest -q --cov=tic_crawler.parse --cov=tic_crawler.validate --cov-fail-under=80

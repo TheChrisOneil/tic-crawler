@@ -1,0 +1,63 @@
+@startuml component
+title tic-crawler components
+skinparam componentStyle rectangle
+
+package "tic_crawler" {
+  [cli (Typer)\ndiscover / crawl / verify-seeds / sync-drive / report] as CLI
+  package "discovery (Strategy)" {
+    interface DiscoverySource
+    [SeedFileSource] ..|> DiscoverySource
+    [ExchangePufSource] ..|> DiscoverySource
+    [RootTxtSource\n(active 2027-09-06)] ..|> DiscoverySource
+    [DiscoveryRegistry\n+ dedupe_payers] as REG
+  }
+  package "pipeline (Template Method)" {
+    [CrawlPipeline.run()] as BASE
+    [TocCrawlPipeline] as TOCP
+    [RawDownloadPipeline] as RAWP
+    TOCP --|> BASE
+    RAWP --|> TOCP
+  }
+  [HttpClient\nper-host rate limit\nrobots.txt / retries] as HTTP
+  [parse\nijson streaming + sha256] as PARSE
+  [TocValidator\nvendored CMS v2.2.1] as VAL
+  [StateStore (SQLite)] as STATE
+  package "storage (Strategy + Adapter)" {
+    interface StorageBackend
+    [LocalBackend] ..|> StorageBackend
+    [DriveAdapter] ..|> StorageBackend
+    interface RawStore
+    [LocalRawStore] ..|> RawStore
+    [GcsRawStore] ..|> RawStore
+    [SheetRegistry]
+  }
+}
+
+cloud "Payer sites / CDNs" as WEB
+cloud "CMS Exchange PUF" as PUF
+cloud "Google Drive (Shared Drive)\n+ Sheets" as GD
+cloud "GCS bucket" as GCS
+
+CLI --> REG
+CLI --> TOCP
+CLI --> RAWP : --download-raw
+CLI --> SheetRegistry
+CLI --> StorageBackend
+REG --> DiscoverySource
+BASE --> HTTP
+BASE --> PARSE
+BASE --> VAL
+BASE --> STATE
+RAWP --> RawStore
+[ExchangePufSource] --> HTTP
+[RootTxtSource\n(active 2027-09-06)] --> HTTP
+HTTP --> WEB
+HTTP --> PUF
+[DriveAdapter] --> GD
+SheetRegistry --> GD
+[GcsRawStore] --> GCS
+note bottom of RawStore
+  Raw in-network and allowed-amount
+  files never go to Drive.
+end note
+@enduml

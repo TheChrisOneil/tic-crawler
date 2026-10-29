@@ -1,0 +1,43 @@
+@startuml sequence
+title Weekly run: crawl --all, then sync-drive
+actor "GitHub Actions" as GHA
+participant CLI
+participant StateStore as DB
+participant TocCrawlPipeline as P
+participant HttpClient as H
+participant "parse.iter_toc" as S
+participant TocValidator as V
+participant DriveAdapter as D
+participant SheetRegistry as SH
+
+GHA -> CLI : discover
+CLI -> DB : save de-duplicated payers
+GHA -> CLI : crawl --all
+CLI -> DB : open or resume run
+loop each payer with a TOC URL, not done in this run, not crawled in last 6 days
+  CLI -> P : run(payer)
+  P -> H : GET TOC (robots, 1 req/s per host, retry + backoff)
+  H --> P : streamed to temp file (size capped)
+  P -> S : iterate items (gzip aware)
+  loop each reporting_structure item
+    S --> P : item
+    P -> V : validate_item
+    P -> P : collect unique MRF URLs + plans
+  end
+  P -> V : validate_header
+  P -> DB : previous TOC sha256?
+  alt same sha256
+    P --> CLI : unchanged (no HEADs, no new files)
+  else new or changed
+    loop each unique MRF URL
+      P -> H : HEAD (403/405 -> GET Range 0-0)
+    end
+    P -> P : write toc/<payer>/<date>.json.gz\nand manifests/<payer>/<date>.csv
+  end
+  CLI -> DB : record result
+end
+CLI -> CLI : write runs/<timestamp>.json, registry.csv
+GHA -> CLI : sync-drive
+CLI -> D : upload files whose sha256 changed
+CLI -> SH : batch update rows in place by payer_id
+@enduml

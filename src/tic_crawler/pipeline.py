@@ -9,10 +9,13 @@ from __future__ import annotations
 import asyncio
 import csv
 import hashlib
+import re
 import tempfile
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
+from html import unescape
 from pathlib import Path
+from urllib.parse import urljoin
 
 from .config import Settings
 from .fetch import FetchError, HttpClient, RobotsDisallowed
@@ -109,6 +112,8 @@ class CrawlPipeline:
 class TocCrawlPipeline(CrawlPipeline):
     async def fetch_toc(self, ctx: CrawlContext) -> None:
         candidates = render_toc_urls(ctx.payer.toc_url, self.today)
+        if not candidates and ctx.payer.toc_link_pattern and ctx.payer.landing_url:
+            candidates = await self.scrape_toc_links(ctx.payer)
         if not candidates:
             raise SkipPayer("no_toc_url")
         errors: list[str] = []
@@ -139,6 +144,13 @@ class TocCrawlPipeline(CrawlPipeline):
             ctx.result.toc_bytes = size
             return
         raise FetchError(candidates[0], None, "; ".join(errors)[:400])
+
+    async def scrape_toc_links(self, payer: Payer) -> list[str]:
+        """Find TOC links on the landing page. Newest first, assuming dated names sort."""
+        html = await self.http.get_text(payer.landing_url)
+        found = {urljoin(payer.landing_url, unescape(m.group(0)))
+                 for m in re.finditer(payer.toc_link_pattern, html)}
+        return sorted(found, reverse=True)[:3]
 
     def parse_and_validate(self, ctx: CrawlContext) -> None:
         assert ctx.toc_path is not None

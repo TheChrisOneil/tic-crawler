@@ -161,3 +161,15 @@ def test_settings_from_repo_config():
     from datetime import date
     assert s.stale_days(date(2026, 10, 1)) == 35
     assert s.stale_days(date(2027, 3, 6)) == 100
+
+
+@respx.mock
+def test_verify_seeds(env):
+    respx.get("https://mrf.example.com/robots.txt").mock(return_value=httpx.Response(404))
+    respx.head("https://mrf.example.com/").mock(return_value=httpx.Response(200))
+    respx.head("https://mrf.example.com/index.json").mock(return_value=httpx.Response(404))
+    r = runner.invoke(cli.app, ["verify-seeds"])
+    assert r.exit_code == 0, r.output
+    assert "checked 2 urls, 1 ok" in r.output
+    text = (env / "out" / "seed_verification.csv").read_text()
+    assert "http_404" in text

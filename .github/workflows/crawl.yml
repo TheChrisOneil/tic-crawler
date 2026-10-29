@@ -1,0 +1,68 @@
+name: crawl
+# Weekly. Payers update monthly until 2027-03-06 and quarterly after (CMS-9882-F);
+# unchanged TOCs are skipped by SHA-256, so extra runs are cheap.
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      payer:
+        description: "Crawl one payer id instead of --all"
+        required: false
+
+concurrency:
+  group: tic-crawl
+  cancel-in-progress: false
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      TIC_DRIVE_FOLDER_ID: ${{ secrets.TIC_DRIVE_FOLDER_ID }}
+      TIC_CONTACT_EMAIL: ${{ secrets.TIC_CONTACT_EMAIL }}
+      TIC_RAW_STORE: ${{ secrets.TIC_RAW_STORE }}
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - name: Restore crawl state
+        uses: actions/cache/restore@v4
+        with:
+          path: state/
+          key: tic-state-${{ github.run_id }}
+          restore-keys: tic-state-
+      - name: Write service account key
+        env:
+          SA_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          umask 077
+          printf '%s' "$SA_JSON" > "$GOOGLE_APPLICATION_CREDENTIALS"
+      - run: tic-crawler discover
+      - name: Crawl
+        run: |
+          if [ -n "${{ github.event.inputs.payer }}" ]; then
+            tic-crawler crawl --payer "${{ github.event.inputs.payer }}"
+          else
+            tic-crawler crawl --all
+          fi
+      - run: tic-crawler sync-drive
+      - run: tic-crawler report
+      - name: Save crawl state
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: state/
+          key: tic-state-${{ github.run_id }}
+      - name: Upload run log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: run-log
+          path: out/runs/
+      - name: Remove key
+        if: always()
+        run: rm -f "$GOOGLE_APPLICATION_CREDENTIALS"

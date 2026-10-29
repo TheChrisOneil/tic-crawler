@@ -15,6 +15,8 @@ class Payer:
     landing_url: str = ""
     # A literal URL or a pattern with strftime fields, e.g. ".../{date:%Y-%m}-01_index.json".
     toc_url: str = ""
+    # Regex for TOC links on landing_url, for payers whose TOC name changes each month.
+    toc_link_pattern: str = ""
     kind: str = "issuer"  # issuer | tpa
     aliases: list[str] = field(default_factory=list)
     sources: list[str] = field(default_factory=list)

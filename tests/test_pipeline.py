@@ -191,3 +191,19 @@ async def test_raw_download_refuses_over_cap(settings, state, tmp_path, cms_samp
         r = await pipe.run(payer())
     assert r.status == "skipped" and r.error.startswith("raw_download_over_cap")
     assert not (tmp_path / "raw").exists()
+
+
+@respx.mock
+async def test_toc_link_pattern_scrapes_landing_page(settings, state, tmp_path, cms_sample_bytes):
+    mock_site(cms_sample_bytes)
+    html = ('<a href="/json/2026-08-28_x_index.json">old</a>'
+            '<a href="https://mrf.example.com/json/2026-09-28_x_index.json">new</a>')
+    respx.get("https://mrf.example.com/tic").mock(return_value=httpx.Response(200, text=html))
+    respx.get("https://mrf.example.com/json/2026-09-28_x_index.json").mock(
+        return_value=httpx.Response(200, content=cms_sample_bytes))
+    p = Payer("acme", "Acme", landing_url="https://mrf.example.com/tic",
+              toc_link_pattern=r"[^\"']*\d{4}-\d{2}-\d{2}_x_index\.json")
+    async with HttpClient(settings, sleep=no_sleep) as http:
+        r = await TocCrawlPipeline(settings, http, state, tmp_path, today=TODAY).run(p)
+    assert r.status == "ok", r.error
+    assert r.toc_url == "https://mrf.example.com/json/2026-09-28_x_index.json"

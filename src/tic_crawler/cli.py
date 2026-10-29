@@ -15,7 +15,7 @@ import typer
 from .config import Settings, load_settings
 from .discovery import DiscoveryRegistry, load_seed_file
 from .fetch import HttpClient
-from .models import Payer, PayerResult, RegistryRow
+from .models import Payer, PayerResult, RegistryRow, render_toc_urls
 from .pipeline import RawDownloadPipeline, TocCrawlPipeline
 from .state import StateStore, utcnow
 from .storage import (
@@ -65,7 +65,7 @@ def discover(
     (out / "payers.json").write_text(json.dumps([p.to_dict() for p in payers], indent=2))
     for name, s in status.items():
         typer.echo(f"{name}: {s}")
-    with_toc = sum(1 for p in payers if p.toc_url)
+    with_toc = sum(1 for p in payers if p.toc_url or p.toc_link_pattern)
     typer.echo(f"payers: {len(payers)} (with TOC URL: {with_toc})")
 
 
@@ -89,7 +89,7 @@ def crawl(
             raise typer.BadParameter(f"unknown payer ids: {', '.join(missing)}")
         targets = [known[p] for p in payer]
     else:
-        targets = [p for p in known.values() if p.toc_url]
+        targets = [p for p in known.values() if p.toc_url or p.toc_link_pattern]
     run_args = {"payers": sorted(p.payer_id for p in targets), "raw": download_raw, "force": force}
     run_id, resumed = state.open_run(run_args)
     done = state.done_payers(run_id)
@@ -212,6 +212,39 @@ def sync_outputs(settings: Settings, state: StateStore, drive: DriveAdapter) -> 
             state.mark_uploaded(rel, sha, remote)
             counts["uploaded"] += 1
     return counts
+
+
+@app.command("verify-seeds")
+def verify_seeds(config: ConfigOpt = None) -> None:
+    """Check every landing and TOC URL in the seed file over HTTP and write a CSV report."""
+    settings = _settings(config)
+    payers = load_seed_file(Path(settings.seed_file))
+    today = _today()
+
+    async def go():
+        rows = []
+        async with HttpClient(settings) as http:
+            for p in payers:
+                urls = [("landing_url", p.landing_url)]
+                urls += [("toc_url", u) for u in render_toc_urls(p.toc_url, today)]
+                for field, url in urls:
+                    if not url:
+                        continue
+                    c = await http.head_or_range(url)
+                    rows.append([p.payer_id, field, url, c.status or "", c.method,
+                                 c.content_length or "", c.error, today.isoformat()])
+        return rows
+
+    rows = asyncio.run(go())
+    path = Path(settings.local_dir) / "seed_verification.csv"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["payer_id", "field", "url", "http_status", "method", "content_length",
+                    "error", "checked_on"])
+        w.writerows(rows)
+    good = sum(1 for r in rows if not r[6])
+    typer.echo(f"checked {len(rows)} urls, {good} ok; report {path}")
 
 
 @app.command("sync-drive")
