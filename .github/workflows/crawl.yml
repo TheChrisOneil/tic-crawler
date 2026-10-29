@@ -36,6 +36,7 @@ jobs:
           key: tic-state-${{ github.run_id }}
           restore-keys: tic-state-
       - name: Write service account key
+        if: env.TIC_DRIVE_FOLDER_ID != ''
         env:
           SA_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
@@ -49,7 +50,9 @@ jobs:
           else
             tic-crawler crawl --all
           fi
-      - run: tic-crawler sync-drive
+      - name: Sync to Drive
+        if: env.TIC_DRIVE_FOLDER_ID != ''
+        run: tic-crawler sync-drive
       - run: tic-crawler report
       - name: Save crawl state
         if: always()

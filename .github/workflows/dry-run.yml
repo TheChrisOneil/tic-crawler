@@ -1,0 +1,61 @@
+name: dry-run
+# Hands-free dry run: local storage only, HEAD requests only, no Google credentials.
+# Outputs (TOCs, manifests, run log, registry.csv) are uploaded as a workflow artifact.
+on:
+  workflow_dispatch:
+    inputs:
+      payers:
+        description: "Space-separated payer ids"
+        required: true
+        default: "bcbs-michigan-group bcbs-mississippi centene-ambetter bcbs-kansas"
+  push:
+    branches: [main]
+    paths: [".github/workflows/dry-run.yml"]
+
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      TIC_CONTACT_EMAIL: ${{ secrets.TIC_CONTACT_EMAIL || 'chris@thechrisoneil.com' }}
+      PAYERS: ${{ github.event.inputs.payers || 'bcbs-michigan-group bcbs-mississippi centene-ambetter bcbs-kansas' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - run: pytest -q
+      - run: tic-crawler discover --source seed
+      - name: Crawl
+        run: |
+          args=""
+          for p in $PAYERS; do args="$args --payer $p"; done
+          tic-crawler crawl $args
+      - run: tic-crawler report
+      - name: Summary
+        if: always()
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import csv, glob, json, collections
+          for f in glob.glob("out/runs/*.json"):
+              log = json.load(open(f))
+              print("## Run", log["run_id"]); print("```json"); print(json.dumps(log["summary"], indent=2)); print("```")
+              for r in log["results"]:
+                  v = r.get("validation") or {}
+                  print(f"- **{r['payer_id']}** {r['status']} mrfs={r['mrf_count']} bytes={r['total_bytes']} "
+                        f"toc_bytes={r['toc_bytes']} valid={r['schema_valid']} errors={v.get('error_count')} {r['error']}")
+                  for e in (v.get("errors") or [])[:3]:
+                      print(f"  - `{e}`")
+          for f in sorted(glob.glob("out/manifests/*/*.csv")):
+              rows = list(csv.DictReader(open(f)))
+              st = collections.Counter(r["http_status"] for r in rows)
+              m = collections.Counter(r["check_method"] for r in rows)
+              print(f"\n### {f}: {len(rows)} rows\n- http_status: {dict(st)}\n- check_method: {dict(m)}")
+          PY
+      - name: Upload outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dry-run-out
+          path: out/
