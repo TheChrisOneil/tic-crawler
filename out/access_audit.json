@@ -1,5 +1,5 @@
 {
-  "audited_at": "2026-10-29T20:03:52Z",
+  "audited_at": "2026-10-29T20:06:41Z",
   "user_agent": "EverBetter-TiC-Crawler/1.0 (+chris@thechrisoneil.com)",
   "robots": [
     {
@@ -504,58 +504,77 @@
       "payer_id": "centene-ambetter",
       "role": "landing",
       "url": "https://www.centene.com/price-transparency-files.html",
-      "robots_allows_us": false,
+      "robots_allows_us": true,
       "robots_allows": {
-        "*": false,
-        "Googlebot": false,
-        "GPTBot": false,
-        "CCBot": false
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
       },
-      "fetched": false,
-      "status": null,
+      "fetched": true,
+      "status": 200,
       "server": "",
-      "content_type": "",
+      "content_type": "text/html;charset=utf-8",
       "wall": "",
       "error": "",
-      "verdict": "robots_blocked"
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "centene-ambetter",
+      "role": "mrf_sample",
+      "url": "https://www.centene.com/content/dam/centene/Centene%20Corporate/json/DOCUMENT/2026-09-28_centene-management-company-llc_ambetter-al_allowed-amounts.json",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "",
+      "content_type": "application/json",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
     },
     {
       "payer_id": "centene-fidelis",
       "role": "landing",
       "url": "https://www.centene.com/price-transparency-files.html",
-      "robots_allows_us": false,
+      "robots_allows_us": true,
       "robots_allows": {
-        "*": false,
-        "Googlebot": false,
-        "GPTBot": false,
-        "CCBot": false
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
       },
-      "fetched": false,
-      "status": null,
+      "fetched": true,
+      "status": 200,
       "server": "",
-      "content_type": "",
+      "content_type": "text/html;charset=utf-8",
       "wall": "",
       "error": "",
-      "verdict": "robots_blocked"
+      "verdict": "accessible"
     },
     {
       "payer_id": "centene-health-net",
       "role": "landing",
       "url": "https://www.centene.com/price-transparency-files.html",
-      "robots_allows_us": false,
+      "robots_allows_us": true,
       "robots_allows": {
-        "*": false,
-        "Googlebot": false,
-        "GPTBot": false,
-        "CCBot": false
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
       },
-      "fetched": false,
-      "status": null,
+      "fetched": true,
+      "status": 200,
       "server": "",
-      "content_type": "",
+      "content_type": "text/html;charset=utf-8",
       "wall": "",
       "error": "",
-      "verdict": "robots_blocked"
+      "verdict": "accessible"
     },
     {
       "payer_id": "cigna",
@@ -627,7 +646,7 @@
       },
       "fetched": true,
       "status": 200,
-      "server": "Apache",
+      "server": "",
       "content_type": "text/html; charset=UTF-8",
       "wall": "",
       "error": "",
@@ -637,25 +656,6 @@
       "payer_id": "molina",
       "role": "landing",
       "url": "https://www.molinahealthcare.com/marketplace/oh/en-us/About/compinfo/PricingTransparency",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "Googlebot": true,
-        "GPTBot": true,
-        "CCBot": true
-      },
-      "fetched": true,
-      "status": 404,
-      "server": "",
-      "content_type": "text/html; charset=utf-8",
-      "wall": "",
-      "error": "",
-      "verdict": "http_error"
-    },
-    {
-      "payer_id": "qualchoice",
-      "role": "landing",
-      "url": "https://www.centene.com/price-transparency-files.html",
       "robots_allows_us": false,
       "robots_allows": {
         "*": false,
@@ -670,6 +670,25 @@
       "wall": "",
       "error": "",
       "verdict": "robots_blocked"
+    },
+    {
+      "payer_id": "qualchoice",
+      "role": "landing",
+      "url": "https://www.centene.com/price-transparency-files.html",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 200,
+      "server": "",
+      "content_type": "text/html;charset=utf-8",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
     }
   ]
 }
