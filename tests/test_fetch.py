@@ -135,3 +135,11 @@ async def test_stream_get_raises_on_404(client):
     with pytest.raises(FetchError):
         async with client.stream_get("https://h/x"):
             pass
+
+
+@respx.mock
+async def test_robots_reason_recorded(client):
+    respx.get("https://h/robots.txt").mock(return_value=httpx.Response(503))
+    with pytest.raises(RobotsDisallowed) as ei:
+        await client.get_text("https://h/x")
+    assert "robots.txt returned 503" in str(ei.value)

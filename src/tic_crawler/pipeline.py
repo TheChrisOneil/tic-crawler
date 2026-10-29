@@ -131,8 +131,8 @@ class TocCrawlPipeline(CrawlPipeline):
                             if size > self.settings.max_toc_bytes:
                                 raise TooLarge("TOC exceeded max_toc_bytes while streaming")
                             fh.write(chunk)
-            except RobotsDisallowed:
-                errors.append(f"robots_disallowed {url}")
+            except RobotsDisallowed as e:
+                errors.append(f"robots_disallowed {e}")
                 continue
             except FetchError as e:
                 errors.append(str(e))

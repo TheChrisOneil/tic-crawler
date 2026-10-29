@@ -78,6 +78,7 @@ class HttpClient:
         self._client.headers["User-Agent"] = settings.user_agent
         self.limiter = HostRateLimiter(settings.requests_per_second_per_host, sleep=sleep)
         self._robots: dict[str, RobotFileParser | None] = {}
+        self.robots_status: dict[str, str] = {}
         self._robots_locks: dict[str, asyncio.Lock] = {}
         self._sem = asyncio.Semaphore(max(1, settings.concurrency))
 
@@ -102,15 +103,22 @@ class HttpClient:
             return False
         return rp.can_fetch(self.settings.user_agent, url)
 
+    def robots_reason(self, url: str) -> str:
+        parts = urlsplit(url)
+        return self.robots_status.get(f"{parts.scheme}://{parts.netloc}", "")
+
     async def _load_robots(self, origin: str) -> RobotFileParser | None:
         rp = RobotFileParser()
         try:
             await self.limiter.wait(_host(origin))
             resp = await self._client.get(f"{origin}/robots.txt")
-        except httpx.HTTPError:
+        except httpx.HTTPError as e:
+            self.robots_status[origin] = f"robots.txt unreachable ({type(e).__name__})"
             return None
         if resp.status_code >= 500:
+            self.robots_status[origin] = f"robots.txt returned {resp.status_code}"
             return None
+        self.robots_status[origin] = f"robots.txt {resp.status_code}"
         if resp.status_code >= 400:
             rp.parse([])
         else:
@@ -125,7 +133,7 @@ class HttpClient:
                     stream: bool = False) -> httpx.Response:
         """Send with robots check, rate limit and retries. Caller closes streamed responses."""
         if not await self.allowed(url):
-            raise RobotsDisallowed(url)
+            raise RobotsDisallowed(f"{url} [{self.robots_reason(url)}]")
         last_exc: Exception | None = None
         for attempt in range(self.settings.max_retries + 1):
             await self.limiter.wait(_host(url))
