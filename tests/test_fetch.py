@@ -142,4 +142,12 @@ async def test_robots_reason_recorded(client):
     respx.get("https://h/robots.txt").mock(return_value=httpx.Response(503))
     with pytest.raises(RobotsDisallowed) as ei:
         await client.get_text("https://h/x")
-    assert "robots.txt returned 503" in str(ei.value)
+    assert "robots.txt unavailable (HTTP 503)" in str(ei.value)
+
+
+@respx.mock
+async def test_robots_retried_before_disallowing(client):
+    route = respx.get("https://h/robots.txt").mock(side_effect=[
+        httpx.ConnectError("blip"), httpx.Response(429), httpx.Response(200, text="")])
+    assert await client.allowed("https://h/a") is True
+    assert route.call_count == 3

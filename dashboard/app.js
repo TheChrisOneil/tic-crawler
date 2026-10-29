@@ -259,7 +259,8 @@ async function errorsView() {
   const payerName = Object.fromEntries(d.payers.map((p) => [p.payer_id, p.legal_name]));
   const byCause = {};
   acc.forEach((e) => {
-    const cause = e.error.includes("robots") ? "robots.txt" : /\b403\b|cloudflare/i.test(e.error) ? "HTTP 403 / bot wall"
+    const cause = /robots\.txt (unreachable|unavailable)/.test(e.error) ? "robots.txt unreachable"
+      : e.error.includes("robots") ? "robots.txt disallows" : /\b403\b|cloudflare/i.test(e.error) ? "HTTP 403 / bot wall"
       : /404/.test(e.error) ? "HTTP 404" : e.error === "invalid_url" ? "Not a URL" : e.error === "no_toc_url" ? "No TOC URL known" : "Other";
     byCause[cause] = (byCause[cause] || 0) + 1;
   });

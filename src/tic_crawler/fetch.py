@@ -108,15 +108,24 @@ class HttpClient:
         return self.robots_status.get(f"{parts.scheme}://{parts.netloc}", "")
 
     async def _load_robots(self, origin: str) -> RobotFileParser | None:
+        """Fetch robots.txt with retries. Only a persistent 5xx/429/network failure disallows."""
         rp = RobotFileParser()
-        try:
-            await self.limiter.wait(_host(origin))
-            resp = await self._client.get(f"{origin}/robots.txt")
-        except httpx.HTTPError as e:
-            self.robots_status[origin] = f"robots.txt unreachable ({type(e).__name__})"
-            return None
-        if resp.status_code >= 500:
-            self.robots_status[origin] = f"robots.txt returned {resp.status_code}"
+        resp = None
+        problem = ""
+        for attempt in range(self.settings.max_retries + 1):
+            try:
+                await self.limiter.wait(_host(origin))
+                resp = await self._client.get(f"{origin}/robots.txt")
+            except httpx.HTTPError as e:
+                resp, problem = None, f"robots.txt unreachable ({type(e).__name__})"
+            else:
+                if resp.status_code < 500 and resp.status_code != 429:
+                    break
+                problem = f"robots.txt unavailable (HTTP {resp.status_code})"
+            if attempt < self.settings.max_retries:
+                await self._sleep(self._backoff(attempt))
+        else:
+            self.robots_status[origin] = problem
             return None
         self.robots_status[origin] = f"robots.txt {resp.status_code}"
         if resp.status_code >= 400:
