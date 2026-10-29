@@ -9,12 +9,15 @@
     "landing_url": "https://bcbsks.com/mrf",
     "toc_url": "https://mrf.secure.bcbsks.com/api/filedownloadhttptrigger?name=table-of-contents&ext=json",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "TOC endpoint returns a Cloudflare challenge (403) to automated clients (2026-10-29). Save it from a browser to manual_tocs/bcbs-kansas.json and set toc_file.",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-michigan-group",
@@ -26,6 +29,7 @@
     "landing_url": "https://www.bcbsm.com/mrf",
     "toc_url": "https://bcbsm.sapphiremrfhub.com/tocs/current/blue_cross_blue_shield_of_michigan",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Blue Cross Blue Shield of Michigan"
@@ -33,7 +37,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-michigan-employer",
@@ -45,12 +51,15 @@
     "landing_url": "https://www.bcbsm.com/mrf",
     "toc_url": "https://bcbsm.sapphiremrfhub.com/tocs/current/blue_cross_blue_shield_of_michigan_employer",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-mississippi",
@@ -62,6 +71,7 @@
     "landing_url": "https://www.bcbsms.com/about-us/transparency-in-coverage",
     "toc_url": "https://tcr.bcbsms.com/Table_of_Contents/Local_TOC.json",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Blue Cross and Blue Shield of Mississippi"
@@ -69,7 +79,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-mississippi-state-employees",
@@ -81,12 +93,15 @@
     "landing_url": "https://www.bcbsms.com/about-us/transparency-in-coverage",
     "toc_url": "https://tcr.bcbsms.com/Table_of_Contents/State_TOC.json",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "tpa",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": "Administered by BCBS Mississippi."
+    "notes": "Administered by BCBS Mississippi.",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "centene-ambetter",
@@ -96,6 +111,7 @@
     "landing_url": "https://www.centene.com/price-transparency-files.html",
     "toc_url": "",
     "toc_link_pattern": "/content/dam/centene/Centene%20Corporate/json/DOCUMENT/\\d{4}-\\d{2}-\\d{2}_ambetter_index\\.json",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Ambetter Health"
@@ -103,7 +119,9 @@
     "sources": [
       "seed"
     ],
-    "notes": "TOC file name carries the posting date (2026-09-28 at check time), so it is scraped."
+    "notes": "TOC file name carries the posting date (2026-09-28 at check time), so it is scraped.",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "centene-fidelis",
@@ -113,12 +131,15 @@
     "landing_url": "https://www.centene.com/price-transparency-files.html",
     "toc_url": "",
     "toc_link_pattern": "/content/dam/centene/Centene%20Corporate/json/DOCUMENT/\\d{4}-\\d{2}-\\d{2}_fidelis_index\\.json",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "centene-health-net",
@@ -128,6 +149,7 @@
     "landing_url": "https://www.centene.com/price-transparency-files.html",
     "toc_url": "",
     "toc_link_pattern": "/content/dam/centene/Centene%20Corporate/json/DOCUMENT/\\d{4}-\\d{2}-\\d{2}_healthnet_index\\.json",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Health Net"
@@ -135,7 +157,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "qualchoice",
@@ -147,6 +171,7 @@
     "landing_url": "https://www.centene.com/price-transparency-files.html",
     "toc_url": "",
     "toc_link_pattern": "/content/dam/centene/Centene%20Corporate/json/DOCUMENT/\\d{4}-\\d{2}-\\d{2}_qualchoice_index\\.json",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "QualChoice"
@@ -154,7 +179,9 @@
     "sources": [
       "seed"
     ],
-    "notes": "Seven employer sub-index files are listed on the same page."
+    "notes": "Seven employer sub-index files are listed on the same page.",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "cigna",
@@ -164,6 +191,7 @@
     "landing_url": "https://www.cigna.com/legal/compliance/machine-readable-files",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "The Cigna Group",
@@ -172,7 +200,9 @@
     "sources": [
       "seed"
     ],
-    "notes": "TOC link is rendered by JavaScript (\"Error fetching MRF link\" in static HTML). Needs the link from a browser."
+    "notes": "TOC link is rendered by JavaScript (\"Error fetching MRF link\" in static HTML). Needs the link from a browser.",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "elevance-anthem",
@@ -182,6 +212,7 @@
     "landing_url": "https://www.anthem.com/ca/machine-readable-file/search",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Anthem",
@@ -191,7 +222,9 @@
     "sources": [
       "seed"
     ],
-    "notes": "anthem.com robots.txt disallowed the page fetch on 2026-10-29. The crawler honors robots.txt, so this needs a TOC URL on an allowed host."
+    "notes": "anthem.com robots.txt disallowed the page fetch on 2026-10-29. The crawler honors robots.txt, so this needs a TOC URL on an allowed host.",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "molina",
@@ -201,12 +234,15 @@
     "landing_url": "https://www.molinahealthcare.com/marketplace/oh/en-us/About/compinfo/PricingTransparency",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": "Per-state links read \"Table of Contents Update will appear soon\" at check time."
+    "notes": "Per-state links read \"Table of Contents Update will appear soon\" at check time.",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "kaiser-colorado",
@@ -218,12 +254,15 @@
     "landing_url": "https://healthy.kaiserpermanente.org/front-door/machine-readable-co-federal",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": "No TOC link in static HTML; Kaiser says some regions have no TOC file."
+    "notes": "No TOC link in static HTML; Kaiser says some regions have no TOC file.",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "unitedhealthcare",
@@ -233,6 +272,7 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "UnitedHealthcare",
@@ -241,7 +281,9 @@
     "sources": [
       "seed"
     ],
-    "notes": "Landing URL not yet confirmed. Also covers UMR (TPA)."
+    "notes": "Landing URL not yet confirmed. Also covers UMR (TPA).",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "aetna",
@@ -251,6 +293,7 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Aetna",
@@ -260,7 +303,9 @@
     "sources": [
       "seed"
     ],
-    "notes": "Landing URL not yet confirmed. Also covers Meritain Health (TPA)."
+    "notes": "Landing URL not yet confirmed. Also covers Meritain Health (TPA).",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "humana",
@@ -270,6 +315,7 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Humana",
@@ -278,7 +324,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-north-carolina",
@@ -290,12 +338,15 @@
     "landing_url": "https://www.bcbsnc.com/policies-best-practices/machine-readable-files",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": "TOC links appear only after choosing a group on the page."
+    "notes": "TOC links appear only after choosing a group on the page.",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "hcsc",
@@ -311,6 +362,7 @@
     "landing_url": "https://www.bcbsok.com/member/policy-forms/machine-readable-file",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Blue Cross and Blue Shield of Illinois",
@@ -323,7 +375,9 @@
     "sources": [
       "seed"
     ],
-    "notes": "Landing URL from a BCBSOK provider notice; not fetched."
+    "notes": "Landing URL from a BCBSOK provider notice; not fetched.",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-alabama",
@@ -335,12 +389,15 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-arizona",
@@ -352,12 +409,15 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "arkansas-bcbs",
@@ -369,12 +429,15 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "blue-shield-california",
@@ -386,6 +449,7 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Blue Shield of California"
@@ -393,7 +457,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "capital-blue-cross",
@@ -405,12 +471,15 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "carefirst",
@@ -424,6 +493,7 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "CareFirst"
@@ -431,7 +501,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "excellus",
@@ -443,6 +515,7 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Excellus BlueCross BlueShield"
@@ -450,7 +523,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "florida-blue",
@@ -462,6 +537,7 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Florida Blue"
@@ -469,7 +545,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "highmark",
@@ -484,6 +562,7 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Highmark Blue Cross Blue Shield"
@@ -491,7 +570,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "hmsa",
@@ -503,6 +584,7 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "HMSA"
@@ -510,7 +592,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "horizon-bcbsnj",
@@ -522,6 +606,7 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Horizon Blue Cross Blue Shield of New Jersey"
@@ -529,7 +614,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "independence-blue-cross",
@@ -541,6 +628,7 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Independence Blue Cross"
@@ -548,7 +636,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-kansas-city",
@@ -561,6 +651,7 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Blue KC"
@@ -568,7 +659,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-louisiana",
@@ -580,6 +673,7 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Blue Cross and Blue Shield of Louisiana"
@@ -587,7 +681,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-massachusetts",
@@ -599,12 +695,15 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-minnesota",
@@ -616,6 +715,7 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Blue Cross and Blue Shield of Minnesota"
@@ -623,7 +723,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-nebraska",
@@ -635,12 +737,15 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-north-dakota",
@@ -652,6 +757,7 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Blue Cross Blue Shield of North Dakota"
@@ -659,7 +765,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "premera",
@@ -672,12 +780,15 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "regence",
@@ -692,6 +803,7 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Regence BlueCross BlueShield of Oregon",
@@ -701,7 +813,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-rhode-island",
@@ -713,12 +827,15 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-south-carolina",
@@ -730,12 +847,15 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-tennessee",
@@ -747,12 +867,15 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "triple-s",
@@ -764,12 +887,15 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-vermont",
@@ -781,12 +907,15 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "wellmark",
@@ -799,6 +928,7 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [
       "Wellmark Blue Cross and Blue Shield"
@@ -806,7 +936,9 @@
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-wyoming",
@@ -818,12 +950,15 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   },
   {
     "payer_id": "bcbs-western-ny",
@@ -835,11 +970,14 @@
     "landing_url": "",
     "toc_url": "",
     "toc_link_pattern": "",
+    "toc_file": "",
     "kind": "issuer",
     "aliases": [],
     "sources": [
       "seed"
     ],
-    "notes": ""
+    "notes": "",
+    "cohorts": [],
+    "priority": 100
   }
 ]

@@ -1,5 +1,5 @@
 {
-  "audited_at": "2026-10-29T20:02:45Z",
+  "audited_at": "2026-10-29T20:03:52Z",
   "user_agent": "EverBetter-TiC-Crawler/1.0 (+chris@thechrisoneil.com)",
   "robots": [
     {
@@ -627,7 +627,7 @@
       },
       "fetched": true,
       "status": 200,
-      "server": "",
+      "server": "Apache",
       "content_type": "text/html; charset=UTF-8",
       "wall": "",
       "error": "",
