@@ -1,22 +1,23 @@
 name: dry-run
 # Hands-free dry run: local storage only, HEAD requests only, no Google credentials.
-# Outputs (TOCs, manifests, run log, registry.csv) are uploaded as a workflow artifact.
+# State and outputs accumulate on the `data` branch, which the dashboard reads.
 on:
   workflow_dispatch:
     inputs:
       payers:
         description: "Space-separated payer ids"
         required: true
-        default: "bcbs-michigan-group bcbs-mississippi centene-ambetter bcbs-kansas"
+        default: "bcbs-michigan-group bcbs-michigan-employer bcbs-mississippi bcbs-mississippi-state-employees bcbs-kansas centene-ambetter"
   push:
     branches: [main]
-    paths: [".github/workflows/dry-run.yml"]
-  # Monthly hands-free check on the first Monday.
-  schedule:
-    - cron: "41 7 1-7 * 1"
+    paths: [".github/workflows/dry-run.yml", "seeds/payers.yaml"]
 
 permissions:
   contents: write
+
+concurrency:
+  group: tic-data
+  cancel-in-progress: false
 
 jobs:
   dry-run:
@@ -24,7 +25,8 @@ jobs:
     timeout-minutes: 120
     env:
       TIC_CONTACT_EMAIL: ${{ secrets.TIC_CONTACT_EMAIL || 'chris@thechrisoneil.com' }}
-      PAYERS: ${{ github.event.inputs.payers || 'bcbs-michigan-group bcbs-mississippi centene-ambetter bcbs-kansas' }}
+      PAYERS: ${{ github.event.inputs.payers || 'bcbs-michigan-group bcbs-michigan-employer bcbs-mississippi bcbs-mississippi-state-employees bcbs-kansas centene-ambetter' }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -32,50 +34,16 @@ jobs:
           python-version: "3.12"
       - run: pip install -e ".[dev]"
       - run: pytest -q
+      - run: scripts/data_branch.sh restore
       - run: tic-crawler discover --source seed
       - name: Crawl
         run: |
           args=""
           for p in $PAYERS; do args="$args --payer $p"; done
           tic-crawler crawl $args
+      - run: tic-crawler audit-access
+      - run: tic-crawler export-dashboard
       - run: tic-crawler report
-      - name: Summary
+      - name: Publish to data branch
         if: always()
-        run: |
-          python - <<'PY' | tee out/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
-          import csv, glob, json, collections
-          for f in glob.glob("out/runs/*.json"):
-              log = json.load(open(f))
-              print("## Run", log["run_id"]); print("```json"); print(json.dumps(log["summary"], indent=2)); print("```")
-              for r in log["results"]:
-                  v = r.get("validation") or {}
-                  print(f"- **{r['payer_id']}** {r['status']} mrfs={r['mrf_count']} bytes={r['total_bytes']} "
-                        f"toc_bytes={r['toc_bytes']} valid={r['schema_valid']} errors={v.get('error_count')} {r['error']}")
-                  for e in (v.get("errors") or [])[:3]:
-                      print(f"  - `{e}`")
-          for f in sorted(glob.glob("out/manifests/*/*.csv")):
-              rows = list(csv.DictReader(open(f)))
-              st = collections.Counter(r["http_status"] for r in rows)
-              m = collections.Counter(r["check_method"] for r in rows)
-              print(f"\n### {f}: {len(rows)} rows\n- http_status: {dict(st)}\n- check_method: {dict(m)}")
-          PY
-      - name: Upload outputs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: dry-run-out
-          path: out/
-      - name: Publish results to the dry-run-results branch
-        if: always()
-        run: |
-          set -e
-          mkdir -p /tmp/results && cp -r out/. /tmp/results/
-          # Keep the branch small: drop any stored TOC over 50 MB.
-          find /tmp/results -name '*.json.gz' -size +50M -print -delete
-          cd /tmp/results
-          git init -q -b dry-run-results
-          git config user.name "tic-crawler bot"
-          git config user.email "actions@github.com"
-          git add -A
-          git commit -q -m "Dry run ${{ github.run_id }}"
-          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" dry-run-results
+        run: scripts/data_branch.sh publish "dry run ${{ github.run_id }}"

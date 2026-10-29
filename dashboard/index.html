@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TiC Payer Registry</title>
+  <meta name="description" content="Transparency in Coverage machine-readable file registry: payers, freshness, failures and bytes.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">◧</span>
+      <div>
+        <h1>TiC Payer Registry</h1>
+        <p class="sub" id="generated">Loading…</p>
+      </div>
+    </div>
+    <nav id="nav">
+      <a href="#/" data-route="overview">Overview</a>
+      <a href="#/errors" data-route="errors">Errors</a>
+      <a href="#/access" data-route="access">Access</a>
+      <a href="#/request" data-route="request">Request a payer</a>
+      <a href="designs/">User designs</a>
+    </nav>
+  </header>
+  <main id="app" aria-live="polite"></main>
+  <footer class="foot">
+    Public pricing data published under 45 CFR 147.212. No member data.
+    Source: <a id="src-link" href="https://github.com/TheChrisOneil/tic-crawler">tic-crawler</a>.
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

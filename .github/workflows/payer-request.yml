@@ -1,0 +1,45 @@
+name: payer-request
+# When someone files a "Request a payer" issue, probe the URLs and comment with the result.
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  probe:
+    if: contains(github.event.issue.labels.*.name, 'payer-request')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TIC_CONTACT_EMAIL: ${{ secrets.TIC_CONTACT_EMAIL || 'chris@thechrisoneil.com' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - name: Parse the issue form
+        id: form
+        env:
+          BODY: ${{ github.event.issue.body }}
+        run: python scripts/parse_issue_form.py >> "$GITHUB_OUTPUT"
+      - name: Probe
+        env:
+          NAME: ${{ steps.form.outputs.payer_name }}
+          LANDING: ${{ steps.form.outputs.landing_url }}
+          TOC: ${{ steps.form.outputs.toc_url }}
+        run: |
+          tic-crawler probe --name "$NAME" --landing-url "$LANDING" --toc-url "$TOC" --markdown probe.md || true
+          [ -s probe.md ] || echo "Probe failed to run; see the workflow log." > probe.md
+          {
+            cat probe.md
+            echo
+            echo "_Automated check by tic-crawler. To add this payer, copy the seed entry into seeds/payers.yaml._"
+          } > comment.md
+      - name: Comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh issue comment ${{ github.event.issue.number }} --body-file comment.md

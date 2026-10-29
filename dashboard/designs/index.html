@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>User Designs</title>
+  <meta name="description" content="Design explorations for patient-facing uses of Transparency in Coverage price data.">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">◧</span>
+      <div><h1>User designs</h1><p class="sub">Patient-facing design explorations built on TiC price data</p></div>
+    </div>
+    <nav>
+      <a href="../#/">Overview</a><a href="../#/errors">Errors</a><a href="../#/access">Access</a>
+      <a href="../#/request">Request a payer</a><a href="./" class="active">User designs</a>
+    </nav>
+  </header>
+  <main id="app"><div class="empty">Loading…</div></main>
+  <script>
+    // Each entry in manifest.json: {"slug", "title", "summary", "path"} where path is relative to /designs/.
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    fetch("manifest.json", {cache: "no-store"}).then((r) => r.json()).then((items) => {
+      const app = document.getElementById("app");
+      if (!items.length) {
+        app.innerHTML = `<div class="empty">Designs are on the way. They will appear here when they are ready.</div>`;
+        return;
+      }
+      app.innerHTML = `<div class="grid2">${items.map((d) => `
+        <a class="panel" href="${esc(d.path)}" style="display:block;color:inherit">
+          <h3 style="margin-top:0">${esc(d.title)}</h3>
+          <p class="muted" style="margin:0">${esc(d.summary)}</p>
+        </a>`).join("")}</div>`;
+    }).catch(() => { document.getElementById("app").innerHTML = `<div class="empty">Could not load designs.</div>`; });
+  </script>
+</body>
+</html>

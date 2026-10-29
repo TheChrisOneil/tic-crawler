@@ -10,8 +10,11 @@ on:
         description: "Crawl one payer id instead of --all"
         required: false
 
+permissions:
+  contents: write
+
 concurrency:
-  group: tic-crawl
+  group: tic-data
   cancel-in-progress: false
 
 jobs:
@@ -20,8 +23,9 @@ jobs:
     timeout-minutes: 350
     env:
       TIC_DRIVE_FOLDER_ID: ${{ secrets.TIC_DRIVE_FOLDER_ID }}
-      TIC_CONTACT_EMAIL: ${{ secrets.TIC_CONTACT_EMAIL }}
+      TIC_CONTACT_EMAIL: ${{ secrets.TIC_CONTACT_EMAIL || 'chris@thechrisoneil.com' }}
       TIC_RAW_STORE: ${{ secrets.TIC_RAW_STORE }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GOOGLE_APPLICATION_CREDENTIALS: /tmp/tic-sa.json
     steps:
       - uses: actions/checkout@v4
@@ -29,12 +33,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -e .
-      - name: Restore crawl state
-        uses: actions/cache/restore@v4
-        with:
-          path: state/
-          key: tic-state-${{ github.run_id }}
-          restore-keys: tic-state-
+      - name: Restore state and outputs from the data branch
+        run: scripts/data_branch.sh restore
       - name: Write service account key
         if: env.TIC_DRIVE_FOLDER_ID != ''
         env:
@@ -53,13 +53,12 @@ jobs:
       - name: Sync to Drive
         if: env.TIC_DRIVE_FOLDER_ID != ''
         run: tic-crawler sync-drive
+      - run: tic-crawler audit-access
+      - run: tic-crawler export-dashboard
       - run: tic-crawler report
-      - name: Save crawl state
+      - name: Publish to data branch
         if: always()
-        uses: actions/cache/save@v4
-        with:
-          path: state/
-          key: tic-state-${{ github.run_id }}
+        run: scripts/data_branch.sh publish "weekly crawl ${{ github.run_id }}"
       - name: Upload run log
         if: always()
         uses: actions/upload-artifact@v4

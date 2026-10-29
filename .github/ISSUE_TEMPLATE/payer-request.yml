@@ -1,0 +1,42 @@
+name: Request a payer
+description: Ask for a health plan, issuer or TPA to be added to the TiC crawler.
+title: "Payer request: "
+labels: ["payer-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A bot will check the URLs below (robots.txt, bot walls, and the TOC itself if one is given)
+        and comment with the result and a suggested seed entry. Public pricing data only.
+  - type: input
+    id: payer_name
+    attributes:
+      label: Payer legal name
+      placeholder: Blue Cross and Blue Shield of Example
+    validations:
+      required: true
+  - type: input
+    id: landing_url
+    attributes:
+      label: Transparency in Coverage landing page URL
+      placeholder: https://www.example.com/transparency-in-coverage
+    validations:
+      required: true
+  - type: input
+    id: toc_url
+    attributes:
+      label: Table of contents (index) JSON URL, if known
+      placeholder: https://mrf.example.com/2026-10-01_index.json
+  - type: input
+    id: hios_ids
+    attributes:
+      label: HIOS issuer IDs (comma separated), if known
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Type
+      options: [Issuer, TPA / ASO administrator]
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
