@@ -7,7 +7,7 @@ on:
       payers:
         description: "Space-separated payer ids"
         required: true
-        default: "bcbs-michigan-group bcbs-michigan-employer bcbs-mississippi bcbs-mississippi-state-employees bcbs-kansas centene-ambetter"
+        default: "bcbs-michigan-group bcbs-michigan-employer bcbs-mississippi bcbs-mississippi-state-employees bcbs-kansas centene-ambetter centene-fidelis centene-health-net qualchoice"
   push:
     branches: [main]
     paths: [".github/workflows/dry-run.yml", "seeds/payers.yaml"]
@@ -25,7 +25,7 @@ jobs:
     timeout-minutes: 120
     env:
       TIC_CONTACT_EMAIL: ${{ secrets.TIC_CONTACT_EMAIL || 'chris@thechrisoneil.com' }}
-      PAYERS: ${{ github.event.inputs.payers || 'bcbs-michigan-group bcbs-michigan-employer bcbs-mississippi bcbs-mississippi-state-employees bcbs-kansas centene-ambetter' }}
+      PAYERS: ${{ github.event.inputs.payers || 'bcbs-michigan-group bcbs-michigan-employer bcbs-mississippi bcbs-mississippi-state-employees bcbs-kansas centene-ambetter centene-fidelis centene-health-net qualchoice' }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
