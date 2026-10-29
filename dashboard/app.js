@@ -13,6 +13,7 @@ const ACCESS = {
   too_large: "TOC too large", invalid_url: "Not a URL",
 };
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const shortDate = (s) => { const t = Date.parse(s); return isNaN(t) ? (s || "") : new Date(t).toISOString().slice(0, 10); };
 const num = (n) => (n == null || n === "" ? "" : Number(n).toLocaleString());
 function bytes(n) {
   if (!n) return n === 0 ? "0 B" : "";
@@ -33,12 +34,12 @@ const verdictBadge = (v) => {
 const validBadge = (p) => {
   if (p.schema_valid == null) return `<span class="muted">n/a</span>`;
   return p.schema_valid ? `<span class="badge b-ok">valid</span>`
-    : `<span class="badge b-warn">${num(p.validation_errors)} errors</span>`;
+    : `<span class="badge b-warn">${num(p.validation_errors)} ${p.validation_errors === 1 ? "error" : "errors"}</span>`;
 };
 function fresh(p) {
   if (!p.toc_last_updated_on) return `<span class="muted">n/a</span>`;
   const cls = p.stale ? "b-bad" : "b-ok";
-  return `${esc(p.toc_last_updated_on)} <span class="badge ${cls}">${p.age_days}d</span>`;
+  return `<span class="nowrap">${esc(p.toc_last_updated_on)} <span class="badge ${cls}">${p.age_days}d</span></span>`;
 }
 async function getJSON(url) {
   const r = await fetch(url, { cache: "no-store" });
@@ -129,9 +130,9 @@ async function overview() {
     { key: "legal_name", label: "Payer", render: (p) => `<a href="#/payer/${encodeURIComponent(p.payer_id)}">${esc(p.legal_name)}</a><div class="muted mono">${esc(p.payer_id)}${(p.cohorts || []).map((c) => ` <span class="badge b-idle">${esc(c)}</span>`).join("")}</div>` },
     { key: "status", label: "Status", render: (p) => statusBadge(p.status) },
     { key: "toc_last_updated_on", label: "TOC updated", render: fresh, sort: (p) => p.age_days },
-    { key: "last_crawled", label: "Last crawled", render: (p) => esc((p.last_crawled || "").slice(0, 10)) },
-    { key: "mrf_count", label: "MRF files", num: true, render: (p) => num(p.mrf_count) },
-    { key: "total_bytes", label: "Bytes", num: true, render: (p) => bytes(p.total_bytes) },
+    { key: "last_crawled", label: "Last crawled", render: (p) => `<span class="nowrap">${esc((p.last_crawled || "").slice(0, 10))}</span>` },
+    { key: "mrf_count", label: "MRF files", num: true, render: (p) => p.status === "never" ? "" : num(p.mrf_count) },
+    { key: "total_bytes", label: "Bytes", num: true, render: (p) => p.status === "never" ? "" : `<span class="nowrap">${bytes(p.total_bytes)}</span>` },
     { key: "schema_valid", label: "Schema", render: validBadge, sort: (p) => p.validation_errors },
     { key: "error", label: "Last error", render: (p) => `${p.access_status && p.access_status !== "ok" ? `<span class="badge b-idle">${esc(ACCESS[p.access_status] || p.access_status)}</span> ` : ""}<div class="clip muted" title="${esc(p.error)}">${esc(p.error)}</div>` },
   ];
@@ -205,13 +206,13 @@ async function payerView(id) {
           <select id="fs"><option value="">All results</option><option value="ok">HTTP 2xx</option><option value="err">Errors</option></select>
         </div><div id="ftbl"></div>`;
       const cols = [
-        { key: "file_type", label: "Type" },
+        { key: "file_type", label: "Type", render: (x) => `<span class="nowrap">${esc(x.file_type)}</span>` },
         { key: "description", label: "Description", render: (x) => `<div class="clip" title="${esc(x.description)}">${esc(x.description)}</div><div class="mono clip muted" title="${esc(x.url)}">${esc(x.url)}</div>` },
         { key: "plan_count", label: "Plans", num: true, render: (x) => `${num(x.plan_count)}` },
         { key: "plan_names", label: "Plan names", render: (x) => `<div class="clip" title="${esc(x.plan_names)}">${esc(x.plan_names)}${x.plans_truncated ? " …" : ""}</div>` },
         { key: "http_status", label: "HTTP", render: (x) => x.check_error ? `<span class="badge b-bad">${esc(x.http_status || "")} ${esc(x.check_error)}</span>` : `<span class="badge b-ok">${esc(x.http_status)}</span> <span class="muted">${esc(x.check_method)}</span>` },
-        { key: "content_length", label: "Size", num: true, render: (x) => `${bytes(x.content_length)}<span class="sizebar" style="width:${Math.round(60 * (x.content_length || 0) / maxLen)}px"></span>` },
-        { key: "last_modified", label: "Last-Modified", render: (x) => `<span class="muted">${esc(x.last_modified)}</span>`, sort: (x) => Date.parse(x.last_modified) || null },
+        { key: "content_length", label: "Size", num: true, render: (x) => `<span class="nowrap">${bytes(x.content_length)}</span><span class="sizebar" style="width:${Math.round(60 * (x.content_length || 0) / maxLen)}px"></span>` },
+        { key: "last_modified", label: "Modified", render: (x) => `<span class="muted nowrap" title="${esc(x.last_modified)}">${esc(shortDate(x.last_modified))}</span>`, sort: (x) => Date.parse(x.last_modified) || null },
       ];
       const tb = table(document.getElementById("ftbl"), rows, cols, { sort: "content_length", dir: -1, empty: "No manifest for this payer yet." });
       const apply = () => {

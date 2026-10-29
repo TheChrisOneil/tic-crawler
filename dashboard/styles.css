@@ -84,6 +84,7 @@ tbody tr:hover { background: var(--idle-bg); }
 .b-bad { color: var(--bad); background: var(--bad-bg); }
 .b-idle { color: var(--idle); background: var(--idle-bg); }
 .muted { color: var(--muted); }
+.nowrap { white-space: nowrap; }
 .mono { font-family: var(--mono); font-size: 12px; word-break: break-all; }
 .clip { max-width: 420px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sizebar { display: inline-block; height: 6px; background: var(--bar); border-radius: 3px; vertical-align: middle; margin-left: 6px; }
