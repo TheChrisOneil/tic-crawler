@@ -38,6 +38,16 @@ Read this before changing the code.
 - Weekly schedule with a 6-day recrawl window; staleness threshold is 35 days before 2027-03-06
   and 100 days after.
 
+## Dashboard and data branch
+- `dashboard/` is plain HTML/JS on Vercel (team TechNexusClarity, project `tic-crawler`, root
+  `dashboard`). It reads JSON from the `data` branch at runtime; keep it build-free.
+- `export-dashboard` is the only producer of `out/dashboard/`. Change the JSON shape there and in
+  `dashboard/app.js` together.
+- robots.txt: retried with backoff; only a persistent 5xx/429/network failure counts as disallow
+  (RFC 9309), and the reason is recorded so the dashboard can tell "unreachable" from "disallowed".
+- Payer requests are GitHub issues (template `payer-request.yml`); the probe workflow only reads
+  public URLs and comments. It never edits seeds.
+
 ## Seeds
 - `seeds/payers.yaml` entries carry `verified_by` (`page_fetch`, `http`, `none`). Do not invent
   URLs; check them with `tic-crawler verify-seeds` and record the result.

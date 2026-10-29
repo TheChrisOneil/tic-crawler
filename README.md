@@ -56,6 +56,9 @@ tic-crawler crawl --all --force      # ignore TOC hash and recrawl window
 tic-crawler crawl --payer X --download-raw
 tic-crawler sync-drive               # upload new/changed files, update the Sheet in place
 tic-crawler report [--json]
+tic-crawler audit-access             # robots.txt rules, bot walls, per-URL verdicts -> out/access_audit.json
+tic-crawler export-dashboard         # dashboard JSON -> out/dashboard/
+tic-crawler probe --name X --landing-url U [--toc-url T]   # check a requested payer
 ```
 
 `crawl` always writes locally to `out/` and records state in `state/tic.sqlite`. `sync-drive`
@@ -92,11 +95,34 @@ one class.
 
 Payers are merged by normalized legal name (and aliases) and by shared HIOS IDs; seed data wins.
 
+## Dashboard
+
+`dashboard/` is a static site (no build step) deployed on Vercel at https://tic-crawler.vercel.app
+(project `tic-crawler`, root directory `dashboard`). It reads `out/dashboard/*.json` from the `data`
+branch through raw.githubusercontent.com, so new crawl data shows up without a redeploy.
+
+- Overview: payers, freshness (TOC `last_updated_on`), failures, MRF counts and bytes.
+- Payer page: every MRF file with HTTP result and size, the plans in the TOC, and schema errors
+  grouped by kind with example record positions.
+- Errors: access errors (payer and file level) and record errors across payers.
+- Access: robots.txt per host and what a polite crawler sees on each URL (allowed, robots-blocked,
+  bot wall, HTTP error).
+- Request a payer: opens a GitHub issue form; `.github/workflows/payer-request.yml` probes the URLs
+  and replies on the issue with the result and a seed entry.
+- User designs: `dashboard/designs/`, listed from `designs/manifest.json`.
+
+## Data branch
+
+Workflows restore `state/tic.sqlite` and `out/` from the `data` branch, run, then publish back
+(`scripts/data_branch.sh`). Raw MRFs are never published; stored TOCs over 50 MB are dropped from
+the branch.
+
 ## Scheduling
 
-`.github/workflows/crawl.yml` runs weekly (Monday 06:17 UTC) and on demand. Secrets:
-`GOOGLE_SERVICE_ACCOUNT_JSON`, `TIC_DRIVE_FOLDER_ID`, `TIC_CONTACT_EMAIL`, optional `TIC_RAW_STORE`.
-State persists between runs via the Actions cache.
+`.github/workflows/crawl.yml` runs weekly (Monday 06:17 UTC) and on demand; Drive sync runs only
+when `TIC_DRIVE_FOLDER_ID` is set. Secrets: `GOOGLE_SERVICE_ACCOUNT_JSON`, `TIC_DRIVE_FOLDER_ID`,
+`TIC_CONTACT_EMAIL`, optional `TIC_RAW_STORE`. `.github/workflows/dry-run.yml` crawls a fixed set of
+payers on demand and monthly. State persists on the `data` branch.
 
 ## Tests
 
