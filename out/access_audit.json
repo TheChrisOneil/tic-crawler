@@ -1,5 +1,5 @@
 {
-  "audited_at": "2026-10-29T20:06:41Z",
+  "audited_at": "2026-10-29T20:08:59Z",
   "user_agent": "EverBetter-TiC-Crawler/1.0 (+chris@thechrisoneil.com)",
   "robots": [
     {
@@ -134,7 +134,7 @@
       "error": "",
       "server": "",
       "policy": "rules",
-      "text": "User-agent: *\r\nDisallow: /members/*/mem\r\nDisallow: /-/media/Molina/PublicWebsite/PDF/\r\nDisallow: /providers/*/duals\r\nDisallow: /providers/*/medicare\r\nDisallow: /providers/*/medicaid\r\nDisallow: /marketplace/az/*\r\nDisallow: /marketplace/ca/*\r\nDisallow: /marketplace/fl/*\r\nDisallow: /marketplace/ga/*\r\nDisallow: /marketplace/ia/*\r\nDisallow: /marketplace/id/*\r\nDisallow: /marketplace/il/*\r\nDisallow: /marketplace/ky/*\r\nDisallow: /marketplace/ma/*\r\nDisallow: /marketplace/mi/*\r\nDisallow: /marketplace/ms/*\r\nDisallow: /marketplace/ne/*\r\nDisallow: /marketplace/nm/*\r\nDisallow: /marketplace/nv/*\r\nDisallow: /marketplace/ny/*\r\nDisallow: /marketplace/oh/*\r\nDisallow: /marketplace/sc/*\r\nDisallow: /marketplace/tx/*\r\nDisallow: /marketplace/ut/*\r\nDisallow: /marketplace/va/*\r\nDisallow: /marketplace/wa/*\r\nDisallow: /marketplace/wi/*\r\n\r\nSitemap: https://www.molinahealthcare.com/sitemap.xml",
+      "text": "# Group SC\nUser-agent: *\nDisallow:",
       "wall": ""
     }
   ],
@@ -558,6 +558,25 @@
       "verdict": "accessible"
     },
     {
+      "payer_id": "centene-fidelis",
+      "role": "mrf_sample",
+      "url": "https://www.centene.com/content/dam/centene/Centene%20Corporate/json/DOCUMENT/2026-09-28_centene-management-company-llc_fidelis-es_allowed-amounts.json",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "",
+      "content_type": "application/json",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
       "payer_id": "centene-health-net",
       "role": "landing",
       "url": "https://www.centene.com/price-transparency-files.html",
@@ -572,6 +591,25 @@
       "status": 200,
       "server": "",
       "content_type": "text/html;charset=utf-8",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "centene-health-net",
+      "role": "mrf_sample",
+      "url": "https://www.centene.com/content/dam/centene/Centene%20Corporate/json/DOCUMENT/2026-09-30_centene-management-company-llc_healthnet-ca_allowed-amounts.json",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "",
+      "content_type": "application/json",
       "wall": "",
       "error": "",
       "verdict": "accessible"
@@ -646,7 +684,7 @@
       },
       "fetched": true,
       "status": 200,
-      "server": "",
+      "server": "Apache",
       "content_type": "text/html; charset=UTF-8",
       "wall": "",
       "error": "",
@@ -656,20 +694,20 @@
       "payer_id": "molina",
       "role": "landing",
       "url": "https://www.molinahealthcare.com/marketplace/oh/en-us/About/compinfo/PricingTransparency",
-      "robots_allows_us": false,
+      "robots_allows_us": true,
       "robots_allows": {
-        "*": false,
-        "Googlebot": false,
-        "GPTBot": false,
-        "CCBot": false
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
       },
-      "fetched": false,
-      "status": null,
+      "fetched": true,
+      "status": 404,
       "server": "",
-      "content_type": "",
+      "content_type": "text/html; charset=utf-8",
       "wall": "",
       "error": "",
-      "verdict": "robots_blocked"
+      "verdict": "http_error"
     },
     {
       "payer_id": "qualchoice",
@@ -686,6 +724,25 @@
       "status": 200,
       "server": "",
       "content_type": "text/html;charset=utf-8",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "qualchoice",
+      "role": "mrf_sample",
+      "url": "https://www.centene.com/content/dam/centene/Centene%20Corporate/json/DOCUMENT/2026-09-28_centene-management-company-llc_qualchoice_allowed-amounts.json",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "",
+      "content_type": "application/json",
       "wall": "",
       "error": "",
       "verdict": "accessible"

@@ -1,0 +1,406 @@
+{
+  "args": {
+    "force": false,
+    "payers": [
+      "bcbs-kansas",
+      "bcbs-michigan-employer",
+      "bcbs-michigan-group",
+      "bcbs-mississippi",
+      "bcbs-mississippi-state-employees",
+      "centene-ambetter",
+      "centene-fidelis",
+      "centene-health-net",
+      "qualchoice"
+    ],
+    "raw": false
+  },
+  "finished_at": "2026-10-29T20:08:36Z",
+  "results": [
+    {
+      "access_status": "waf_blocked",
+      "crawled_at": "2026-10-29T20:08:15Z",
+      "error": "waf_blocked 403 https://mrf.secure.bcbsks.com/api/filedownloadhttptrigger?name=table-of-contents&ext=json [cloudflare_challenge]",
+      "mrf_count": 0,
+      "outputs": [],
+      "payer_id": "bcbs-kansas",
+      "raw_bytes": 0,
+      "schema_valid": null,
+      "status": "failed",
+      "toc_bytes": 0,
+      "toc_last_updated_on": "",
+      "toc_sha256": "",
+      "toc_url": "",
+      "total_bytes": 0,
+      "validation": null
+    },
+    {
+      "access_status": "ok",
+      "crawled_at": "2026-10-29T20:07:53Z",
+      "error": "",
+      "mrf_count": 518,
+      "outputs": [],
+      "payer_id": "bcbs-michigan-employer",
+      "raw_bytes": 0,
+      "schema_valid": false,
+      "status": "unchanged",
+      "toc_bytes": 292253,
+      "toc_last_updated_on": "2026-10-01",
+      "toc_sha256": "bc5a03e52b50424ddc3f0cda0f0beca89f34814d686c57730c43bc7008661004",
+      "toc_url": "https://bcbsm.sapphiremrfhub.com/tocs/current/blue_cross_blue_shield_of_michigan_employer",
+      "total_bytes": 0,
+      "validation": {
+        "error_count": 10,
+        "error_kinds": [
+          {
+            "count": 5,
+            "examples": [
+              "reporting_structure[0].reporting_plans[0].plan_id_type",
+              "reporting_structure[1].reporting_plans[0].plan_id_type",
+              "reporting_structure[2].reporting_plans[0].plan_id_type",
+              "reporting_structure[3].reporting_plans[0].plan_id_type",
+              "reporting_structure[4].reporting_plans[0].plan_id_type"
+            ],
+            "kind": "reporting_structure[*].reporting_plans[*].plan_id_type: 'EIN' is not one of ['ein', 'hios']"
+          },
+          {
+            "count": 5,
+            "examples": [
+              "reporting_structure[0].reporting_plans[0].plan_market_type",
+              "reporting_structure[1].reporting_plans[0].plan_market_type",
+              "reporting_structure[2].reporting_plans[0].plan_market_type",
+              "reporting_structure[3].reporting_plans[0].plan_market_type",
+              "reporting_structure[4].reporting_plans[0].plan_market_type"
+            ],
+            "kind": "reporting_structure[*].reporting_plans[*].plan_market_type: 'Group' is not one of ['group', 'individual']"
+          }
+        ],
+        "errors": [
+          "reporting_structure[0].reporting_plans[0].plan_id_type: 'EIN' is not one of ['ein', 'hios']",
+          "reporting_structure[0].reporting_plans[0].plan_market_type: 'Group' is not one of ['group', 'individual']",
+          "reporting_structure[1].reporting_plans[0].plan_id_type: 'EIN' is not one of ['ein', 'hios']",
+          "reporting_structure[1].reporting_plans[0].plan_market_type: 'Group' is not one of ['group', 'individual']",
+          "reporting_structure[2].reporting_plans[0].plan_id_type: 'EIN' is not one of ['ein', 'hios']",
+          "reporting_structure[2].reporting_plans[0].plan_market_type: 'Group' is not one of ['group', 'individual']",
+          "reporting_structure[3].reporting_plans[0].plan_id_type: 'EIN' is not one of ['ein', 'hios']",
+          "reporting_structure[3].reporting_plans[0].plan_market_type: 'Group' is not one of ['group', 'individual']",
+          "reporting_structure[4].reporting_plans[0].plan_id_type: 'EIN' is not one of ['ein', 'hios']",
+          "reporting_structure[4].reporting_plans[0].plan_market_type: 'Group' is not one of ['group', 'individual']"
+        ],
+        "file_version": "2.0.0",
+        "invalid_items": 5,
+        "item_count": 5,
+        "pinned_version": "2.2.1",
+        "valid": false
+      }
+    },
+    {
+      "access_status": "ok",
+      "crawled_at": "2026-10-29T20:07:51Z",
+      "error": "",
+      "mrf_count": 294,
+      "outputs": [],
+      "payer_id": "bcbs-michigan-group",
+      "raw_bytes": 0,
+      "schema_valid": false,
+      "status": "unchanged",
+      "toc_bytes": 304798,
+      "toc_last_updated_on": "2026-10-01",
+      "toc_sha256": "ae6074253e201ba507cd2becf555a449751a0b1ccd1d6133ee31d2e41d47b5f9",
+      "toc_url": "https://bcbsm.sapphiremrfhub.com/tocs/current/blue_cross_blue_shield_of_michigan",
+      "total_bytes": 0,
+      "validation": {
+        "error_count": 43,
+        "error_kinds": [
+          {
+            "count": 21,
+            "examples": [
+              "reporting_structure[0].reporting_plans[0].plan_id_type",
+              "reporting_structure[0].reporting_plans[1].plan_id_type",
+              "reporting_structure[1].reporting_plans[0].plan_id_type",
+              "reporting_structure[1].reporting_plans[1].plan_id_type",
+              "reporting_structure[1].reporting_plans[2].plan_id_type"
+            ],
+            "kind": "reporting_structure[*].reporting_plans[*].plan_id_type: 'HIOS' is not one of ['ein', 'hios']"
+          },
+          {
+            "count": 12,
+            "examples": [
+              "reporting_structure[0].reporting_plans[1].plan_market_type",
+              "reporting_structure[1].reporting_plans[1].plan_market_type",
+              "reporting_structure[1].reporting_plans[2].plan_market_type",
+              "reporting_structure[1].reporting_plans[5].plan_market_type",
+              "reporting_structure[1].reporting_plans[6].plan_market_type"
+            ],
+            "kind": "reporting_structure[*].reporting_plans[*].plan_market_type: 'Individual' is not one of ['group', 'individual']"
+          },
+          {
+            "count": 9,
+            "examples": [
+              "reporting_structure[0].reporting_plans[0].plan_market_type",
+              "reporting_structure[1].reporting_plans[0].plan_market_type",
+              "reporting_structure[1].reporting_plans[3].plan_market_type",
+              "reporting_structure[1].reporting_plans[4].plan_market_type",
+              "reporting_structure[3].reporting_plans[1].plan_market_type"
+            ],
+            "kind": "reporting_structure[*].reporting_plans[*].plan_market_type: 'Group' is not one of ['group', 'individual']"
+          },
+          {
+            "count": 1,
+            "examples": [
+              "reporting_structure[5].allowed_amount_file.location"
+            ],
+            "kind": "reporting_structure[*].allowed_amount_file.location: 'Missing file' does not match '^https://'"
+          }
+        ],
+        "errors": [
+          "reporting_structure[0].reporting_plans[0].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[0].reporting_plans[0].plan_market_type: 'Group' is not one of ['group', 'individual']",
+          "reporting_structure[0].reporting_plans[1].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[0].reporting_plans[1].plan_market_type: 'Individual' is not one of ['group', 'individual']",
+          "reporting_structure[1].reporting_plans[0].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[1].reporting_plans[0].plan_market_type: 'Group' is not one of ['group', 'individual']",
+          "reporting_structure[1].reporting_plans[1].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[1].reporting_plans[1].plan_market_type: 'Individual' is not one of ['group', 'individual']",
+          "reporting_structure[1].reporting_plans[2].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[1].reporting_plans[2].plan_market_type: 'Individual' is not one of ['group', 'individual']",
+          "reporting_structure[1].reporting_plans[3].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[1].reporting_plans[3].plan_market_type: 'Group' is not one of ['group', 'individual']",
+          "reporting_structure[1].reporting_plans[4].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[1].reporting_plans[4].plan_market_type: 'Group' is not one of ['group', 'individual']",
+          "reporting_structure[1].reporting_plans[5].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[1].reporting_plans[5].plan_market_type: 'Individual' is not one of ['group', 'individual']",
+          "reporting_structure[1].reporting_plans[6].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[1].reporting_plans[6].plan_market_type: 'Individual' is not one of ['group', 'individual']",
+          "reporting_structure[2].reporting_plans[0].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[2].reporting_plans[0].plan_market_type: 'Individual' is not one of ['group', 'individual']",
+          "reporting_structure[3].reporting_plans[0].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[3].reporting_plans[0].plan_market_type: 'Individual' is not one of ['group', 'individual']",
+          "reporting_structure[3].reporting_plans[1].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[3].reporting_plans[1].plan_market_type: 'Group' is not one of ['group', 'individual']",
+          "reporting_structure[4].reporting_plans[0].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[4].reporting_plans[0].plan_market_type: 'Group' is not one of ['group', 'individual']",
+          "reporting_structure[4].reporting_plans[1].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[4].reporting_plans[1].plan_market_type: 'Individual' is not one of ['group', 'individual']",
+          "reporting_structure[5].allowed_amount_file.location: 'Missing file' does not match '^https://'",
+          "reporting_structure[5].reporting_plans[0].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[5].reporting_plans[0].plan_market_type: 'Individual' is not one of ['group', 'individual']",
+          "reporting_structure[5].reporting_plans[1].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[5].reporting_plans[1].plan_market_type: 'Group' is not one of ['group', 'individual']",
+          "reporting_structure[6].reporting_plans[0].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[6].reporting_plans[0].plan_market_type: 'Group' is not one of ['group', 'individual']",
+          "reporting_structure[6].reporting_plans[1].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[6].reporting_plans[1].plan_market_type: 'Individual' is not one of ['group', 'individual']",
+          "reporting_structure[7].reporting_plans[0].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[7].reporting_plans[0].plan_market_type: 'Group' is not one of ['group', 'individual']",
+          "reporting_structure[7].reporting_plans[1].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[7].reporting_plans[1].plan_market_type: 'Individual' is not one of ['group', 'individual']",
+          "reporting_structure[8].reporting_plans[0].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+          "reporting_structure[8].reporting_plans[0].plan_market_type: 'Individual' is not one of ['group', 'individual']"
+        ],
+        "file_version": "2.0.0",
+        "invalid_items": 9,
+        "item_count": 9,
+        "pinned_version": "2.2.1",
+        "valid": false
+      }
+    },
+    {
+      "access_status": "ok",
+      "crawled_at": "2026-10-29T20:07:54Z",
+      "error": "",
+      "mrf_count": 508,
+      "outputs": [],
+      "payer_id": "bcbs-mississippi",
+      "raw_bytes": 0,
+      "schema_valid": false,
+      "status": "unchanged",
+      "toc_bytes": 1631710,
+      "toc_last_updated_on": "2026-10-20",
+      "toc_sha256": "d87e73babf02376cf6533f849e2fd96e55296541ef7efcd3336c31accc669235",
+      "toc_url": "https://tcr.bcbsms.com/Table_of_Contents/Local_TOC.json",
+      "total_bytes": 0,
+      "validation": {
+        "error_count": 1,
+        "error_kinds": [
+          {
+            "count": 1,
+            "examples": [
+              "reporting_structure[0].in_network_files"
+            ],
+            "kind": "reporting_structure[*].in_network_files: [{'description': 'in-network file', 'location': '<url>'}, {'description': 'in-network file', 'location': '<url>'}, {'description': 'in-network file', 'location': '<url>'}, {'description': 'in-network"
+          }
+        ],
+        "errors": [
+          "reporting_structure[0].in_network_files: [{'description': 'in-network file', 'location': 'https://bcbsms.mrf.bcbs.com/2026-10_510_01C0_in-network-rates_12_of_29.json.gz?&Expires=1795269681&Signature=YrlguzV4eI-4N7anpHnpuUl3CNQoTZD8AIxh5HSa~LAX3gr-XR-qMMSAJ9PH1q8DVgiTNyEfcZV74k1J6FdP9cT7aNGwSODlEl-H3"
+        ],
+        "file_version": "2.0.0",
+        "invalid_items": 1,
+        "item_count": 1,
+        "pinned_version": "2.2.1",
+        "valid": false
+      }
+    },
+    {
+      "access_status": "ok",
+      "crawled_at": "2026-10-29T20:08:14Z",
+      "error": "",
+      "mrf_count": 508,
+      "outputs": [],
+      "payer_id": "bcbs-mississippi-state-employees",
+      "raw_bytes": 0,
+      "schema_valid": false,
+      "status": "unchanged",
+      "toc_bytes": 334090,
+      "toc_last_updated_on": "2026-10-20",
+      "toc_sha256": "f8dfe3a8c26fa674963e11567eef598986da2c3955ed93abef0b8553b6599b55",
+      "toc_url": "https://tcr.bcbsms.com/Table_of_Contents/State_TOC.json",
+      "total_bytes": 0,
+      "validation": {
+        "error_count": 1,
+        "error_kinds": [
+          {
+            "count": 1,
+            "examples": [
+              "reporting_structure[0].in_network_files"
+            ],
+            "kind": "reporting_structure[*].in_network_files: [{'description': 'in-network file', 'location': '<url>'}, {'description': 'in-network file', 'location': '<url>'}, {'description': 'in-network file', 'location': '<url>'}, {'description': 'in-network"
+          }
+        ],
+        "errors": [
+          "reporting_structure[0].in_network_files: [{'description': 'in-network file', 'location': 'https://bcbsms.mrf.bcbs.com/2026-10_510_01C0_in-network-rates_12_of_29.json.gz?&Expires=1795269681&Signature=YrlguzV4eI-4N7anpHnpuUl3CNQoTZD8AIxh5HSa~LAX3gr-XR-qMMSAJ9PH1q8DVgiTNyEfcZV74k1J6FdP9cT7aNGwSODlEl-H3"
+        ],
+        "file_version": "2.0.0",
+        "invalid_items": 1,
+        "item_count": 1,
+        "pinned_version": "2.2.1",
+        "valid": false
+      }
+    },
+    {
+      "access_status": "ok",
+      "crawled_at": "2026-10-29T20:08:16Z",
+      "error": "",
+      "mrf_count": 56,
+      "outputs": [],
+      "payer_id": "centene-ambetter",
+      "raw_bytes": 0,
+      "schema_valid": true,
+      "status": "unchanged",
+      "toc_bytes": 359636,
+      "toc_last_updated_on": "2026-09-28",
+      "toc_sha256": "5bdedc3b0108305bd19d26cd554a57499982def9d79ec3052ca645c32a1df25a",
+      "toc_url": "https://www.centene.com/content/dam/centene/Centene%20Corporate/json/DOCUMENT/2026-09-28_ambetter_index.json",
+      "total_bytes": 0,
+      "validation": {
+        "error_count": 0,
+        "error_kinds": [],
+        "errors": [],
+        "file_version": "2.0.0",
+        "invalid_items": 0,
+        "item_count": 28,
+        "pinned_version": "2.2.1",
+        "valid": true
+      }
+    },
+    {
+      "access_status": "ok",
+      "crawled_at": "2026-10-29T20:08:19Z",
+      "error": "",
+      "mrf_count": 4,
+      "outputs": [
+        "toc/centene-fidelis/2026-10-29.json.gz",
+        "manifests/centene-fidelis/2026-10-29.csv"
+      ],
+      "payer_id": "centene-fidelis",
+      "raw_bytes": 0,
+      "schema_valid": true,
+      "status": "ok",
+      "toc_bytes": 30014,
+      "toc_last_updated_on": "2026-09-28",
+      "toc_sha256": "8d4e9262bf539d79b633685d1839ddba26d98f9fa4ee530a12453cdfc60934df",
+      "toc_url": "https://www.centene.com/content/dam/centene/Centene%20Corporate/json/DOCUMENT/2026-09-28_fidelis_index.json",
+      "total_bytes": 278778357,
+      "validation": {
+        "error_count": 0,
+        "error_kinds": [],
+        "errors": [],
+        "file_version": "2.0.0",
+        "invalid_items": 0,
+        "item_count": 2,
+        "pinned_version": "2.2.1",
+        "valid": true
+      }
+    },
+    {
+      "access_status": "ok",
+      "crawled_at": "2026-10-29T20:08:25Z",
+      "error": "",
+      "mrf_count": 4,
+      "outputs": [
+        "toc/centene-health-net/2026-10-29.json.gz",
+        "manifests/centene-health-net/2026-10-29.csv"
+      ],
+      "payer_id": "centene-health-net",
+      "raw_bytes": 0,
+      "schema_valid": true,
+      "status": "ok",
+      "toc_bytes": 575930,
+      "toc_last_updated_on": "2026-09-30",
+      "toc_sha256": "a397c9f9605e0da76603cd13385bfac90314e1bcc7307ceff224a21482b85b58",
+      "toc_url": "https://www.centene.com/content/dam/centene/Centene%20Corporate/json/DOCUMENT/2026-09-30_healthnet_index.json",
+      "total_bytes": 702883706,
+      "validation": {
+        "error_count": 0,
+        "error_kinds": [],
+        "errors": [],
+        "file_version": "2.0.0",
+        "invalid_items": 0,
+        "item_count": 2,
+        "pinned_version": "2.2.1",
+        "valid": true
+      }
+    },
+    {
+      "access_status": "ok",
+      "crawled_at": "2026-10-29T20:08:32Z",
+      "error": "",
+      "mrf_count": 2,
+      "outputs": [
+        "toc/qualchoice/2026-10-29.json.gz",
+        "manifests/qualchoice/2026-10-29.csv"
+      ],
+      "payer_id": "qualchoice",
+      "raw_bytes": 0,
+      "schema_valid": true,
+      "status": "ok",
+      "toc_bytes": 88828,
+      "toc_last_updated_on": "2026-09-28",
+      "toc_sha256": "fbf880349d00ae04179fd660f29b411a082d65b821d8a23b437269dedccce403",
+      "toc_url": "https://www.centene.com/content/dam/centene/Centene%20Corporate/json/DOCUMENT/2026-09-28_qualchoice_index.json",
+      "total_bytes": 82110,
+      "validation": {
+        "error_count": 0,
+        "error_kinds": [],
+        "errors": [],
+        "file_version": "2.0.0",
+        "invalid_items": 0,
+        "item_count": 1,
+        "pinned_version": "2.2.1",
+        "valid": true
+      }
+    }
+  ],
+  "run_id": "20261029T200751Z",
+  "schema_version": "2.2.1",
+  "summary": {
+    "by_status": {
+      "failed": 1,
+      "ok": 3,
+      "unchanged": 5
+    },
+    "mrf_bytes": 981744173,
+    "mrf_urls": 10,
+    "payers": 9,
+    "toc_bytes": 3617259
+  }
+}
