@@ -86,3 +86,20 @@ ok https://fallon.sapphiremrfhub.com/mrfs/202610/20260923_Eyemed_Fallon_in-netwo
 npi-lookup: 29076 institutional NPIs, 3000 looked up, 2542 in [MA NH]
 == join-quality (exit 0)
 crosswalk: 77400 links map[address:23 affiliation:77376 name_zip:1]; fallon-health: 28130126 rows in states, 23860 providers, 16792 linked to 75 hospitals
+== nppes (exit 1)
+error: no monthly NPPES_Data_Dissemination zip link on the NPPES files page
+== provider-data (exit 0)
+632h-zaca "Unplanned Hospital Visits - Hospital": 1274 rows (modified 2026-09-10)
+77hc-ibv8 "Healthcare Associated Infections - Hospital": 3276 rows (modified 2026-07-22)
+dgck-syfz "Patient survey (HCAHPS) - Hospital": 6188 rows (modified 2026-07-22)
+mj5m-pzi6 "National Downloadable File": 116838 rows (modified 2026-10-02)
+xubh-q36u "Hospital General Information": 111 rows (modified 2026-07-22)
+ynj2-r877 "Complications and Deaths - Hospital": 1820 rows (modified 2026-09-10)
+yv7e-xc69 "Timely and Effective Care - Hospital": 2605 rows (modified 2026-07-22)
+27ea-46a8 "Facility Affiliation Data": 103229 rows (modified 2026-10-02)
+== extract-rates (exit 0)
+ok https://fallon.sapphiremrfhub.com/mrfs/202610/20260901-185656_sapphire-fallon_in-network-rates.json.gz 913208598 bytes in 2m14s 
+== npi-lookup (exit 0)
+npi-lookup: 29076 institutional NPIs, 3000 looked up, 2542 in [MA NH]
+== join-quality (exit 0)
+crosswalk: 77400 links map[address:23 affiliation:77376 name_zip:1]; fallon-health: 28130126 rows in states, 23860 providers, 16792 linked to 75 hospitals
