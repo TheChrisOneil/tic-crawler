@@ -1,0 +1,458 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/CMSgov/price-transparency-guide/blob/master/schemas/in-network-rates/in-network-rates.json",
+  "definitions": {
+    "in_network": {
+      "type": "object",
+      "properties": {
+        "negotiation_arrangement": {
+          "enum": [
+            "ffs",
+            "bundle",
+            "capitation"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "billing_code_type": {
+          "$ref": "#/definitions/billing_code_types"
+        },
+        "severity_of_illness": {
+          "type": "string",
+          "minLength": 1
+        },
+        "billing_code_type_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "billing_code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "negotiated_rates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/negotiated_rates"
+          },
+          "default": [],
+          "minItems": 1
+        },
+        "covered_services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/contained_billing_code"
+          },
+          "default": [],
+          "minItems": 1
+        },
+        "bundled_codes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/contained_billing_code"
+          },
+          "default": [],
+          "minItems": 1
+        }
+      },
+      "required": [
+        "negotiation_arrangement",
+        "name",
+        "billing_code_type",
+        "billing_code_type_version",
+        "billing_code",
+        "negotiated_rates",
+        "description"
+      ]
+    },
+    "contained_billing_code": {
+      "type": "object",
+      "properties": {
+        "billing_code_type": {
+          "$ref": "#/definitions/billing_code_types"
+        },
+        "billing_code_type_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "billing_code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "billing_code_type",
+        "billing_code_type_version",
+        "billing_code",
+        "description"
+      ]
+    },
+    "negotiated_rates": {
+      "type": "object",
+      "properties": {
+        "negotiated_prices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/negotiated_price"
+          },
+          "uniqueItems": true,
+          "default": [],
+          "minItems": 1
+        },
+        "provider_references": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "uniqueItems": true,
+          "default": [],
+          "minItems": 1
+        }
+      },
+      "required": [
+        "provider_references",
+        "negotiated_prices"
+      ]
+    },
+    "negotiated_price": {
+      "type": "object",
+      "properties": {
+        "service_code": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^(0[1-9]|1[0-9]|2[0-7]|3[1-4]|4[1-2]|4[9]|5[0-8]|6[0-2]|6[5-6]|7[1-2]|81|99)$"
+              },
+              "uniqueItems": true
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^CSTM-00$"
+              },
+              "maxItems": 1
+            }
+          ]
+        },
+        "billing_class": {
+          "enum": [
+            "professional",
+            "institutional",
+            "both"
+          ]
+        },
+        "setting": {
+          "enum": [
+            "inpatient",
+            "outpatient",
+            "both"
+          ]
+        },
+        "negotiated_type": {
+          "enum": [
+            "negotiated",
+            "derived",
+            "fee schedule",
+            "percentage",
+            "per diem"
+          ]
+        },
+        "billing_code_modifier": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "default": [],
+          "minItems": 1
+        },
+        "negotiated_rate": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "expiration_date": {
+          "type": "string",
+          "format": "date",
+          "description": "This is a date format of YYYY-MM-DD",
+          "minLength": 10,
+          "maxLength": 10
+        },
+        "additional_information": {
+          "type": "string",
+          "description": "In situations in which alternative reimbursement arrangements can neither be expressed as a dollar amount nor as a percentage, this open text field can be used to provide information such as, a description of the formula, variables, methodology or other information necessary to understand the arrangement. The open text field may be utilized for reporting only if a plan or issuer cannot disclose its in-network rates as a dollar amount or a percentage.",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "negotiated_type",
+        "billing_class",
+        "negotiated_rate",
+        "expiration_date",
+        "setting"
+      ],
+      "if": {
+        "properties": {
+          "billing_class": {
+            "const": "professional"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "service_code"
+        ]
+      }
+    },
+    "providers": {
+      "type": "object",
+      "properties": {
+        "npi": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 1000000000,
+                "maximum": 9999999999
+              },
+              "uniqueItems": true,
+              "minItems": 1
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 0
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          ]
+        },
+        "tin": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            },
+            "business_name": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "oneOf": [
+            {
+              "properties": {
+                "type": {
+                  "pattern": "^ein$"
+                },
+                "value": {
+                  "pattern": "^[0-9]{2}-?[0-9]{7}$"
+                }
+              },
+              "required": ["type", "value", "business_name"]
+            },
+            {
+              "properties": {
+                "type": {
+                  "pattern": "^npi$"
+                },
+                "value": {
+                  "pattern": "^[1-9][0-9]{9}$"
+                }
+              },
+              "required": ["type", "value"]
+            }
+          ]
+        }
+      },
+      "required": [
+        "npi",
+        "tin"
+      ]
+    },
+    "billing_code_types": {
+      "enum": [
+        "CPT",
+        "HCPCS",
+        "ICD",
+        "MS-DRG",
+        "R-DRG",
+        "S-DRG",
+        "APS-DRG",
+        "AP-DRG",
+        "APR-DRG",
+        "APC",
+        "NDC",
+        "HIPPS",
+        "LOCAL",
+        "EAPG",
+        "CDT",
+        "RC",
+        "CSTM-ALL"
+      ]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "reporting_entity_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reporting_entity_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "plan_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issuer_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "plan_sponsor_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "plan_id_type": {
+      "enum": [
+        "ein",
+        "hios"
+      ]
+    },
+    "plan_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "plan_market_type": {
+      "enum": [
+        "group",
+        "individual"
+      ]
+    },
+    "last_updated_on": {
+      "type": "string",
+      "format": "date",
+      "description": "This is a date format of YYYY-MM-DD",
+      "minLength": 10,
+      "maxLength": 10
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "provider_references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "provider_group_id": {
+            "type": "integer"
+          },
+          "provider_groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/providers"
+            },
+            "default": [],
+            "minItems": 1
+          },
+          "network_name": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "required": [
+          "provider_group_id",
+          "provider_groups",
+          "network_name"
+        ]
+      },
+      "minLength": 1
+    },
+    "in_network": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/in_network"
+      },
+      "default": [],
+      "minItems": 1
+    }
+  },
+  "if": {
+    "properties": {
+      "plan_id_type": {
+        "enum": [
+          "ein"
+        ]
+      }
+    },
+    "required": [
+      "plan_id_type"
+    ]
+  },
+  "then": {
+    "required": [
+      "plan_sponsor_name"
+    ]
+  },
+  "required": [
+    "reporting_entity_name",
+    "reporting_entity_type",
+    "last_updated_on",
+    "in_network",
+    "version"
+  ],
+  "dependencies": {
+    "plan_name": [
+      "plan_id_type",
+      "plan_id",
+      "plan_market_type",
+      "issuer_name"
+    ],
+    "plan_id_type": [
+      "plan_name",
+      "plan_id",
+      "plan_market_type",
+      "issuer_name"
+    ],
+    "plan_id": [
+      "plan_name",
+      "plan_id_type",
+      "plan_market_type",
+      "issuer_name"
+    ],
+    "plan_market_type": [
+      "plan_name",
+      "plan_id_type",
+      "plan_id",
+      "issuer_name"
+    ],
+    "issuer_name": [
+      "plan_name",
+      "plan_id_type",
+      "plan_market_type",
+      "plan_id"
+    ]
+  }
+}
