@@ -40,20 +40,21 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-      - run: go test ./...
-      - run: go build -o bin/tic-crawler ./cmd/tic-crawler
+      - run: scripts/step.sh "go test" go test ./...
       - name: Restore state and outputs from the data branch
         run: scripts/data_branch.sh restore
+      - name: Build
+        run: go build -o bin/tic-crawler ./cmd/tic-crawler
       - name: NPPES providers in MA and NH
-        run: bin/tic-crawler reference nppes
+        run: scripts/step.sh nppes bin/tic-crawler reference nppes
       - name: Care Compare datasets
-        run: bin/tic-crawler reference provider-data
+        run: scripts/step.sh provider-data bin/tic-crawler reference provider-data
       - name: Extract shoppable-code rates for MA/NH providers
         run: |
-          bin/tic-crawler extract-rates --payer "$PAYER" --toc-url "$TOC_URL" \
+          scripts/step.sh extract-rates bin/tic-crawler extract-rates --payer "$PAYER" --toc-url "$TOC_URL" \
             --npi-file out/reference/nppes.csv.gz --max-files "$MAX_FILES" --max-bytes 8589934592
       - name: Crosswalk and price-quality join
-        run: bin/tic-crawler join-quality --payer "$PAYER"
+        run: scripts/step.sh join-quality bin/tic-crawler join-quality --payer "$PAYER"
       - name: Summary
         if: always()
         run: |
