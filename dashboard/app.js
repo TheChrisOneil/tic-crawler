@@ -109,7 +109,7 @@ async function overview() {
   const tiles = [
     ["Payers tracked", num(t.payers)], ["With a TOC source", num(t.with_toc_source)],
     ["Crawled OK", num(t.ok)], ["Failed", num(t.failed)], ["Retry next run", num(t.deferred || 0)], ["Stale TOCs", num(t.stale)],
-    ["MRF files", num(t.mrf_urls)], ["MRF bytes (HEAD)", bytes(t.mrf_bytes)], ["Schema-invalid TOCs", num(t.schema_invalid)],
+    ["MRF files", num(t.mrf_urls)], ["Size on payer servers", bytes(t.mrf_bytes)], ["Schema-invalid TOCs", num(t.schema_invalid)],
   ];
   app.innerHTML = `
     <div class="kpis">${tiles.map(([l, v]) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("")}</div>
@@ -132,7 +132,7 @@ async function overview() {
     { key: "toc_last_updated_on", label: "TOC updated", render: fresh, sort: (p) => p.age_days },
     { key: "last_crawled", label: "Last crawled", render: (p) => `<span class="nowrap">${esc((p.last_crawled || "").slice(0, 10))}</span>` },
     { key: "mrf_count", label: "MRF files", num: true, render: (p) => p.status === "never" ? "" : num(p.mrf_count) },
-    { key: "total_bytes", label: "Bytes", num: true, render: (p) => p.status === "never" ? "" : `<span class="nowrap">${bytes(p.total_bytes)}</span>` },
+    { key: "total_bytes", label: "Size on payer servers", num: true, render: (p) => p.status === "never" ? "" : `<span class="nowrap">${bytes(p.total_bytes)}</span>` },
     { key: "schema_valid", label: "Schema", render: validBadge, sort: (p) => p.validation_errors },
     { key: "error", label: "Last error", render: (p) => `${p.access_status && p.access_status !== "ok" ? `<span class="badge b-idle">${esc(ACCESS[p.access_status] || p.access_status)}</span> ` : ""}<div class="clip muted" title="${esc(p.error)}">${esc(p.error)}</div>` },
   ];
