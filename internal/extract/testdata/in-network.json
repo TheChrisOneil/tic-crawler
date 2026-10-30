@@ -1,0 +1,50 @@
+{
+  "reporting_entity_name": "Example Health Plan",
+  "reporting_entity_type": "health insurance issuer",
+  "plan_name": "Example PPO",
+  "plan_id_type": "EIN",
+  "plan_id": "12-3456789",
+  "plan_market_type": "group",
+  "last_updated_on": "2026-10-01",
+  "version": "2.2.1",
+  "in_network": [
+    {
+      "negotiated_rates": [
+        {"provider_references": [1], "negotiated_prices": [
+          {"negotiated_type": "negotiated", "negotiated_rate": 1250.5, "expiration_date": "9999-12-31",
+           "billing_class": "institutional", "setting": "outpatient", "service_code": ["22"]}]}
+      ],
+      "negotiation_arrangement": "ffs", "name": "MRI knee", "billing_code_type": "CPT",
+      "billing_code_type_version": "2026", "billing_code": "73721", "description": "MRI joint of lower extremity"
+    },
+    {
+      "negotiation_arrangement": "ffs", "name": "Office visit", "billing_code_type": "CPT",
+      "billing_code_type_version": "2026", "billing_code": "99213", "description": "Office visit",
+      "negotiated_rates": [
+        {"provider_references": [1, 2], "negotiated_prices": [
+          {"negotiated_type": "negotiated", "negotiated_rate": 98.12, "expiration_date": "9999-12-31",
+           "billing_class": "professional", "setting": "both", "service_code": ["11", "22"], "billing_code_modifier": ["25"]},
+          {"negotiated_type": "negotiated", "negotiated_rate": 0.01, "expiration_date": "9999-12-31",
+           "billing_class": "professional", "setting": "both"}]},
+        {"provider_groups": [{"npi": [1999999999], "tin": {"type": "ein", "value": "98-7654321", "business_name": "Inline Clinic"}}],
+         "negotiated_prices": [{"negotiated_type": "negotiated", "negotiated_rate": 120, "expiration_date": "9999-12-31",
+           "billing_class": "professional", "setting": "both"}]},
+        {"provider_references": [3], "negotiated_prices": [{"negotiated_type": "negotiated", "negotiated_rate": 77,
+           "expiration_date": "9999-12-31", "billing_class": "professional", "setting": "both"}]}
+      ]
+    },
+    {
+      "negotiation_arrangement": "ffs", "name": "Not wanted", "billing_code_type": "CPT",
+      "billing_code_type_version": "2026", "billing_code": "11111", "description": "x",
+      "negotiated_rates": [{"provider_references": [1], "negotiated_prices": [{"negotiated_type": "negotiated",
+        "negotiated_rate": 5, "expiration_date": "9999-12-31", "billing_class": "professional", "setting": "both"}]}]
+    }
+  ],
+  "provider_references": [
+    {"provider_group_id": 1, "network_name": ["PPO"], "provider_groups": [
+      {"npi": [1234567893, 1111111111], "tin": {"type": "ein", "value": "11-1111111", "business_name": "Mass Hospital"}}]},
+    {"provider_group_id": 2, "network_name": ["PPO"], "provider_groups": [
+      {"npi": [2222222222], "tin": {"type": "ein", "value": "22-2222222", "business_name": "Far Away Clinic"}}]},
+    {"provider_group_id": 3, "location": "https://example.test/ref3.json"}
+  ]
+}

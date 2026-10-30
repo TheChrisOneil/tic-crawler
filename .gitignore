@@ -16,3 +16,7 @@ state/
 out/
 raw/
 *.sqlite
+
+# Go
+/tic-crawler-go
+/bin/
