@@ -258,6 +258,12 @@ func (c *Client) do(ctx context.Context, method, rawURL string, headers map[stri
 	return c.HTTP.Do(req)
 }
 
+// Raw sends one request with the crawler's User-Agent and nothing else: no robots check, rate
+// limit, or retries. The access audit uses it to see exactly what a host returns.
+func (c *Client) Raw(ctx context.Context, method, rawURL string, headers map[string]string) (*http.Response, error) {
+	return c.do(ctx, method, rawURL, headers)
+}
+
 type cancelOnClose struct {
 	io.ReadCloser
 	cancel context.CancelFunc

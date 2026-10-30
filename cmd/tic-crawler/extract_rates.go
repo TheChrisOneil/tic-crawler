@@ -166,7 +166,7 @@ never stored. The run stops before downloading more than limits.max_run_bytes.`,
 				}
 			}
 			ctx := context.Background()
-			client := fetch.New(s)
+			client := newClient(s)
 			// Remote provider references are read while the main file's slot is held, so they
 			// bypass the concurrency semaphore (Send still applies robots and the rate limit).
 			opt.FetchRemote = func(u string) (io.ReadCloser, error) {

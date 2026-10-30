@@ -13,7 +13,6 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/TheChrisOneil/tic-crawler/internal/extract"
-	"github.com/TheChrisOneil/tic-crawler/internal/fetch"
 	"github.com/TheChrisOneil/tic-crawler/internal/quality"
 	"github.com/TheChrisOneil/tic-crawler/internal/reference"
 )
@@ -53,7 +52,7 @@ func referenceCmd() *cobra.Command {
 				return err
 			}
 			ctx := context.Background()
-			c := fetch.New(s)
+			c := newClient(s)
 			src := nppesZip
 			info := map[string]any{"states": rc.States}
 			if src == "" {
@@ -109,7 +108,7 @@ func referenceCmd() *cobra.Command {
 				return err
 			}
 			ctx := context.Background()
-			c := fetch.New(s)
+			c := newClient(s)
 			var metas []reference.DatasetMeta
 			// State-filtered datasets first; national files without a state column (facility
 			// affiliations) are then filtered to the NPIs found in NPPES and the clinician file.
@@ -173,7 +172,7 @@ func referenceCmd() *cobra.Command {
 					todo = append(todo, n)
 				}
 			}
-			looked, kept, err := reference.LookupNPIs(context.Background(), fetch.New(s), rc.NPIAPIURL, todo, rcStates(rc),
+			looked, kept, err := reference.LookupNPIs(context.Background(), newClient(s), rc.NPIAPIURL, todo, rcStates(rc),
 				rc.NPILookupMax, filepath.Join(outDir, "npi-lookup.csv.gz"))
 			fmt.Fprintf(cmd.OutOrStdout(), "npi-lookup: %d institutional NPIs, %d looked up, %d in %v\n", len(npis), looked, kept, rc.States)
 			if err != nil {
