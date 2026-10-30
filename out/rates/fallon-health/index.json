@@ -1,0 +1,99 @@
+{
+  "bytes_downloaded": 178777148,
+  "files": [
+    {
+      "url": "https://fallon.sapphiremrfhub.com/mrfs/202610/2026-09-04_Beacon_Fallon-Health_in-network-rates.json.gz",
+      "dir": "931ac26936ff",
+      "plan_count": 35,
+      "plan_names": [
+        "Standard Silver: Community Care Connector High Silver",
+        "Standard Silver: Community Care Connector High Silver II",
+        "Standard High Gold: Community Care Connector High Gold",
+        "Non-Standard Low Gold: Community Care Connector Low Gold",
+        "Standard Platinum: Community Care Connector Platinum",
+        "Standard High Bronze: Community Care Connector Bronze #1",
+        "Standard Low Silver HSA: Community Care Connector Low Silver HSA ",
+        "Standard Low Silver HSA: Community Care Connector Low Silver HSA"
+      ],
+      "content_length": 137687505,
+      "bytes_downloaded": 137687505,
+      "status": "ok",
+      "meta": {
+        "reporting_entity_name": "Carelon",
+        "reporting_entity_type": "Third party",
+        "last_updated_on": "2026-09-01",
+        "version": "2.0.0",
+        "plan": {
+          "issuer_name": "fallon health",
+          "plan_id": "04-3169246",
+          "plan_id_type": "ein",
+          "plan_market_type": "group",
+          "plan_name": "Fallon-Health",
+          "plan_sponsor_name": "FALLON COMMUNITY HEALTH PLAN  INC"
+        },
+        "sha256": "c4f94d012c381050d91509aa002eb54dfcab6e4530258f54ffc5b7ab23b742b7",
+        "bytes_decompressed": 1670304443,
+        "in_network_items": 2107526,
+        "in_network_items_kept": 181830,
+        "provider_references": 5079,
+        "provider_references_kept": 5079,
+        "remote_references_fetched": 0,
+        "rate_rows": 181830,
+        "group_rows": 5079,
+        "placeholder_rate_rows": 171,
+        "codes_found": [
+          "HCPCS:90791",
+          "HCPCS:90834",
+          "HCPCS:90837",
+          "HCPCS:90847",
+          "HCPCS:99202",
+          "HCPCS:99203",
+          "HCPCS:99204",
+          "HCPCS:99205",
+          "HCPCS:99212",
+          "HCPCS:99213",
+          "HCPCS:99214",
+          "HCPCS:99215"
+        ]
+      }
+    },
+    {
+      "url": "https://fallon.sapphiremrfhub.com/mrfs/202610/2026-09-21_Fallon-Health_Dental_in-network-rates.json.gz",
+      "dir": "8b4cea966ada",
+      "plan_count": 35,
+      "plan_names": [
+        "Standard Silver: Community Care Connector High Silver",
+        "Standard Silver: Community Care Connector High Silver II",
+        "Standard High Gold: Community Care Connector High Gold",
+        "Non-Standard Low Gold: Community Care Connector Low Gold",
+        "Standard Platinum: Community Care Connector Platinum",
+        "Standard High Bronze: Community Care Connector Bronze #1",
+        "Standard Low Silver HSA: Community Care Connector Low Silver HSA ",
+        "Standard Low Silver HSA: Community Care Connector Low Silver HSA"
+      ],
+      "content_length": 41089643,
+      "bytes_downloaded": 41089643,
+      "status": "ok",
+      "meta": {
+        "reporting_entity_name": "DentaQuest",
+        "reporting_entity_type": "Third party administrator",
+        "last_updated_on": "2026-09-21",
+        "version": "2.0",
+        "sha256": "089376ab53e751fb6e55445c4577873b60ed7d837d8208c28c141bfcf85e8ec0",
+        "bytes_decompressed": 461564390,
+        "in_network_items": 561,
+        "in_network_items_kept": 0,
+        "provider_references": 0,
+        "provider_references_kept": 0,
+        "remote_references_fetched": 0,
+        "rate_rows": 0,
+        "group_rows": 0,
+        "placeholder_rate_rows": 0,
+        "codes_found": null
+      }
+    }
+  ],
+  "max_run_bytes": 8589934592,
+  "payer_id": "fallon-health",
+  "toc_url": "https://fallon.sapphiremrfhub.com/tocs/202610/2026-10-01_fallon-health_index.json"
+}

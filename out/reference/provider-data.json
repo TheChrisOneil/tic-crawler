@@ -1,0 +1,66 @@
+[
+  {
+    "id": "632h-zaca",
+    "title": "Unplanned Hospital Visits - Hospital",
+    "modified": "2026-09-10",
+    "download_url": "https://data.cms.gov/provider-data/sites/default/files/resources/30edc1d0417a34b58affcc2495a02b0a_1790013959/Unplanned_Hospital_Visits-Hospital.csv",
+    "rows_kept": 1274,
+    "file": "provider-data/632h-zaca.csv.gz"
+  },
+  {
+    "id": "77hc-ibv8",
+    "title": "Healthcare Associated Infections - Hospital",
+    "modified": "2026-07-22",
+    "download_url": "https://data.cms.gov/provider-data/sites/default/files/resources/43825e12dc0c923df9ba5cbdf473c9d5_1785189952/Healthcare_Associated_Infections-Hospital.csv",
+    "rows_kept": 3276,
+    "file": "provider-data/77hc-ibv8.csv.gz"
+  },
+  {
+    "id": "dgck-syfz",
+    "title": "Patient survey (HCAHPS) - Hospital",
+    "modified": "2026-07-22",
+    "download_url": "https://data.cms.gov/provider-data/sites/default/files/resources/78a50346fbe828ea0ce2837847af6a7c_1785189950/HCAHPS-Hospital.csv",
+    "rows_kept": 6188,
+    "file": "provider-data/dgck-syfz.csv.gz"
+  },
+  {
+    "id": "mj5m-pzi6",
+    "title": "National Downloadable File",
+    "modified": "2026-10-02",
+    "download_url": "https://data.cms.gov/provider-data/sites/default/files/resources/52c3f098d7e56028a298fd297cb0b38d_1790972133/DAC_NationalDownloadableFile.csv",
+    "rows_kept": 116838,
+    "file": "provider-data/mj5m-pzi6.csv.gz"
+  },
+  {
+    "id": "xubh-q36u",
+    "title": "Hospital General Information",
+    "modified": "2026-07-22",
+    "download_url": "https://data.cms.gov/provider-data/sites/default/files/resources/893c372430d9d71a1c52737d01239d47_1785189955/Hospital_General_Information.csv",
+    "rows_kept": 111,
+    "file": "provider-data/xubh-q36u.csv.gz"
+  },
+  {
+    "id": "ynj2-r877",
+    "title": "Complications and Deaths - Hospital",
+    "modified": "2026-09-10",
+    "download_url": "https://data.cms.gov/provider-data/sites/default/files/resources/6af7c44d77436e5a1caac3ce39a83fe9_1790013956/Complications_and_Deaths-Hospital.csv",
+    "rows_kept": 1820,
+    "file": "provider-data/ynj2-r877.csv.gz"
+  },
+  {
+    "id": "yv7e-xc69",
+    "title": "Timely and Effective Care - Hospital",
+    "modified": "2026-07-22",
+    "download_url": "https://data.cms.gov/provider-data/sites/default/files/resources/0437b5494ac61507ad90f2af6b8085a7_1785189967/Timely_and_Effective_Care-Hospital.csv",
+    "rows_kept": 2605,
+    "file": "provider-data/yv7e-xc69.csv.gz"
+  },
+  {
+    "id": "27ea-46a8",
+    "title": "Facility Affiliation Data",
+    "modified": "2026-10-02",
+    "download_url": "https://data.cms.gov/provider-data/sites/default/files/resources/b7c4080ae144663e43353a9c35cd3f53_1790972135/Facility_Affiliation.csv",
+    "rows_kept": 103229,
+    "file": "provider-data/27ea-46a8.csv.gz"
+  }
+]

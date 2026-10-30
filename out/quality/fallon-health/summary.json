@@ -1,0 +1,143 @@
+{
+  "payer_id": "fallon-health",
+  "files": 2,
+  "rate_rows_in": 181830,
+  "rows_in_states": 53939,
+  "providers": 1838,
+  "providers_linked_to_hospital": 93,
+  "hospitals": 59,
+  "codes": [
+    {
+      "code": "HCPCS:90791",
+      "label": "Psychiatric diagnostic evaluation",
+      "rows": 9526,
+      "providers": 1838,
+      "providers_linked_to_hospital": 93,
+      "providers_with_star_rating": 77,
+      "min_rate": 50,
+      "median_rate": 154.41,
+      "max_rate": 424.01
+    },
+    {
+      "code": "HCPCS:90834",
+      "label": "Psychotherapy, 45 min",
+      "rows": 8015,
+      "providers": 1836,
+      "providers_linked_to_hospital": 93,
+      "providers_with_star_rating": 77,
+      "min_rate": 45,
+      "median_rate": 102.96,
+      "max_rate": 340.88
+    },
+    {
+      "code": "HCPCS:90837",
+      "label": "Psychotherapy, 60 min",
+      "rows": 7995,
+      "providers": 1836,
+      "providers_linked_to_hospital": 93,
+      "providers_with_star_rating": 77,
+      "min_rate": 59.85,
+      "median_rate": 148.41,
+      "max_rate": 453.35
+    },
+    {
+      "code": "HCPCS:90847",
+      "label": "Family psychotherapy with patient",
+      "rows": 7975,
+      "providers": 1834,
+      "providers_linked_to_hospital": 93,
+      "providers_with_star_rating": 77,
+      "min_rate": 45,
+      "median_rate": 104.41,
+      "max_rate": 350.42
+    },
+    {
+      "code": "HCPCS:99202",
+      "label": "New patient office visit, 15-29 min",
+      "rows": 2553,
+      "providers": 863,
+      "providers_linked_to_hospital": 87,
+      "providers_with_star_rating": 71,
+      "min_rate": 18.3,
+      "median_rate": 78.79,
+      "max_rate": 166.67
+    },
+    {
+      "code": "HCPCS:99203",
+      "label": "New patient office visit, 30-44 min",
+      "rows": 2553,
+      "providers": 863,
+      "providers_linked_to_hospital": 87,
+      "providers_with_star_rating": 71,
+      "min_rate": 27,
+      "median_rate": 122.09,
+      "max_rate": 239.8
+    },
+    {
+      "code": "HCPCS:99204",
+      "label": "New patient office visit, 45-59 min",
+      "rows": 2554,
+      "providers": 863,
+      "providers_linked_to_hospital": 87,
+      "providers_with_star_rating": 71,
+      "min_rate": 40.8,
+      "median_rate": 183.29,
+      "max_rate": 362.35
+    },
+    {
+      "code": "HCPCS:99205",
+      "label": "New patient office visit, 60-74 min",
+      "rows": 2554,
+      "providers": 863,
+      "providers_linked_to_hospital": 87,
+      "providers_with_star_rating": 71,
+      "min_rate": 51.3,
+      "median_rate": 236.97,
+      "max_rate": 455.64
+    },
+    {
+      "code": "HCPCS:99212",
+      "label": "Established patient office visit, 10-19 min",
+      "rows": 2552,
+      "providers": 863,
+      "providers_linked_to_hospital": 87,
+      "providers_with_star_rating": 71,
+      "min_rate": 14.1,
+      "median_rate": 58.085,
+      "max_rate": 118.41
+    },
+    {
+      "code": "HCPCS:99213",
+      "label": "Established patient office visit, 20-29 min",
+      "rows": 2556,
+      "providers": 863,
+      "providers_linked_to_hospital": 87,
+      "providers_with_star_rating": 71,
+      "min_rate": 26.6,
+      "median_rate": 92.52,
+      "max_rate": 177.6
+    },
+    {
+      "code": "HCPCS:99214",
+      "label": "Established patient office visit, 30-39 min",
+      "rows": 2554,
+      "providers": 863,
+      "providers_linked_to_hospital": 87,
+      "providers_with_star_rating": 71,
+      "min_rate": 34.5,
+      "median_rate": 140.89,
+      "max_rate": 296.01
+    },
+    {
+      "code": "HCPCS:99215",
+      "label": "Established patient office visit, 40-54 min",
+      "rows": 2552,
+      "providers": 863,
+      "providers_linked_to_hospital": 87,
+      "providers_with_star_rating": 71,
+      "min_rate": 46.5,
+      "median_rate": 184.51,
+      "max_rate": 473.61
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "reporting_entity_name": "DentaQuest",
+  "reporting_entity_type": "Third party administrator",
+  "last_updated_on": "2026-09-21",
+  "version": "2.0",
+  "sha256": "089376ab53e751fb6e55445c4577873b60ed7d837d8208c28c141bfcf85e8ec0",
+  "bytes_decompressed": 461564390,
+  "in_network_items": 561,
+  "in_network_items_kept": 0,
+  "provider_references": 0,
+  "provider_references_kept": 0,
+  "remote_references_fetched": 0,
+  "rate_rows": 0,
+  "group_rows": 0,
+  "placeholder_rate_rows": 0,
+  "codes_found": null
+}

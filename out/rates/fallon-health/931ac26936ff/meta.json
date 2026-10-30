@@ -1,0 +1,38 @@
+{
+  "reporting_entity_name": "Carelon",
+  "reporting_entity_type": "Third party",
+  "last_updated_on": "2026-09-01",
+  "version": "2.0.0",
+  "plan": {
+    "issuer_name": "fallon health",
+    "plan_id": "04-3169246",
+    "plan_id_type": "ein",
+    "plan_market_type": "group",
+    "plan_name": "Fallon-Health",
+    "plan_sponsor_name": "FALLON COMMUNITY HEALTH PLAN  INC"
+  },
+  "sha256": "c4f94d012c381050d91509aa002eb54dfcab6e4530258f54ffc5b7ab23b742b7",
+  "bytes_decompressed": 1670304443,
+  "in_network_items": 2107526,
+  "in_network_items_kept": 181830,
+  "provider_references": 5079,
+  "provider_references_kept": 5079,
+  "remote_references_fetched": 0,
+  "rate_rows": 181830,
+  "group_rows": 5079,
+  "placeholder_rate_rows": 171,
+  "codes_found": [
+    "HCPCS:90791",
+    "HCPCS:90834",
+    "HCPCS:90837",
+    "HCPCS:90847",
+    "HCPCS:99202",
+    "HCPCS:99203",
+    "HCPCS:99204",
+    "HCPCS:99205",
+    "HCPCS:99212",
+    "HCPCS:99213",
+    "HCPCS:99214",
+    "HCPCS:99215"
+  ]
+}
