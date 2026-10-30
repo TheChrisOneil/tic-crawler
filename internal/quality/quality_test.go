@@ -81,7 +81,7 @@ func TestCrosswalkAndJoin(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Only NPI 1234567893 (MA) is in both the file and the state list.
-	if sum.Files != 1 || sum.Providers != 1 || sum.ProvidersWithCCN != 1 || sum.Hospitals != 1 || sum.RowsInStates != 4 {
+	if sum.Files != 1 || sum.Providers != 1 || sum.ProvidersWithCCN != 1 || sum.Hospitals != 1 || sum.RowsInStates != 5 {
 		b, _ := json.Marshal(sum)
 		t.Fatalf("%s", b)
 	}
@@ -91,7 +91,8 @@ func TestCrosswalkAndJoin(t *testing.T) {
 			visit = c
 		}
 	}
-	if visit == nil || visit.Label != "Office visit" || visit.ProvidersWithStars != 1 || visit.Min != 98.12 || visit.Max != 98.12 {
+	if visit == nil || visit.Label != "Office visit" || visit.ProvidersWithStars != 1 || visit.Min != 98.12 || visit.Max != 98.12 ||
+		visit.BillingClass != "professional" || visit.OtherTypeRows != 1 || visit.DollarRows != 1 {
 		t.Fatalf("%+v", visit)
 	}
 

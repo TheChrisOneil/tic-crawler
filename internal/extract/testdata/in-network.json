@@ -25,6 +25,8 @@
           {"negotiated_type": "negotiated", "negotiated_rate": 98.12, "expiration_date": "9999-12-31",
            "billing_class": "professional", "setting": "both", "service_code": ["11", "22"], "billing_code_modifier": ["25"]},
           {"negotiated_type": "negotiated", "negotiated_rate": 0.01, "expiration_date": "9999-12-31",
+           "billing_class": "professional", "setting": "both"},
+          {"negotiated_type": "percentage", "negotiated_rate": 85, "expiration_date": "9999-12-31",
            "billing_class": "professional", "setting": "both"}]},
         {"provider_groups": [{"npi": [1999999999], "tin": {"type": "ein", "value": "98-7654321", "business_name": "Inline Clinic"}}],
          "negotiated_prices": [{"negotiated_type": "negotiated", "negotiated_rate": 120, "expiration_date": "9999-12-31",

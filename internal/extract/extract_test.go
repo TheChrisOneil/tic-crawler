@@ -68,9 +68,9 @@ func TestFiltersByCodeAndNPI(t *testing.T) {
 	})
 	rates := readGz(t, filepath.Join(out, "rates.csv.gz"))
 	groups := readGz(t, filepath.Join(out, "groups.csv.gz"))
-	// 73721 via group 1; 99213 two prices via group 1, one via remote group 3.
+	// 73721 via group 1; 99213 three prices via group 1, one via remote group 3.
 	// Group 2 (NPI not listed) and the inline group are dropped.
-	if len(rates)-1 != 4 {
+	if len(rates)-1 != 5 {
 		t.Fatalf("rates: %v", rates)
 	}
 	for _, r := range rates[1:] {
@@ -81,7 +81,7 @@ func TestFiltersByCodeAndNPI(t *testing.T) {
 	if len(groups)-1 != 2 || groups[1][1] != "1234567893" || groups[2][0] != "3" {
 		t.Fatalf("groups: %v", groups)
 	}
-	if m.PlaceholderRows != 1 || m.RateRows != 4 || m.ItemsKept != 2 || m.InNetworkItems != 3 || m.RemoteRefsFetched != 1 {
+	if m.PlaceholderRows != 1 || m.RateRows != 5 || m.ItemsKept != 2 || m.InNetworkItems != 3 || m.RemoteRefsFetched != 1 {
 		t.Fatalf("%+v", m)
 	}
 	if m.ReportingEntityName != "Example Health Plan" || m.Plan["plan_id"] != "12-3456789" || m.SHA256 == "" {

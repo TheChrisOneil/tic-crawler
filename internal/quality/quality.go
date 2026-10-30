@@ -368,10 +368,16 @@ var PriceHeader = []string{"billing_code_type", "billing_code", "label", "negoti
 	"billing_class", "setting", "placeholder", "npi", "provider_name", "entity_type", "city", "state", "zip5",
 	"taxonomy", "tin_value", "business_name", "ccn", "match_method", "hospital_name", "hospital_overall_rating", "source_dir"}
 
+// CodeStats summarizes one billing code for one billing class (professional fees and facility
+// fees are different prices). Min, median and max use dollar rates only; percentage-of-charges
+// and per diem rows are counted but left out of the price statistics.
 type CodeStats struct {
 	Code               string  `json:"code"`
 	Label              string  `json:"label"`
+	BillingClass       string  `json:"billing_class"`
 	Rows               int     `json:"rows"`
+	DollarRows         int     `json:"dollar_rows"`
+	OtherTypeRows      int     `json:"other_type_rows"`
 	Providers          int     `json:"providers"`
 	ProvidersWithCCN   int     `json:"providers_linked_to_hospital"`
 	ProvidersWithStars int     `json:"providers_with_star_rating"`
@@ -451,6 +457,8 @@ func JoinPrices(payerID, ratesDir, outDir string, providers map[string]Provider,
 			}
 			sum.RateRowsIn++
 			key := extract.CodeKey(rec[ct], rec[code])
+			class := strings.ToLower(rec[bclass])
+			dollar := isDollarType(rec[ntype])
 			for _, g := range groups[rec[pg]] {
 				p, ok := providers[g.npi]
 				if !ok {
@@ -466,12 +474,15 @@ func JoinPrices(payerID, ratesDir, outDir string, providers map[string]Provider,
 				if l.CCN != "" {
 					allHospitals[l.CCN] = true
 				}
-				st := stats[key]
+				st := stats[key+"|"+class]
 				if st == nil {
-					st = &CodeStats{Code: key, Label: labels[key], providers: map[string]int{}}
-					stats[key] = st
+					st = &CodeStats{Code: key, Label: labels[key], BillingClass: class, providers: map[string]int{}}
+					stats[key+"|"+class] = st
 				}
 				st.Rows++
+				if !dollar {
+					st.OtherTypeRows++
+				}
 				level := 0
 				if l.CCN != "" {
 					level = 1
@@ -482,8 +493,9 @@ func JoinPrices(payerID, ratesDir, outDir string, providers map[string]Provider,
 				if level > st.providers[p.NPI] || st.providers[p.NPI] == 0 {
 					st.providers[p.NPI] = level
 				}
-				if f, err := strconv.ParseFloat(rec[rate], 64); err == nil && rec[ph] != "1" {
+				if f, err := strconv.ParseFloat(rec[rate], 64); err == nil && rec[ph] != "1" && dollar {
 					st.rates = append(st.rates, f)
+					st.DollarRows++
 				}
 			}
 		}
@@ -523,6 +535,16 @@ func JoinPrices(payerID, ratesDir, outDir string, providers map[string]Provider,
 	}
 	b, _ := json.MarshalIndent(sum, "", "  ")
 	return sum, os.WriteFile(filepath.Join(outDir, "summary.json"), append(b, '\n'), 0o644)
+}
+
+// isDollarType reports whether a negotiated_type is a dollar amount. "percentage" is a percent
+// of billed charges and "per diem" is a daily rate, so neither compares with a case price.
+func isDollarType(t string) bool {
+	switch strings.ToLower(t) {
+	case "negotiated", "fee schedule", "derived":
+		return true
+	}
+	return false
 }
 
 func loadGroups(path string) (map[string][]group, error) {
