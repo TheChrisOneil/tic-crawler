@@ -1,35 +1,70 @@
-== go test (exit 0)
+== go test (exit 1)
 go: downloading github.com/BurntSushi/toml v1.4.0
 go: downloading gopkg.in/yaml.v3 v3.0.1
 go: downloading github.com/spf13/cobra v1.8.1
+go: downloading github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
+go: downloading golang.org/x/text v0.21.0
+go: downloading cloud.google.com/go/storage v1.49.0
+go: downloading cloud.google.com/go v0.116.0
+go: downloading google.golang.org/api v0.214.0
 go: downloading github.com/spf13/pflag v1.0.5
+go: downloading cloud.google.com/go/compute/metadata v0.6.0
+go: downloading cloud.google.com/go/iam v1.2.2
+go: downloading github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.48.1
+go: downloading github.com/google/uuid v1.6.0
+go: downloading github.com/googleapis/gax-go/v2 v2.14.0
+go: downloading go.opentelemetry.io/contrib/detectors/gcp v1.29.0
+go: downloading go.opentelemetry.io/otel v1.29.0
+go: downloading go.opentelemetry.io/otel/sdk/metric v1.29.0
+go: downloading go.opentelemetry.io/otel/sdk v1.29.0
+go: downloading golang.org/x/oauth2 v0.24.0
+go: downloading google.golang.org/genproto v0.0.0-20241118233622-e639e219e697
+go: downloading google.golang.org/grpc v1.67.3
+go: downloading google.golang.org/protobuf v1.35.2
+go: downloading cloud.google.com/go/auth v0.13.0
+go: downloading google.golang.org/genproto/googleapis/api v0.0.0-20241118233622-e639e219e697
+go: downloading go.opencensus.io v0.24.0
+go: downloading go.opentelemetry.io/otel/trace v1.29.0
+go: downloading google.golang.org/genproto/googleapis/rpc v0.0.0-20241209162323-e6fa225c2576
+go: downloading cloud.google.com/go/monitoring v1.21.2
+go: downloading github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.48.1
+go: downloading github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.25.0
+go: downloading go.opentelemetry.io/otel/metric v1.29.0
+go: downloading golang.org/x/sys v0.28.0
+go: downloading cloud.google.com/go/auth/oauth2adapt v0.2.6
+go: downloading go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.54.0
+go: downloading golang.org/x/net v0.33.0
+go: downloading github.com/google/s2a-go v0.1.8
+go: downloading github.com/go-logr/logr v1.4.2
+go: downloading github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
+go: downloading go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.54.0
+go: downloading golang.org/x/time v0.8.0
+go: downloading github.com/go-logr/stdr v1.2.2
+go: downloading github.com/googleapis/enterprise-certificate-proxy v0.3.4
+go: downloading github.com/felixge/httpsnoop v1.0.4
+go: downloading github.com/envoyproxy/go-control-plane v0.13.1
+go: downloading github.com/cespare/xxhash/v2 v2.3.0
+go: downloading github.com/cncf/xds/go v0.0.0-20240905190251-b4127c9b8d78
+go: downloading github.com/envoyproxy/protoc-gen-validate v1.1.0
+go: downloading golang.org/x/sync v0.10.0
+go: downloading cel.dev/expr v0.16.1
+go: downloading github.com/census-instrumentation/opencensus-proto v0.4.1
+go: downloading golang.org/x/crypto v0.31.0
+# github.com/TheChrisOneil/tic-crawler/internal/pipeline
+internal/pipeline/pipeline.go:31:2: no required module provides package github.com/TheChrisOneil/tic-crawler/internal/state; to add it:
+	go get github.com/TheChrisOneil/tic-crawler/internal/state
+FAIL	github.com/TheChrisOneil/tic-crawler/internal/pipeline [setup failed]
 ok  	github.com/TheChrisOneil/tic-crawler/cmd/tic-crawler	0.015s
 ok  	github.com/TheChrisOneil/tic-crawler/internal/config	0.003s
 ok  	github.com/TheChrisOneil/tic-crawler/internal/discovery	0.009s
-ok  	github.com/TheChrisOneil/tic-crawler/internal/extract	0.022s
-ok  	github.com/TheChrisOneil/tic-crawler/internal/fetch	0.012s
-ok  	github.com/TheChrisOneil/tic-crawler/internal/model	0.004s
-ok  	github.com/TheChrisOneil/tic-crawler/internal/quality	0.013s
-ok  	github.com/TheChrisOneil/tic-crawler/internal/reference	0.013s
-ok  	github.com/TheChrisOneil/tic-crawler/internal/robots	0.003s
+ok  	github.com/TheChrisOneil/tic-crawler/internal/extract	0.020s
+ok  	github.com/TheChrisOneil/tic-crawler/internal/fetch	0.013s
+ok  	github.com/TheChrisOneil/tic-crawler/internal/model	0.003s
+ok  	github.com/TheChrisOneil/tic-crawler/internal/quality	0.023s
+ok  	github.com/TheChrisOneil/tic-crawler/internal/reference	0.025s
+ok  	github.com/TheChrisOneil/tic-crawler/internal/robots	0.004s
+?   	github.com/TheChrisOneil/tic-crawler/internal/schemas	[no test files]
+ok  	github.com/TheChrisOneil/tic-crawler/internal/storage	0.023s
 ok  	github.com/TheChrisOneil/tic-crawler/internal/toc	0.004s
-== nppes (exit 1)
-error: no monthly NPPES_Data_Dissemination zip link on the NPPES files page
-== nppes (exit 1)
-error: no monthly NPPES_Data_Dissemination zip link on the NPPES files page
-== provider-data (exit 0)
-632h-zaca "Unplanned Hospital Visits - Hospital": 1274 rows (modified 2026-09-10)
-77hc-ibv8 "Healthcare Associated Infections - Hospital": 3276 rows (modified 2026-07-22)
-dgck-syfz "Patient survey (HCAHPS) - Hospital": 6188 rows (modified 2026-07-22)
-mj5m-pzi6 "National Downloadable File": 116838 rows (modified 2026-10-02)
-xubh-q36u "Hospital General Information": 111 rows (modified 2026-07-22)
-ynj2-r877 "Complications and Deaths - Hospital": 1820 rows (modified 2026-09-10)
-yv7e-xc69 "Timely and Effective Care - Hospital": 2605 rows (modified 2026-07-22)
-27ea-46a8 "Facility Affiliation Data": 103229 rows (modified 2026-10-02)
-== extract-rates (exit 0)
-ok https://fallon.sapphiremrfhub.com/mrfs/202610/2026-09-04_Beacon_Fallon-Health_in-network-rates.json.gz 137687505 bytes in 34s 
-ok https://fallon.sapphiremrfhub.com/mrfs/202610/2026-09-21_Fallon-Health_Dental_in-network-rates.json.gz 41089643 bytes in 7s 
-== npi-lookup (exit 0)
-npi-lookup: 404 institutional NPIs, 404 looked up, 384 in [MA NH]
-== join-quality (exit 0)
-crosswalk: 77431 links map[address:50 affiliation:77376 name_zip:5]; fallon-health: 53939 rows in states, 1838 providers, 93 linked to 59 hospitals
+ok  	github.com/TheChrisOneil/tic-crawler/internal/validate	0.025s
+FAIL
