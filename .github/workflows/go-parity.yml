@@ -1,0 +1,59 @@
+name: go-parity
+# Crawls the same payers with the Python and the Go tool, one after the other, each with its
+# own empty state, and diffs manifests, registry and dashboard JSON. Local output only; it does
+# not publish to the data branch.
+on:
+  workflow_dispatch:
+    inputs:
+      payers:
+        description: "Space-separated payer ids"
+        default: "qualchoice bcbs-mississippi bcbs-kansas bcbs-michigan-employer"
+  push:
+    branches: [go-rewrite]
+    paths: [".github/workflows/go-parity.yml", "scripts/parity_diff.py"]
+
+permissions:
+  contents: read
+
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      TIC_CONTACT_EMAIL: ${{ secrets.TIC_CONTACT_EMAIL || 'chris@thechrisoneil.com' }}
+      PAYERS: ${{ github.event.inputs.payers || 'qualchoice bcbs-mississippi bcbs-kansas bcbs-michigan-employer' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: pip install -e .
+      - run: go build -o bin/tic-crawler-go ./cmd/tic-crawler
+      - name: Configs
+        run: |
+          for t in py go; do
+            mkdir -p parity/$t
+            sed -e "s#^local_dir *=.*#local_dir = \"parity/$t/out\"#" \
+                -e "s#^state_db *=.*#state_db = \"parity/$t/state/tic.sqlite\"#" config.toml > parity/$t/config.toml
+          done
+      - name: Crawl with Python
+        run: |
+          args=""; for p in $PAYERS; do args="$args --payer $p"; done
+          C=parity/py/config.toml
+          scripts/step.sh py-discover tic-crawler discover --source seed --config $C
+          scripts/step.sh py-crawl tic-crawler crawl $args --config $C
+          tic-crawler audit-access --mrf-samples 0 --config $C
+          tic-crawler export-dashboard --config $C
+      - name: Crawl with Go
+        run: |
+          args=""; for p in $PAYERS; do args="$args --payer $p"; done
+          C=parity/go/config.toml
+          scripts/step.sh go-discover bin/tic-crawler-go discover --source seed --config $C
+          scripts/step.sh go-crawl bin/tic-crawler-go crawl $args --config $C
+          bin/tic-crawler-go audit-access --mrf-samples 0 --config $C
+          bin/tic-crawler-go export-dashboard --config $C
+      - name: Diff
+        run: scripts/step.sh diff python3 scripts/parity_diff.py parity
