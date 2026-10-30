@@ -72,6 +72,9 @@ func TestCrosswalkAndJoin(t *testing.T) {
 	if _, err := extract.Run(f, extract.Options{TempDir: dir}, filepath.Join(rates, "file1")); err != nil {
 		t.Fatal(err)
 	}
+	if npis, err := InstitutionalNPIs(rates); err != nil || len(npis) != 2 || npis[0] != "1111111111" {
+		t.Fatal(npis, err) // the MRI price uses group 1 (two NPIs) and is institutional
+	}
 	labels := map[string]string{"HCPCS:99213": "Office visit"}
 	sum, err := JoinPrices("p", rates, filepath.Join(dir, "q"), providers, hospitals, links, labels)
 	if err != nil {

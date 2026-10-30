@@ -46,13 +46,20 @@ jobs:
       - name: Build
         run: go build -o bin/tic-crawler ./cmd/tic-crawler
       - name: NPPES providers in MA and NH
+        # The bulk file is sometimes offline for maintenance; the NPI Registry API and the
+        # CMS clinician file cover the join without it.
+        continue-on-error: true
         run: scripts/step.sh nppes bin/tic-crawler reference nppes
       - name: Care Compare datasets
         run: scripts/step.sh provider-data bin/tic-crawler reference provider-data
-      - name: Extract shoppable-code rates for MA/NH providers
+      - name: Extract shoppable-code rates
         run: |
+          npi_args=""
+          [ -f out/reference/nppes.csv.gz ] && npi_args="--npi-file out/reference/nppes.csv.gz"
           scripts/step.sh extract-rates bin/tic-crawler extract-rates --payer "$PAYER" --toc-url "$TOC_URL" \
-            --npi-file out/reference/nppes.csv.gz --max-files "$MAX_FILES" --max-bytes 8589934592
+            $npi_args --max-files "$MAX_FILES" --max-bytes 8589934592
+      - name: Look up facility NPIs
+        run: scripts/step.sh npi-lookup bin/tic-crawler reference npi-lookup --payer "$PAYER"
       - name: Crosswalk and price-quality join
         run: scripts/step.sh join-quality bin/tic-crawler join-quality --payer "$PAYER"
       - name: Summary

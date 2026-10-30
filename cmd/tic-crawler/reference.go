@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
@@ -107,11 +108,26 @@ func referenceCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			npis, _ := reference.LoadNPISet(filepath.Join(outDir, "nppes.csv.gz")) // for national files
 			ctx := context.Background()
 			c := fetch.New(s)
 			var metas []reference.DatasetMeta
-			for _, id := range reference.SortedKeys(rc.Datasets) {
+			// State-filtered datasets first; national files without a state column (facility
+			// affiliations) are then filtered to the NPIs found in NPPES and the clinician file.
+			ids := reference.SortedKeys(rc.Datasets)
+			sort.SliceStable(ids, func(i, j int) bool { return !npiFiltered[ids[i]] && npiFiltered[ids[j]] })
+			var npis map[string]bool
+			for _, id := range ids {
+				if npiFiltered[id] && npis == nil {
+					npis = map[string]bool{}
+					for _, f := range []string{filepath.Join(outDir, "nppes.csv.gz"), filepath.Join(outDir, "provider-data", dsClinicians+".csv.gz")} {
+						set, err := reference.LoadNPISet(f)
+						if err == nil {
+							for k := range set {
+								npis[k] = true
+							}
+						}
+					}
+				}
 				m, err := reference.DatasetInfo(ctx, c, rc.ProviderDataAPI, id, rc.Datasets[id])
 				if err != nil {
 					return err
@@ -133,8 +149,45 @@ func referenceCmd() *cobra.Command {
 			return writeJSON(filepath.Join(outDir, "provider-data.json"), metas)
 		},
 	}
+	var payer, ratesDir string
+	lookup := &cobra.Command{
+		Use:   "npi-lookup",
+		Short: "Look up facility NPIs from extracted institutional rates in the NPI Registry API",
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			s, err := settings()
+			if err != nil {
+				return err
+			}
+			rc, err := reference.LoadConfig(configPath())
+			if err != nil {
+				return err
+			}
+			known, _ := reference.LoadNPISet(filepath.Join(outDir, "nppes.csv.gz"))
+			npis, err := quality.InstitutionalNPIs(filepath.Join(ratesDir, payer))
+			if err != nil {
+				return err
+			}
+			var todo []string
+			for _, n := range npis {
+				if !known[n] {
+					todo = append(todo, n)
+				}
+			}
+			looked, kept, err := reference.LookupNPIs(context.Background(), fetch.New(s), rc.NPIAPIURL, todo, rcStates(rc),
+				rc.NPILookupMax, filepath.Join(outDir, "npi-lookup.csv.gz"))
+			fmt.Fprintf(cmd.OutOrStdout(), "npi-lookup: %d institutional NPIs, %d looked up, %d in %v\n", len(npis), looked, kept, rc.States)
+			if err != nil {
+				return err
+			}
+			return writeJSON(filepath.Join(outDir, "npi-lookup.json"), map[string]any{"payer_id": payer,
+				"institutional_npis": len(npis), "looked_up": looked, "kept": kept, "max": rc.NPILookupMax})
+		},
+	}
+	lookup.Flags().StringVar(&payer, "payer", "", "payer id")
+	lookup.Flags().StringVar(&ratesDir, "rates", "out/rates", "extract-rates output folder")
+	lookup.MarkFlagRequired("payer")
 	cmd.PersistentFlags().StringVar(&outDir, "out", "out/reference", "output folder")
-	cmd.AddCommand(nppes, pdc)
+	cmd.AddCommand(nppes, pdc, lookup)
 	return cmd
 }
 
@@ -150,7 +203,11 @@ func rcStates(rc reference.Config) map[string]bool {
 const (
 	dsHospitals    = "xubh-q36u"
 	dsAffiliations = "27ea-46a8"
+	dsClinicians   = "mj5m-pzi6"
 )
+
+// Datasets without a state column, filtered by NPI instead.
+var npiFiltered = map[string]bool{dsAffiliations: true}
 
 var measureDatasets = map[string]string{
 	"ynj2-r877": "complications_and_deaths",
@@ -182,11 +239,14 @@ func joinQualityCmd() *cobra.Command {
 		Use:   "join-quality",
 		Short: "Link providers to CMS hospitals and join extracted prices to Care Compare measures",
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			providers, err := quality.LoadProviders(filepath.Join(refDir, "nppes.csv.gz"))
+			pd := filepath.Join(refDir, "provider-data")
+			providers, err := quality.LoadProviders(filepath.Join(refDir, "nppes.csv.gz"), filepath.Join(refDir, "npi-lookup.csv.gz"))
 			if err != nil {
 				return err
 			}
-			pd := filepath.Join(refDir, "provider-data")
+			if err := quality.LoadDACProviders(filepath.Join(pd, dsClinicians+".csv.gz"), providers); err != nil {
+				return err
+			}
 			hospitals, err := quality.LoadHospitals(filepath.Join(pd, dsHospitals+".csv.gz"))
 			if err != nil {
 				return err

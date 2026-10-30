@@ -113,7 +113,66 @@ type Provider struct {
 	NPI, EntityType, Name, Address, City, State, Zip, Taxonomy string
 }
 
-func LoadProviders(path string) (map[string]Provider, error) {
+// LoadProviders reads NPPES-format files (bulk NPPES or NPI Registry lookups); later files
+// do not override earlier ones. Missing files are skipped.
+func LoadProviders(paths ...string) (map[string]Provider, error) {
+	out := map[string]Provider{}
+	for _, p := range paths {
+		if _, err := os.Stat(p); err != nil {
+			continue
+		}
+		m, err := loadProviderFile(p)
+		if err != nil {
+			return nil, err
+		}
+		for k, v := range m {
+			if _, ok := out[k]; !ok {
+				out[k] = v
+			}
+		}
+	}
+	return out, nil
+}
+
+// LoadDACProviders reads the filtered Doctors and Clinicians file as individual providers.
+func LoadDACProviders(path string, into map[string]Provider) error {
+	if _, err := os.Stat(path); err != nil {
+		return nil
+	}
+	r, c, closeFn, err := reference.OpenGzCSV(path)
+	if err != nil {
+		return err
+	}
+	defer closeFn()
+	npi, first, last := c.Find("npi"), c.Find("provider_first_name", "frst_nm"), c.Find("provider_last_name", "lst_nm")
+	addr, city, st, zip := c.Find("adr_ln_1", "address_line_1"), c.Find("citytown", "cty"), c.Find("state", "st"), c.Find("zip_code", "zip")
+	spec := c.Find("pri_spec", "primary_specialty")
+	if npi < 0 || st < 0 {
+		return errors.New("doctors and clinicians file: expected columns missing")
+	}
+	for {
+		rec, err := r.Read()
+		if errors.Is(err, io.EOF) {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		g := func(i int) string {
+			if i < 0 || i >= len(rec) {
+				return ""
+			}
+			return strings.TrimSpace(rec[i])
+		}
+		if _, ok := into[g(npi)]; ok {
+			continue
+		}
+		into[g(npi)] = Provider{NPI: g(npi), EntityType: "1", Name: strings.TrimSpace(g(first) + " " + g(last)),
+			Address: g(addr), City: g(city), State: strings.ToUpper(g(st)), Zip: zip5(g(zip)), Taxonomy: g(spec)}
+	}
+}
+
+func loadProviderFile(path string) (map[string]Provider, error) {
 	r, c, closeFn, err := reference.OpenGzCSV(path)
 	if err != nil {
 		return nil, err
@@ -484,4 +543,55 @@ func loadGroups(path string) (map[string][]group, error) {
 		}
 		out[rec[k]] = append(out[rec[k]], group{rec[n], rec[tv], rec[bn]})
 	}
+}
+
+// InstitutionalNPIs returns the NPIs (sorted) in provider groups used by institutional rates,
+// i.e. the facilities whose identity the crosswalk needs.
+func InstitutionalNPIs(ratesDir string) ([]string, error) {
+	entries, err := os.ReadDir(ratesDir)
+	if err != nil {
+		return nil, err
+	}
+	set := map[string]bool{}
+	for _, e := range entries {
+		dir := filepath.Join(ratesDir, e.Name())
+		if !e.IsDir() {
+			continue
+		}
+		if _, err := os.Stat(filepath.Join(dir, "rates.csv.gz")); err != nil {
+			continue
+		}
+		groups, err := loadGroups(filepath.Join(dir, "groups.csv.gz"))
+		if err != nil {
+			return nil, err
+		}
+		r, c, closeFn, err := reference.OpenGzCSV(filepath.Join(dir, "rates.csv.gz"))
+		if err != nil {
+			return nil, err
+		}
+		bc, pg := c.Find("billing_class"), c.Find("provider_group")
+		used := map[string]bool{}
+		for {
+			rec, err := r.Read()
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			if err != nil {
+				closeFn()
+				return nil, err
+			}
+			if strings.EqualFold(rec[bc], "institutional") {
+				used[rec[pg]] = true
+			}
+		}
+		closeFn()
+		for k := range used {
+			for _, g := range groups[k] {
+				if g.npi != "" {
+					set[g.npi] = true
+				}
+			}
+		}
+	}
+	return reference.SortedKeys(set), nil
 }

@@ -118,3 +118,22 @@ func TestLoadConfig(t *testing.T) {
 		t.Fatal("want error")
 	}
 }
+
+func TestParseNPIResponse(t *testing.T) {
+	body := `{"result_count":1,"results":[{"number":1234567893,"enumeration_type":"NPI-2",
+	  "basic":{"organization_name":"MASSACHUSETTS GENERAL HOSPITAL","status":"A"},
+	  "addresses":[{"address_purpose":"MAILING","address_1":"PO BOX 1","city":"X","state":"TX","postal_code":"75201"},
+	               {"address_purpose":"LOCATION","address_1":"55 FRUIT ST","city":"BOSTON","state":"MA","postal_code":"021142696"}],
+	  "taxonomies":[{"code":"261QM0801X","primary":false},{"code":"282N00000X","primary":true}]}]}`
+	row, err := ParseNPIResponse([]byte(body))
+	want := []string{"1234567893", "2", "MASSACHUSETTS GENERAL HOSPITAL", "55 FRUIT ST", "BOSTON", "MA", "02114", "282N00000X"}
+	if err != nil || strings.Join(row, "|") != strings.Join(want, "|") {
+		t.Fatal(row, err)
+	}
+	if row, err := ParseNPIResponse([]byte(`{"result_count":0,"results":[]}`)); row != nil || err != nil {
+		t.Fatal(row, err)
+	}
+	if _, err := ParseNPIResponse([]byte(`{"Errors":[{"description":"bad"}]}`)); err == nil {
+		t.Fatal("want error")
+	}
+}

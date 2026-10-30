@@ -28,6 +28,8 @@ type Config struct {
 	States          []string          `toml:"states"`
 	NPPESIndexURL   string            `toml:"nppes_index_url"`
 	NPPESMaxBytes   int64             `toml:"nppes_max_bytes"`
+	NPIAPIURL       string            `toml:"npi_api_url"`
+	NPILookupMax    int               `toml:"npi_lookup_max"`
 	ProviderDataAPI string            `toml:"provider_data_api"`
 	Datasets        map[string]string `toml:"datasets"`
 }
@@ -384,4 +386,99 @@ func SortedKeys[V any](m map[string]V) []string {
 	}
 	sort.Strings(keys)
 	return keys
+}
+
+// ---------- NPI Registry API ----------
+
+type npiResult struct {
+	Number          json.Number `json:"number"`
+	EnumerationType string      `json:"enumeration_type"`
+	Basic           struct {
+		OrganizationName string `json:"organization_name"`
+		FirstName        string `json:"first_name"`
+		LastName         string `json:"last_name"`
+		Status           string `json:"status"`
+	} `json:"basic"`
+	Addresses []struct {
+		Purpose    string `json:"address_purpose"`
+		Address1   string `json:"address_1"`
+		City       string `json:"city"`
+		State      string `json:"state"`
+		PostalCode string `json:"postal_code"`
+	} `json:"addresses"`
+	Taxonomies []struct {
+		Code    string `json:"code"`
+		Primary bool   `json:"primary"`
+	} `json:"taxonomies"`
+}
+
+// ParseNPIResponse turns an NPI Registry API response into an NPPES-format row, or nil.
+func ParseNPIResponse(body []byte) ([]string, error) {
+	var resp struct {
+		Results []npiResult `json:"results"`
+		Errors  []struct {
+			Description string `json:"description"`
+		} `json:"Errors"`
+	}
+	if err := json.Unmarshal(body, &resp); err != nil {
+		return nil, err
+	}
+	if len(resp.Errors) > 0 {
+		return nil, errors.New(resp.Errors[0].Description)
+	}
+	if len(resp.Results) == 0 {
+		return nil, nil
+	}
+	r := resp.Results[0]
+	etype := "1"
+	name := strings.TrimSpace(r.Basic.FirstName + " " + r.Basic.LastName)
+	if r.EnumerationType == "NPI-2" {
+		etype, name = "2", r.Basic.OrganizationName
+	}
+	row := []string{r.Number.String(), etype, name, "", "", "", "", ""}
+	for _, a := range r.Addresses {
+		if strings.EqualFold(a.Purpose, "LOCATION") {
+			zip := a.PostalCode
+			if len(zip) > 5 {
+				zip = zip[:5]
+			}
+			row[3], row[4], row[5], row[6] = a.Address1, a.City, strings.ToUpper(a.State), zip
+		}
+	}
+	for _, t := range r.Taxonomies {
+		if t.Primary {
+			row[7] = t.Code
+		}
+	}
+	return row, nil
+}
+
+// LookupNPIs queries the NPI Registry API for each NPI (in order) and writes NPPES-format rows
+// for providers in states. It is polite (the client's rate limit) and capped by max.
+func LookupNPIs(ctx context.Context, c *fetch.Client, api string, npis []string, states map[string]bool, max int, out string) (looked, kept int, err error) {
+	w, err := CreateGzCSV(out, NPPESHeader)
+	if err != nil {
+		return 0, 0, err
+	}
+	for _, n := range npis {
+		if looked >= max {
+			break
+		}
+		looked++
+		txt, err := c.GetText(ctx, api+n, 1<<20)
+		if err != nil {
+			w.Close()
+			return looked, kept, fmt.Errorf("NPI %s: %w", n, err)
+		}
+		row, err := ParseNPIResponse([]byte(txt))
+		if err != nil {
+			w.Close()
+			return looked, kept, fmt.Errorf("NPI %s: %w", n, err)
+		}
+		if row != nil && states[row[5]] {
+			w.Write(row)
+			kept++
+		}
+	}
+	return looked, kept, w.Close()
 }
