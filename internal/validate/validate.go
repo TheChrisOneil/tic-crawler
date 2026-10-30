@@ -112,6 +112,18 @@ func New(version string, maxErrors int) (*Validator, error) {
 		seen:   map[[32]byte]bool{}, kinds: map[string]*ErrorKind{}, order: schemaKeyOrder(raw)}, nil
 }
 
+// truncate cuts s to n characters (not bytes), like a Python slice.
+func truncate(s string, n int) string {
+	if len(s) <= n {
+		return s
+	}
+	r := []rune(s)
+	if len(r) <= n {
+		return s
+	}
+	return string(r[:n])
+}
+
 // AddError records an error found outside the schema, such as a JSON parse error.
 func (v *Validator) AddError(msg string) { v.add(msg) }
 
@@ -119,16 +131,11 @@ func (v *Validator) add(msg string) {
 	v.report.ErrorCount++
 	v.report.Valid = false
 	if len(v.report.Errors) < v.maxErrors {
-		if len(msg) > 300 {
-			msg = msg[:300]
-		}
-		v.report.Errors = append(v.report.Errors, msg)
+		v.report.Errors = append(v.report.Errors, truncate(msg, 300))
 	}
 	location, detail, _ := strings.Cut(msg, ": ")
 	kind := indexRx.ReplaceAllString(location, "[*]") + ": " + quotedURLRx.ReplaceAllString(detail, "'<url>'")
-	if len(kind) > 240 {
-		kind = kind[:240]
-	}
+	kind = truncate(kind, 240)
 	e := v.kinds[kind]
 	if e == nil {
 		if len(v.kinds) >= MaxKinds {

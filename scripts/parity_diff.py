@@ -32,7 +32,10 @@ def walk(a, b, path, out):
         for i, (x, y) in enumerate(zip(a, b)):
             walk(x, y, f"{path}[{i}]", out)
     elif a != b:
-        out.append(f"{path}: {str(a)[:80]!r} vs {str(b)[:80]!r}")
+        sa, sb = str(a), str(b)
+        i = next((n for n, (x, y) in enumerate(zip(sa, sb)) if x != y), min(len(sa), len(sb)))
+        start = max(0, i - 30)
+        out.append(f"{path}: @{i} {sa[start:start + 80]!r} vs {sb[start:start + 80]!r}")
 
 
 def rows(path):
@@ -90,8 +93,11 @@ def main(root):
         print(f"  {n:6d}  {k}")
     for d in notes[:8]:
         print(d)
-    print(f"{len(diffs)} differences")
-    return 1 if diffs else 0
+    # Known and intended: Go's HEAD sends no Accept-Encoding, so servers that compress report
+    # the real file size instead of the gzip transfer size Python saw.
+    known = [d for d in diffs if any(k in d for k in ("content_length", "total_bytes", "mrf_bytes"))]
+    print(f"{len(diffs)} differences ({len(known)} size differences from Accept-Encoding, expected)")
+    return 1 if len(diffs) > len(known) else 0
 
 
 if __name__ == "__main__":

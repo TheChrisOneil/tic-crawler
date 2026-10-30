@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/TheChrisOneil/tic-crawler/internal/toc"
@@ -55,5 +56,21 @@ func TestMatchesPythonReport(t *testing.T) {
 	if !reflect.DeepEqual(got, want) {
 		gb, _ := json.MarshalIndent(got, "", " ")
 		t.Errorf("report differs:\n%s", gb)
+	}
+}
+
+// A long message is cut for the error list, but its kind comes from the whole message, so a
+// URL past the cut is still replaced with '<url>'.
+func TestLongMessageKind(t *testing.T) {
+	v, _ := New("2.2.1", 50)
+	msg := "reporting_structure[3].x: " + strings.Repeat("é", 290) + " 'https://a/b' is bad"
+	v.AddError(msg)
+	r := v.Finish()
+	if n := len([]rune(r.Errors[0])); n != 300 {
+		t.Fatalf("error cut to %d characters", n)
+	}
+	want := "reporting_structure[*].x: " + strings.Repeat("é", 214)
+	if r.ErrorKinds[0].Kind != want {
+		t.Fatalf("kind %q", r.ErrorKinds[0].Kind)
 	}
 }
