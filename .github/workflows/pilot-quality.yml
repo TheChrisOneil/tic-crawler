@@ -11,6 +11,9 @@ on:
       toc_url:
         description: "TOC URL"
         default: https://fallon.sapphiremrfhub.com/tocs/202610/2026-10-01_fallon-health_index.json
+      skip:
+        description: "Regexp; in-network file URLs to leave out"
+        default: "(?i)dental|beacon|vision"
       max_files:
         description: "In-network files to extract"
         default: "2"
@@ -33,6 +36,7 @@ jobs:
       PAYER: ${{ github.event.inputs.payer || 'fallon-health' }}
       TOC_URL: ${{ github.event.inputs.toc_url || 'https://fallon.sapphiremrfhub.com/tocs/202610/2026-10-01_fallon-health_index.json' }}
       MAX_FILES: ${{ github.event.inputs.max_files || '2' }}
+      SKIP: ${{ github.event.inputs.skip || '(?i)dental|beacon|vision' }}
       TIC_CONTACT_EMAIL: ${{ secrets.TIC_CONTACT_EMAIL || 'chris@thechrisoneil.com' }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -57,7 +61,7 @@ jobs:
           npi_args=""
           [ -f out/reference/nppes.csv.gz ] && npi_args="--npi-file out/reference/nppes.csv.gz"
           scripts/step.sh extract-rates bin/tic-crawler extract-rates --payer "$PAYER" --toc-url "$TOC_URL" \
-            $npi_args --max-files "$MAX_FILES" --max-bytes 8589934592
+            $npi_args --skip "$SKIP" --max-files "$MAX_FILES" --max-bytes 8589934592
       - name: Look up facility NPIs
         run: scripts/step.sh npi-lookup bin/tic-crawler reference npi-lookup --payer "$PAYER"
       - name: Crosswalk and price-quality join

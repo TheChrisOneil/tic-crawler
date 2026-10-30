@@ -11,6 +11,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -112,7 +113,7 @@ type fileResult struct {
 	PlanNames       []string      `json:"plan_names"`
 	ContentLength   int64         `json:"content_length,omitempty"`
 	BytesDownloaded int64         `json:"bytes_downloaded"`
-	Status          string        `json:"status"` // ok | skipped_size | failed
+	Status          string        `json:"status"` // ok | skipped_size | failed | not_tried
 	Error           string        `json:"error,omitempty"`
 	Meta            *extract.Meta `json:"meta,omitempty"`
 }
@@ -121,6 +122,7 @@ func extractRatesCmd() *cobra.Command {
 	var payer, tocURL, codesPath, npiFile, tinFile, outDir string
 	var urls []string
 	var maxFiles int
+	var skip string
 	var maxBytes int64
 	cmd := &cobra.Command{
 		Use:   "extract-rates",
@@ -204,13 +206,30 @@ never stored. The run stops before downloading more than limits.max_run_bytes.`,
 			if len(candidates) == 0 {
 				return errors.New("give --toc-url or --url")
 			}
+			if skip != "" {
+				re, err := regexp.Compile(skip)
+				if err != nil {
+					return fmt.Errorf("--skip: %w", err)
+				}
+				kept := candidates[:0]
+				for _, e := range candidates {
+					if !re.MatchString(e.URL) {
+						kept = append(kept, e)
+					}
+				}
+				candidates = kept
+			}
 
 			base := filepath.Join(outDir, payer)
 			var results []fileResult
 			var spent int64
 			done := 0
-			for _, e := range candidates {
+			for i, e := range candidates {
 				if done >= maxFiles {
+					// Record the rest so the index shows what a later run could pick.
+					for _, rest := range candidates[i:] {
+						results = append(results, fileResult{URL: rest.URL, PlanCount: rest.PlanCount, Status: "not_tried"})
+					}
 					break
 				}
 				res := fileResult{URL: e.URL, PlanCount: e.PlanCount, PlanNames: e.PlanNames}
@@ -263,6 +282,7 @@ never stored. The run stops before downloading more than limits.max_run_bytes.`,
 	f.StringVar(&codesPath, "codes", "config/codes.yaml", "billing codes to keep")
 	f.StringVar(&npiFile, "npi-file", "", "CSV with an npi column; keep only these providers")
 	f.StringVar(&tinFile, "tin-file", "", "CSV with an ein column; also keep these organizations")
+	f.StringVar(&skip, "skip", "", "regexp; leave out in-network files whose URL matches")
 	f.IntVar(&maxFiles, "max-files", 1, "stop after this many files")
 	f.Int64Var(&maxBytes, "max-bytes", 0, "download budget in bytes (default and ceiling: limits.max_run_bytes)")
 	f.StringVar(&outDir, "out", "out/rates", "output folder")
