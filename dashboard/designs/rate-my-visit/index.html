@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rate My Visit</title>
+<meta name="description" content="Design concept: members report on their own care into their sovereign pod and choose whether to share it with the care score.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../patient.css">
+<style>
+fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+legend { font-weight: 600; margin-bottom: 4px; }
+.scale { display: flex; flex-wrap: wrap; gap: 8px; }
+.scale label { flex-direction: row; align-items: center; gap: 6px; color: var(--fg); font-size: 0.9rem; border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+.scale input, .consent input { width: auto; }
+.consent { display: flex; flex-direction: column; gap: 12px; }
+.consent label { flex-direction: row; align-items: flex-start; gap: 10px; color: var(--fg); font-size: 0.93rem; }
+.consent label span { display: flex; flex-direction: column; gap: 2px; }
+.where { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.where > div { border: 1px solid var(--line); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.where ul { margin: 0; padding-left: 1.1em; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="concept-bar"><span><a href="../">← User designs</a> · Everbetter app concept with example data</span><span>Nothing on this page is sent anywhere</span></div>
+
+  <header style="display:flex;flex-direction:column;gap:8px">
+    <h1>How was your visit?</h1>
+    <p class="muted">Your answers go into your sovereign pod, which only you control. You decide whether a de-identified copy helps other members by feeding the care score.</p>
+  </header>
+
+  <form class="panel" id="form" autocomplete="off">
+    <h2>The visit</h2>
+    <div class="fields">
+      <label for="provider">Where you went <input id="provider" value="Riverbend Medical Center"></label>
+      <label for="service">What you had <select id="service"><option>MRI of the knee</option><option>Colonoscopy</option><option>Lab work</option><option>Other</option></select></label>
+      <label for="date">Date <input id="date" type="date" value="2026-10-14"></label>
+    </div>
+
+    <fieldset>
+      <legend>Would you go back?</legend>
+      <div class="scale">
+        <label><input type="radio" name="back" value="yes" checked> Yes</label>
+        <label><input type="radio" name="back" value="maybe"> Maybe</label>
+        <label><input type="radio" name="back" value="no"> No</label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Did staff explain what would happen and what it would cost?</legend>
+      <div class="scale">
+        <label><input type="radio" name="explain" value="5" checked> Fully</label>
+        <label><input type="radio" name="explain" value="3"> Partly</label>
+        <label><input type="radio" name="explain" value="1"> Not at all</label>
+      </div>
+    </fieldset>
+    <div class="fields">
+      <label for="wait">Days from booking to visit <input id="wait" type="number" min="0" value="6"></label>
+      <label for="paid">What you paid ($, optional) <input id="paid" type="number" min="0" value="2020"></label>
+      <label for="eob">Attach your Explanation of Benefits (optional) <input id="eob" type="file" accept=".pdf,image/*"></label>
+    </div>
+    <label for="note">Anything else other members should know? (optional)
+      <textarea id="note" rows="3">Parking was hard to find, but the scan started on time.</textarea>
+    </label>
+
+    <h2>Your choices</h2>
+    <div class="consent">
+      <label for="c-pod"><input id="c-pod" type="checkbox" checked disabled>
+        <span><strong>Save to my sovereign pod</strong><span class="small muted">Always on. Your report is stored in your pod. You can view, export or delete it at any time.</span></span></label>
+      <label for="c-score"><input id="c-score" type="checkbox">
+        <span><strong>Help other members: add a de-identified copy to the care score</strong><span class="small muted">We remove your name, member ID and exact date. Your free-text note is not shared. You can withdraw later.</span></span></label>
+      <label for="c-price"><input id="c-price" type="checkbox">
+        <span><strong>Use what I paid to check price estimates</strong><span class="small muted">Only the service, the provider and the amount are used.</span></span></label>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="submit">Save my report</button></div>
+  </form>
+
+  <section class="panel" id="done" aria-live="polite" hidden>
+    <h2>Saved</h2>
+    <div class="where" id="where"></div>
+  </section>
+
+  <div class="callout">
+    <h3>Why we ask</h3>
+    <p class="small">Public Medicare data covers infections, complications and patient surveys, but not what members of plans like yours experience. Reports from members fill that gap. A site shows a care score only once enough members have reported, and providers can respond.</p>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+$("form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const back = document.querySelector('input[name="back"]:checked').value;
+  const pod = [`Visit to ${esc($("provider").value)} for ${esc($("service").value)}`, `Would go back: ${back}`, `Wait: ${+$("wait").value || 0} days`];
+  if ($("paid").value) pod.push(`Paid: $${(+$("paid").value).toLocaleString("en-US")}`);
+  if ($("eob").files.length) pod.push(`EOB file: ${esc($("eob").files[0].name)}`);
+  if ($("note").value.trim()) pod.push("Your note");
+  const shared = [];
+  if ($("c-score").checked) shared.push(`Care score input for ${esc($("provider").value)}: would go back (${back}), explanation, wait time`);
+  if ($("c-price").checked && $("paid").value) shared.push(`Price check: ${esc($("service").value)} at ${esc($("provider").value)}, $${(+$("paid").value).toLocaleString("en-US")}`);
+  $("where").innerHTML = `
+    <div><h3>In your sovereign pod</h3><ul>${pod.map((x) => `<li>${x}</li>`).join("")}</ul><p class="small muted">Only you can see this.</p></div>
+    <div><h3>Shared, de-identified</h3>${shared.length ? `<ul>${shared.map((x) => `<li>${x}</li>`).join("")}</ul>` : `<p class="small">Nothing. You kept this report private.</p>`}<p class="small muted">No name, member ID, exact date or note.</p></div>`;
+  $("done").hidden = false;
+  $("done").scrollIntoView({behavior: "smooth", block: "start"});
+});
+</script>
+</body>
+</html>

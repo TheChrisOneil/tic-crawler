@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Shop One Scan</title>
-<meta name="description" content="Design concept: compare what you would pay for one service at nearby in-network sites.">
+<meta name="description" content="Design concept: compare what you would pay, and how well rated each site is, for one service at nearby in-network sites.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="../patient.css">
 <style>
@@ -15,28 +15,38 @@
 .site.best { border-color: var(--accent); }
 .bar { height: 6px; background: var(--line); border-radius: 3px; grid-column: 1 / -1; overflow: hidden; }
 .bar-fill { height: 100%; background: var(--accent); }
-.summary { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.summary { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center; }
+.score { display: inline-flex; align-items: baseline; gap: 6px; font-size: 0.86rem; }
+.score b { font-family: var(--mono); font-size: 0.95rem; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; margin-left: auto; }
+.seg button { background: transparent; color: var(--fg); border-radius: 0; padding: 6px 12px; font-weight: 500; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.ask { display: flex; gap: 8px; flex-wrap: wrap; }
+.ask input { flex: none; }
+.answer { border-left: 3px solid var(--accent); padding-left: 12px; display: flex; flex-direction: column; gap: 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips button { background: transparent; color: var(--accent); border: 1px solid var(--line); font-weight: 500; font-size: 0.85rem; padding: 4px 10px; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="concept-bar"><span><a href="../">← User designs</a> · Design concept with example data</span><span>Rates and sites below are made up for illustration</span></div>
+  <div class="concept-bar"><span><a href="../">← User designs</a> · Everbetter app concept with example data</span><span>Rates, sites and ratings below are made up for illustration</span></div>
 
   <header style="display:flex;flex-direction:column;gap:8px">
-    <h1>What will my scan cost?</h1>
-    <p class="muted">Pick your plan and the service your doctor ordered. We compare in-network sites near you using the rates your insurer publishes, then apply your deductible.</p>
+    <h1>Where should I get my scan?</h1>
+    <p class="muted">For Captivated Health members. We compare in-network sites near you using the rates your plan publishes, apply your deductible, and show each site's care score.</p>
   </header>
 
   <form class="panel" id="form" autocomplete="off">
     <div class="fields">
       <label for="plan">Your plan
-        <select id="plan"><option>BCBS Michigan PPO (example)</option><option>BCBS Michigan HMO (example)</option></select>
+        <select id="plan"><option>Captivated Health program, PPO (example)</option><option>Captivated Health program, HDHP (example)</option></select>
       </label>
       <label for="service">Service
         <select id="service"></select>
       </label>
       <label for="zip">Your ZIP
-        <input id="zip" inputmode="numeric" value="48084">
+        <input id="zip" inputmode="numeric" value="01844">
       </label>
       <label for="radius">Within
         <select id="radius"><option value="10">10 miles</option><option value="25" selected>25 miles</option><option value="50">50 miles</option></select>
@@ -53,17 +63,40 @@
         <input id="oop" type="number" min="0" step="50" value="5000">
       </label>
     </div>
-    <p class="small muted">Your deductible numbers stay in this browser. Find them on your insurer's member site or your latest Explanation of Benefits.</p>
+    <p class="small muted">Your deductible numbers come from your sovereign pod if you allow it, or you can type them. They are never sent to the price service.</p>
   </form>
 
+  <section class="panel" aria-labelledby="ask-h">
+    <h2 id="ask-h">Ask a question</h2>
+    <div class="ask">
+      <label for="q" style="flex:1 1 260px">Your question
+        <input id="q" value="What's the cheapest well-rated place for this?">
+      </label>
+      <button type="button" id="ask-go" style="align-self:end">Ask</button>
+    </div>
+    <div class="chips">
+      <button type="button" data-q="What's the cheapest well-rated place for this?">Cheapest well-rated</button>
+      <button type="button" data-q="Why is the hospital so much more?">Why is the hospital more?</button>
+      <button type="button" data-q="What happens after I meet my deductible?">After my deductible</button>
+    </div>
+    <div class="answer" id="answer" aria-live="polite"></div>
+    <p class="small muted">The assistant explains numbers worked out by the app's estimate engine. It never makes up a price and doesn't give medical advice.</p>
+  </section>
+
   <section style="display:flex;flex-direction:column;gap:12px">
-    <div class="summary" id="summary"></div>
+    <div class="summary">
+      <div id="summary" class="summary"></div>
+      <div class="seg" role="group" aria-label="Sort results">
+        <button type="button" id="sort-cost" aria-pressed="true">Lowest cost</button>
+        <button type="button" id="sort-score" aria-pressed="false">Best care score</button>
+      </div>
+    </div>
     <div class="results" id="results"></div>
   </section>
 
   <div class="callout">
-    <h3>Before you book</h3>
-    <p class="small">Call the site and your insurer to confirm they are in network for your plan. Hospital sites may also bill a separate radiologist fee, which we add where the insurer publishes it. This is an estimate, not a guarantee.</p>
+    <h3>About the care score</h3>
+    <p class="small">The care score is our own rating from 1 to 5. It combines public Medicare quality measures, such as infections, complications and patient surveys, with reports from members who were treated there. We show it only when there is enough data. Call the site and your plan to confirm network status before you book. All figures are estimates.</p>
   </div>
 </div>
 
@@ -74,53 +107,95 @@ const SERVICES = [
   {code: "45378", name: "Colonoscopy (diagnostic)"},
   {code: "80061", name: "Cholesterol panel (lab)"}
 ];
-// Example sites and rates. A real build would read these from the plan x code x NPI index.
+// Example sites, rates and care scores. A real build reads the rate index and our rating.
 const SITES = [
-  {name: "Lakeside Imaging Center", type: "Freestanding imaging", miles: 3.2, quality: "Accredited (ACR)", rates: {"73721": 455, "74177": 520}},
-  {name: "Northfield Open MRI", type: "Freestanding imaging", miles: 8.9, quality: "Accredited (ACR)", rates: {"73721": 398, "74177": 610}},
-  {name: "Riverbend Medical Center", type: "Hospital outpatient", miles: 4.1, quality: "Leapfrog grade A", rates: {"73721": 1820, "74177": 2240, "45378": 2650, "80061": 62}, extra: {"73721": 110, "74177": 140}},
-  {name: "St. Clement Hospital", type: "Hospital outpatient", miles: 14.6, quality: "Leapfrog grade B", rates: {"73721": 2480, "74177": 2910, "45378": 3120, "80061": 88}, extra: {"73721": 125, "74177": 150}},
-  {name: "Oakview Endoscopy Center", type: "Ambulatory surgery center", miles: 6.7, quality: "Medicare-certified ASC", rates: {"45378": 1040}},
-  {name: "Metro Lab Services", type: "Independent lab", miles: 2.0, quality: "CLIA-certified", rates: {"80061": 14}},
-  {name: "Valley Diagnostic Labs", type: "Independent lab", miles: 21.3, quality: "CLIA-certified", rates: {"80061": 11}}
+  {name: "Merrimack Valley Imaging", type: "Freestanding imaging", miles: 3.2, score: 4.4, reports: 86, rates: {"73721": 455, "74177": 520}},
+  {name: "North Shore Open MRI", type: "Freestanding imaging", miles: 8.9, score: 3.6, reports: 31, rates: {"73721": 398, "74177": 610}},
+  {name: "Riverbend Medical Center", type: "Hospital outpatient", miles: 4.1, score: 4.7, reports: 212, rates: {"73721": 1820, "74177": 2240, "45378": 2650, "80061": 62}, extra: {"73721": 110, "74177": 140}},
+  {name: "St. Clement Hospital", type: "Hospital outpatient", miles: 14.6, score: 3.9, reports: 140, rates: {"73721": 2480, "74177": 2910, "45378": 3120, "80061": 88}, extra: {"73721": 125, "74177": 150}},
+  {name: "Oakview Endoscopy Center", type: "Surgery center", miles: 6.7, score: 4.5, reports: 58, rates: {"45378": 1040}},
+  {name: "Metro Lab Services", type: "Independent lab", miles: 2.0, score: null, reports: 4, rates: {"80061": 14}},
+  {name: "Valley Diagnostic Labs", type: "Independent lab", miles: 21.3, score: 4.1, reports: 27, rates: {"80061": 11}}
 ];
 const $ = (id) => document.getElementById(id);
 const fmt = (n) => "$" + Math.round(n).toLocaleString("en-US");
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let sortBy = "cost";
 $("service").innerHTML = SERVICES.map((s) => `<option value="${s.code}">${esc(s.name)} · CPT ${s.code}</option>`).join("");
 
 function owe(rate, ded, coins, oop) {
   const dedPart = Math.min(rate, ded);
   return Math.min(dedPart + coins * (rate - dedPart), oop);
 }
+function inputs() {
+  return {code: $("service").value, radius: +$("radius").value,
+    ded: Math.max(0, +$("ded").value || 0), coins: Math.min(100, Math.max(0, +$("coins").value || 0)) / 100, oop: Math.max(0, +$("oop").value || 0)};
+}
+function rowsFor(v) {
+  return SITES.filter((s) => s.rates[v.code] && s.miles <= v.radius).map((s) => {
+    const rate = s.rates[v.code] + (s.extra?.[v.code] || 0);
+    return {...s, rate, cost: owe(rate, v.ded, v.coins, v.oop)};
+  });
+}
+function scoreHtml(r) {
+  return r.score == null
+    ? `<span class="score muted">No care score yet · ${r.reports} member reports</span>`
+    : `<span class="score">Care score <b>${r.score.toFixed(1)}</b>/5 <span class="muted">· ${r.reports} member reports</span></span>`;
+}
 function render() {
-  const code = $("service").value, radius = +$("radius").value;
-  const ded = Math.max(0, +$("ded").value || 0), coins = Math.min(100, Math.max(0, +$("coins").value || 0)) / 100, oop = Math.max(0, +$("oop").value || 0);
-  const rows = SITES.filter((s) => s.rates[code] && s.miles <= radius).map((s) => {
-    const rate = s.rates[code] + (s.extra?.[code] || 0);
-    return {...s, rate, cost: owe(rate, ded, coins, oop)};
-  }).sort((a, b) => a.cost - b.cost);
+  const v = inputs(), rows = rowsFor(v);
+  rows.sort(sortBy === "cost" ? (a, b) => a.cost - b.cost : (a, b) => (b.score ?? -1) - (a.score ?? -1) || a.cost - b.cost);
   if (!rows.length) {
     $("summary").innerHTML = "";
-    $("results").innerHTML = `<div class="panel"><p>No in-network sites with a published rate within ${radius} miles. Try a wider distance.</p></div>`;
+    $("results").innerHTML = `<div class="panel"><p>No in-network sites with a published rate within ${v.radius} miles. Try a wider distance.</p></div>`;
     return;
   }
-  const max = Math.max(...rows.map((r) => r.cost)) || 1, lo = rows[0].cost, hi = rows[rows.length - 1].cost;
-  $("summary").innerHTML = `<p><strong>${rows.length}</strong> sites within ${radius} miles</p><p>You would pay <strong class="num">${fmt(lo)}</strong> to <strong class="num">${fmt(hi)}</strong></p>` +
-    (hi - lo > 0 ? `<p class="yes">Choosing the lowest saves you <strong class="num">${fmt(hi - lo)}</strong></p>` : "");
-  $("results").innerHTML = rows.map((r, i) => `
-    <article class="panel site${i === 0 ? " best" : ""}">
+  const costs = rows.map((r) => r.cost), max = Math.max(...costs) || 1, lo = Math.min(...costs), hi = Math.max(...costs);
+  $("summary").innerHTML = `<p><strong>${rows.length}</strong> sites within ${v.radius} miles</p><p>You would pay <strong class="num">${fmt(lo)}</strong> to <strong class="num">${fmt(hi)}</strong></p>`;
+  const cheapest = rows.reduce((a, b) => (b.cost < a.cost ? b : a));
+  $("results").innerHTML = rows.map((r) => `
+    <article class="panel site${r === cheapest ? " best" : ""}">
       <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
-        <h3>${esc(r.name)} ${i === 0 ? '<span class="pill yes">Lowest cost</span>' : ""}</h3>
-        <div class="meta"><span>${esc(r.type)}</span><span>·</span><span>${r.miles} mi</span><span>·</span><span>${esc(r.quality)}</span></div>
-        <div class="meta"><span class="num">Plan rate ${fmt(r.rate)}</span>${r.extra?.[code] ? `<span>(includes ${fmt(r.extra[code])} radiologist fee)</span>` : ""}</div>
+        <h3>${esc(r.name)} ${r === cheapest ? '<span class="pill yes">Lowest cost</span>' : ""}</h3>
+        <div class="meta"><span>${esc(r.type)}</span><span>·</span><span>${r.miles} mi</span></div>
+        <div class="meta">${scoreHtml(r)}</div>
+        <div class="meta"><span class="num">Plan rate ${fmt(r.rate)}</span>${r.extra?.[v.code] ? `<span>(includes ${fmt(r.extra[v.code])} radiologist fee)</span>` : ""}</div>
       </div>
       <div><div class="cost num">${fmt(r.cost)}</div><div class="small muted" style="text-align:right">you pay</div></div>
       <div class="bar" aria-hidden="true"><div class="bar-fill" style="width:${(r.cost / max * 100).toFixed(1)}%"></div></div>
     </article>`).join("");
+  answer();
+}
+// Concept of the assistant: in the real app a language model phrases the answer, but every number comes from rowsFor().
+function answer() {
+  const q = $("q").value.toLowerCase(), v = inputs(), rows = rowsFor(v);
+  const svc = SERVICES.find((s) => s.code === v.code).name;
+  let html;
+  if (!rows.length) html = `<p>I couldn't find an in-network site with a published rate within ${v.radius} miles.</p>`;
+  else if (q.includes("hospital")) {
+    const hosp = rows.filter((r) => r.type.startsWith("Hospital")), other = rows.filter((r) => !r.type.startsWith("Hospital"));
+    html = hosp.length && other.length
+      ? `<p>Hospitals usually negotiate higher rates than standalone centers, and often add a separate reading fee. For ${esc(svc)}, the hospital rates near you run ${fmt(Math.min(...hosp.map((r) => r.rate)))} to ${fmt(Math.max(...hosp.map((r) => r.rate)))}, against ${fmt(Math.min(...other.map((r) => r.rate)))} to ${fmt(Math.max(...other.map((r) => r.rate)))} elsewhere.</p>`
+      : `<p>For ${esc(svc)}, the sites near you are all the same kind, so there is no hospital comparison to make.</p>`;
+  } else if (q.includes("deductible")) {
+    const best = rows.reduce((a, b) => (b.cost < a.cost ? b : a)), worst = rows.reduce((a, b) => (b.cost > a.cost ? b : a));
+    const after = (r) => Math.min(v.coins * r.rate, v.oop);
+    html = `<p>Right now you'd pay ${fmt(best.cost)} to ${fmt(worst.cost)} because most of the price goes to your deductible. Once it's met, you'd pay ${v.coins * 100}% instead: ${fmt(after(best))} at ${esc(best.name)} or ${fmt(after(worst))} at ${esc(worst.name)}.</p>`;
+  } else {
+    const good = rows.filter((r) => r.score != null && r.score >= 4).sort((a, b) => a.cost - b.cost);
+    html = good.length
+      ? `<p><strong>${esc(good[0].name)}</strong> is the lowest-cost site with a care score of 4 or more. You'd pay about <strong>${fmt(good[0].cost)}</strong>, and it scores ${good[0].score.toFixed(1)} out of 5 from ${good[0].reports} member reports and Medicare measures. It's ${good[0].miles} miles away.</p>`
+      : `<p>None of the sites near you has a care score of 4 or more yet. The lowest cost is ${fmt(Math.min(...rows.map((r) => r.cost)))}.</p>`;
+  }
+  $("answer").innerHTML = html + `<p class="small muted">Source: your plan's published rates (example data) and the Everbetter care score.</p>`;
 }
 $("form").addEventListener("input", render);
 $("form").addEventListener("submit", (e) => e.preventDefault());
+$("ask-go").addEventListener("click", answer);
+$("q").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); answer(); } });
+document.querySelectorAll(".chips button").forEach((b) => b.addEventListener("click", () => { $("q").value = b.dataset.q; answer(); }));
+$("sort-cost").addEventListener("click", () => { sortBy = "cost"; $("sort-cost").setAttribute("aria-pressed", "true"); $("sort-score").setAttribute("aria-pressed", "false"); render(); });
+$("sort-score").addEventListener("click", () => { sortBy = "score"; $("sort-score").setAttribute("aria-pressed", "true"); $("sort-cost").setAttribute("aria-pressed", "false"); render(); });
 render();
 </script>
 </body>
