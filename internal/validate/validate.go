@@ -107,6 +107,9 @@ func New(version string, maxErrors int) (*Validator, error) {
 		seen:   map[[32]byte]bool{}, kinds: map[string]*ErrorKind{}}, nil
 }
 
+// AddError records an error found outside the schema, such as a JSON parse error.
+func (v *Validator) AddError(msg string) { v.add(msg) }
+
 func (v *Validator) add(msg string) {
 	v.report.ErrorCount++
 	v.report.Valid = false

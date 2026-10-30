@@ -118,6 +118,7 @@ type UrlCheck struct {
 	Status        int    `json:"status,omitempty"`
 	Method        string `json:"method,omitempty"`
 	ContentLength int64  `json:"content_length,omitempty"`
+	HasLength     bool   `json:"-"` // false when the server sent no length
 	LastModified  string `json:"last_modified,omitempty"`
 	ETag          string `json:"etag,omitempty"`
 	Error         string `json:"error,omitempty"`
@@ -418,7 +419,7 @@ func checkFrom(resp *http.Response, method string) UrlCheck {
 	}
 	uc := UrlCheck{Status: resp.StatusCode, Method: method, LastModified: resp.Header.Get("Last-Modified"), ETag: resp.Header.Get("ETag")}
 	if length >= 0 {
-		uc.ContentLength = length
+		uc.ContentLength, uc.HasLength = length, true
 	}
 	if resp.StatusCode >= 400 {
 		uc.Error = fmt.Sprintf("http_%d", resp.StatusCode)
