@@ -9,6 +9,7 @@ import (
 	"io"
 	"math/rand/v2"
 	"net/http"
+	"net/http/cookiejar"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -148,9 +149,18 @@ func New(s config.Settings) *Client {
 	tr := http.DefaultTransport.(*http.Transport).Clone()
 	// Bodies can stream for hours, so only the wait for response headers is bounded.
 	tr.ResponseHeaderTimeout = time.Duration(s.TimeoutSeconds * float64(time.Second))
+	// Like the Python client (httpx): keep cookies and follow up to 20 redirects, so sites that
+	// set a cookie and redirect to themselves do not loop.
+	jar, _ := cookiejar.New(nil)
+	hc := &http.Client{Transport: tr, Jar: jar, CheckRedirect: func(req *http.Request, via []*http.Request) error {
+		if len(via) >= 20 {
+			return errors.New("stopped after 20 redirects")
+		}
+		return nil
+	}}
 	return &Client{
 		S:       s,
-		HTTP:    &http.Client{Transport: tr},
+		HTTP:    hc,
 		Limiter: NewHostLimiter(s.RequestsPerSecondHost),
 		Sleep:   time.Sleep,
 		sem:     make(chan struct{}, n),

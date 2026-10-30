@@ -22,6 +22,8 @@ def walk(a, b, path, out):
         for k in sorted(set(a) | set(b)):
             if k in VOLATILE:
                 continue
+            if k == "verdict" and k in a and k in b and a[k] != b[k]:
+                out.append(f"{path}.url: {a.get('url', '')[:100]!r} errors {a.get('error', '')[:60]!r} vs {b.get('error', '')[:60]!r}")
             if k not in a or k not in b:
                 out.append(f"{path}.{k}: only in {'py' if k in a else 'go'}")
             else:
@@ -80,7 +82,8 @@ def main(root):
     rb = {r["payer_id"]: r for r in rows(go / "registry.csv")}
     walk(ra, rb, "registry", diffs)
     # Size and status differences go last too: they explain total_bytes mismatches.
-    notes = [d for d in diffs if " content_length:" in d or " http_status:" in d or " check_method:" in d]
+    notes = [d for d in diffs if any(k in d for k in (" content_length:", " http_status:", " check_method:",
+                                                       "].error:", "].url:"))]
     for d in diffs[:300]:
         print(d)
     # Grouped counts last, so the tail of the log (the run annotation) shows the overview.
