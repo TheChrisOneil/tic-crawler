@@ -251,6 +251,8 @@ func (c *Client) do(ctx context.Context, method, rawURL string, headers map[stri
 		return nil, err
 	}
 	req.Header.Set("User-Agent", c.S.UserAgent())
+	// httpx sends Accept: */*; some CDNs serve a different robots.txt to clients without it.
+	req.Header.Set("Accept", "*/*")
 	for k, v := range headers {
 		req.Header.Set(k, v)
 	}
