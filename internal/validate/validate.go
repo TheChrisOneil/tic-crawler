@@ -56,6 +56,7 @@ type Validator struct {
 	seen         map[[32]byte]bool
 	kinds        map[string]*ErrorKind
 	order        keyOrder
+	schema       any // the full schema, for details Python quotes in schema order
 }
 
 func compile(name string, doc any) (*jsonschema.Schema, error) {
@@ -109,7 +110,7 @@ func New(version string, maxErrors int) (*Validator, error) {
 	}
 	return &Validator{item: item, header: header, maxErrors: maxErrors,
 		report: Report{PinnedVersion: version, Valid: true, Errors: []string{}},
-		seen:   map[[32]byte]bool{}, kinds: map[string]*ErrorKind{}, order: schemaKeyOrder(raw)}, nil
+		seen:   map[[32]byte]bool{}, kinds: map[string]*ErrorKind{}, order: schemaKeyOrder(raw), schema: full}, nil
 }
 
 // truncate cuts s to n characters (not bytes), like a Python slice.
@@ -186,7 +187,7 @@ func (v *Validator) leaves(err error, doc any) []leaf {
 		_, anyOf := e.ErrorKind.(*kind.AnyOf)
 		_, oneOf := e.ErrorKind.(*kind.OneOf)
 		if len(e.Causes) == 0 || anyOf || oneOf {
-			msgs := pyMessages(e, at(doc, e.InstanceLocation))
+			msgs := pyMessages(e, at(doc, e.InstanceLocation), v.schema)
 			if msgs == nil {
 				msgs = []string{e.ErrorKind.LocalizedString(printer)}
 			}

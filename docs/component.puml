@@ -1,61 +1,76 @@
 @startuml component
-title tic-crawler components
+title tic-crawler components (Go)
 skinparam componentStyle rectangle
 
-package "tic_crawler" {
-  [cli (Typer)\ndiscover / crawl / verify-seeds / sync-drive / report] as CLI
+package "cmd/tic-crawler (cobra)" {
+  [discover / crawl / verify-seeds / audit-access\nprobe / export-dashboard / sync-drive / report] as CLI
+  [extract-rates / reference / join-quality\n(price and quality pilot)] as PILOT
+}
+package "internal" {
   package "discovery (Strategy)" {
-    interface DiscoverySource
-    [SeedFileSource] ..|> DiscoverySource
-    [ExchangePufSource] ..|> DiscoverySource
-    [RootTxtSource\n(active 2027-09-06)] ..|> DiscoverySource
-    [DiscoveryRegistry\n+ dedupe_payers] as REG
+    interface Source
+    [SeedFile] ..|> Source
+    [ExchangePUF] ..|> Source
+    [RootTxt\n(active 2027-09-06)] ..|> Source
+    [Run + Dedupe\n(registry via Register)] as REG
   }
   package "pipeline (Template Method)" {
-    [CrawlPipeline.run()] as BASE
-    [TocCrawlPipeline] as TOCP
-    [RawDownloadPipeline] as RAWP
-    TOCP --|> BASE
-    RAWP --|> TOCP
+    [Run(steps)] as BASE
+    interface Steps
+    [TocCrawl] ..|> Steps
+    [RawDownload\n(embeds TocCrawl)] ..|> Steps
+    [Probe\n(embeds TocCrawl)] ..|> Steps
   }
-  [HttpClient\nper-host rate limit\nrobots.txt / retries] as HTTP
-  [parse\nijson streaming + sha256] as PARSE
-  [TocValidator\nvendored CMS v2.2.1] as VAL
-  [StateStore (SQLite)] as STATE
+  [fetch.Client\nper-host rate limit\nrobots.txt / retries] as HTTP
+  [robots\nRFC 9309] as ROB
+  [toc\nstreaming decoder] as TOC
+  [validate\nembedded CMS v2.2.1] as VAL
+  [state\nSQLite (pure Go)] as STATE
+  [audit] as AUD
+  [export\ndashboard JSON] as EXP
+  [extract\nin-network filter] as EXT
+  [reference\nNPPES, NPI API, Care Compare] as REF
+  [quality\nNPI->CCN crosswalk, price join] as QUAL
   package "storage (Strategy + Adapter)" {
-    interface StorageBackend
-    [LocalBackend] ..|> StorageBackend
-    [DriveAdapter] ..|> StorageBackend
+    interface Backend
+    [Local] ..|> Backend
+    [Drive] ..|> Backend
     interface RawStore
-    [LocalRawStore] ..|> RawStore
-    [GcsRawStore] ..|> RawStore
+    [LocalRaw] ..|> RawStore
+    [GCSRaw] ..|> RawStore
     [SheetRegistry]
   }
 }
 
 cloud "Payer sites / CDNs" as WEB
-cloud "CMS Exchange PUF" as PUF
+cloud "CMS (PUF, NPPES,\nNPI Registry, Care Compare)" as CMS
 cloud "Google Drive (Shared Drive)\n+ Sheets" as GD
 cloud "GCS bucket" as GCS
 
 CLI --> REG
-CLI --> TOCP
-CLI --> RAWP : --download-raw
+CLI --> BASE
+CLI --> AUD
+CLI --> EXP
 CLI --> SheetRegistry
-CLI --> StorageBackend
-REG --> DiscoverySource
-BASE --> HTTP
-BASE --> PARSE
-BASE --> VAL
-BASE --> STATE
-RAWP --> RawStore
-[ExchangePufSource] --> HTTP
-[RootTxtSource\n(active 2027-09-06)] --> HTTP
+CLI --> Backend
+PILOT --> EXT
+PILOT --> REF
+PILOT --> QUAL
+REG --> Source
+BASE --> Steps
+[TocCrawl] --> HTTP
+[TocCrawl] --> TOC
+[TocCrawl] --> VAL
+[TocCrawl] --> STATE
+[RawDownload\n(embeds TocCrawl)] --> RawStore
+HTTP --> ROB
 HTTP --> WEB
-HTTP --> PUF
-[DriveAdapter] --> GD
+REF --> HTTP
+HTTP --> CMS
+EXT --> HTTP
+[Drive] --> GD
 SheetRegistry --> GD
-[GcsRawStore] --> GCS
+[GCSRaw] --> GCS
 note bottom of RawStore
   Raw in-network and allowed-amount
   files never go to Drive.

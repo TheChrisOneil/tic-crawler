@@ -43,7 +43,7 @@ func run(t *testing.T, items []any, h toc.GenericHeader) Report {
 }
 
 func TestCMSSampleIsValid(t *testing.T) {
-	b, _ := os.ReadFile("../../tests/fixtures/toc/cms-sample.json")
+	b, _ := os.ReadFile("../../testdata/toc/cms-sample.json")
 	v, _ := New("2.2.1", 50)
 	h, err := toc.ReadGeneric(bytes.NewReader(b), func(i int, it any) error { v.ValidateItem(i, it); return nil })
 	if err != nil {

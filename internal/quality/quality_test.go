@@ -105,3 +105,42 @@ func TestCrosswalkAndJoin(t *testing.T) {
 		t.Fatal(n, err)
 	}
 }
+
+func TestLoadDACProvidersKeepsExisting(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "dac.csv.gz")
+	writeGz(t, p, []string{"NPI", "Provider First Name", "Provider Last Name", "adr_ln_1", "Citytown", "State", "ZIP Code", "pri_spec"},
+		[]string{"1111111111", "Ann", "Lee", "1 Main St", "Boston", "ma", "021151234", "CARDIOLOGY"},
+		[]string{"2222222222", "Bo", "Ng", "2 Elm St", "Nashua", "NH", "03060", "INTERNAL MEDICINE"})
+	into := map[string]Provider{"2222222222": {NPI: "2222222222", Name: "From NPPES"}}
+	if err := LoadDACProviders(p, into); err != nil {
+		t.Fatal(err)
+	}
+	a := into["1111111111"]
+	if a.Name != "Ann Lee" || a.State != "MA" || a.Zip != "02115" || a.EntityType != "1" || a.Taxonomy != "CARDIOLOGY" {
+		t.Fatalf("%+v", a)
+	}
+	if into["2222222222"].Name != "From NPPES" {
+		t.Fatal("an NPPES row must win over the clinician file")
+	}
+	if err := LoadDACProviders(filepath.Join(dir, "missing.csv.gz"), into); err != nil {
+		t.Fatal("a missing file is skipped", err)
+	}
+	writeGz(t, p, []string{"name"}, []string{"x"})
+	if err := LoadDACProviders(p, into); err == nil {
+		t.Fatal("want missing-columns error")
+	}
+}
+
+func TestBestLinkPrefersAddress(t *testing.T) {
+	links := []Link{{NPI: "1", CCN: "A", Method: "affiliation"}, {NPI: "1", CCN: "B", Method: "address"}, {NPI: "1", CCN: "C", Method: "name_zip"}}
+	best := links[0]
+	for _, l := range links[1:] {
+		if rank(l) > rank(best) {
+			best = l
+		}
+	}
+	if best.CCN != "B" || rank(Link{Method: "name_zip"}) != 1 {
+		t.Fatal(best)
+	}
+}

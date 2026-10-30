@@ -1,7 +1,7 @@
 # tic-crawler runtime configuration. Secrets and IDs come from the environment (see .env.example).
 
 [schema]
-# Pinned CMS price-transparency-guide release. Schemas are vendored in src/tic_crawler/schemas/v<version>/.
+# Pinned CMS price-transparency-guide release. Schemas are embedded from internal/schemas/v<version>/.
 version = "2.2.1"
 max_errors_per_toc = 50
 

@@ -8,7 +8,7 @@ import (
 )
 
 func TestReadSampleTOC(t *testing.T) {
-	b, err := os.ReadFile("../../tests/fixtures/toc/cms-sample.json")
+	b, err := os.ReadFile("../../testdata/toc/cms-sample.json")
 	if err != nil {
 		t.Fatal(err)
 	}

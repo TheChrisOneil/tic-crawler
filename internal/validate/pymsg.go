@@ -152,7 +152,7 @@ func at(doc any, loc []string) any {
 
 // pyMessages returns the Python jsonschema message(s) for one error, or nil to fall back to
 // the library's own wording.
-func pyMessages(e *jsonschema.ValidationError, inst any) []string {
+func pyMessages(e *jsonschema.ValidationError, inst, schemaDoc any) []string {
 	r := pyRepr(inst)
 	switch k := e.ErrorKind.(type) {
 	case *kind.Enum:
@@ -166,7 +166,14 @@ func pyMessages(e *jsonschema.ValidationError, inst any) []string {
 		}
 		return out
 	case *kind.Type:
-		return []string{fmt.Sprintf("%s is not of type %s", r, quoteAll(k.Want))}
+		want := k.Want // sorted by the library; Python lists the types in schema order
+		if list, ok := at(schemaDoc, keywordPointer(e)).([]any); ok && len(list) == len(want) {
+			want = make([]string, len(list))
+			for i, x := range list {
+				want[i] = fmt.Sprint(x)
+			}
+		}
+		return []string{fmt.Sprintf("%s is not of type %s", r, quoteAll(want))}
 	case *kind.Format:
 		return []string{fmt.Sprintf("%s is not a %s", r, pyStr(k.Want))}
 	case *kind.MinItems:

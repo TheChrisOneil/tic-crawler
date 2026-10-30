@@ -76,7 +76,7 @@ func newSite(t *testing.T) *site {
 		}
 	}))
 	t.Cleanup(s.srv.Close)
-	sample, err := os.ReadFile("../../tests/fixtures/toc/cms-sample.json")
+	sample, err := os.ReadFile("../../testdata/toc/cms-sample.json")
 	if err != nil {
 		t.Fatal(err)
 	}

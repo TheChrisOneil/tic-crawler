@@ -1,6 +1,6 @@
 # tic-crawler
 
-Deterministic Python 3.12 tool that finds U.S. health plan and issuer Transparency in Coverage (TiC)
+Deterministic Go tool (one static binary) that finds U.S. health plan and issuer Transparency in Coverage (TiC)
 machine-readable files (MRFs) and catalogs them in Google Drive. It makes no LLM or inference calls.
 
 - Regulation: 45 CFR 147.212. MRFs are public and need no account.
@@ -35,11 +35,12 @@ names (`plans_truncated` marks the cap). The full plan list stays in the stored 
 ## Setup
 
 ```bash
-python3.12 -m venv .venv && . .venv/bin/activate
-pip install -e ".[dev]"          # add ,gcs for the GCS raw store
-cp .env.example .env              # fill in values, never commit .env
+go build -o bin/tic-crawler ./cmd/tic-crawler    # Go 1.24+; no cgo (pure-Go SQLite)
+cp .env.example .env                              # fill in values, never commit .env
 set -a; . ./.env; set +a
 ```
+
+The examples below call the binary `tic-crawler`; use `bin/tic-crawler` or put `bin/` on your `PATH`.
 
 Google access uses a service account (`GOOGLE_APPLICATION_CREDENTIALS`). Add the service account
 as **Content manager** on the Shared Drive that holds `TIC_DRIVE_FOLDER_ID`. Service accounts have
@@ -61,17 +62,31 @@ tic-crawler export-dashboard         # dashboard JSON -> out/dashboard/
 tic-crawler probe --name X --landing-url U [--toc-url T]   # check a requested payer
 ```
 
+Price and quality pilot (see `.github/workflows/pilot-quality.yml`):
+
+```bash
+tic-crawler reference provider-data            # CMS Care Compare hospital files for [reference].states
+tic-crawler reference nppes                    # NPPES bulk file filtered to those states
+tic-crawler extract-rates --payer P --toc-url T --codes config/codes.yaml --max-files 1
+tic-crawler reference npi-lookup --payer P     # NPI Registry API for facility NPIs NPPES lacks
+tic-crawler join-quality --payer P             # NPI -> CCN crosswalk, prices + CMS measures
+```
+
+`extract-rates` streams an in-network file and keeps only the listed billing codes (and optional
+NPI/TIN lists); a run never downloads more than `max_run_bytes` (10 GB).
+
 `crawl` always writes locally to `out/` and records state in `state/tic.sqlite`. `sync-drive`
 uploads only files whose SHA-256 changed since the last sync.
 
 ## Crawl behavior
 
-- Async httpx, 1 request/second per host (configurable), robots.txt honored (RFC 9309: 4xx = allow,
+- Concurrent HTTP (`net/http`), 1 request/second per host (configurable), robots.txt honored (RFC 9309: 4xx = allow,
   5xx or unreachable = disallow), User-Agent `EverBetter-TiC-Crawler/1.0 (+TIC_CONTACT_EMAIL)`,
   retries with exponential backoff and `Retry-After`.
-- TOCs are streamed to disk (capped by `max_toc_bytes`, default 2 GB) and parsed with ijson one
-  `reporting_structure` item at a time. Header fields may come after the array; that is handled.
-- Each item is validated against the vendored CMS schema; the header is validated at the end.
+- TOCs are streamed to disk (capped by `max_toc_bytes`, default 2 GB) and parsed with a streaming JSON
+  decoder one `reporting_structure` item at a time. Header fields may come after the array; that is handled.
+- Each item is validated against the embedded CMS schema (`internal/schemas/`), with error
+  messages worded as Python jsonschema words them; the header is validated at the end.
   Validation errors go to the manifest and run log; an invalid TOC is still cataloged.
 - MRF URLs get HEAD only. If HEAD returns 403/405/501 (common for signed S3 links), one
   `GET Range: bytes=0-0` reads the size from `Content-Range`.
@@ -84,13 +99,13 @@ uploads only files whose SHA-256 changed since the last sync.
 
 ## Discovery
 
-Each source is a `DiscoverySource` subclass and registers itself; adding a source means adding
-one class.
+Each source implements `discovery.Source` and is added with `discovery.Register`; adding a source
+means adding one type (`internal/discovery`).
 
-1. `SeedFileSource`: `seeds/payers.yaml`, maintained by hand.
-2. `ExchangePufSource`: CMS Exchange PUF (issuer names, HIOS IDs, states). URL in `config.toml`.
+1. `SeedFile`: `seeds/payers.yaml`, maintained by hand.
+2. `ExchangePUF`: CMS Exchange PUF (issuer names, HIOS IDs, states). URL in `config.toml`.
    Covers HealthCare.gov issuers only.
-3. `RootTxtSource`: the payer root `.txt` file, active from 2027-09-06. The file name is
+3. `RootTxt`: the payer root `.txt` file, active from 2027-09-06. The file name is
    configurable (`root_txt_filename`); confirm it against the final rule before relying on it.
 
 Payers are merged by normalized legal name (and aliases) and by shared HIOS IDs; seed data wins.
@@ -98,8 +113,9 @@ Payers are merged by normalized legal name (and aliases) and by shared HIOS IDs;
 ## Dashboard
 
 `dashboard/` is a static site (no build step) deployed on Vercel at https://tic-crawler.vercel.app
-(project `tic-crawler`, root directory `dashboard`). It reads `out/dashboard/*.json` from the `data`
-branch through raw.githubusercontent.com, so new crawl data shows up without a redeploy.
+(project `tic-crawler`, root directory `dashboard`). It reads `dashboard/data/*.json` from its own
+origin. Each workflow run copies `out/dashboard/` to `main:dashboard/data/`
+(`scripts/data_branch.sh dashboard`), which triggers a Vercel deploy; this works with a private repo.
 
 - Overview: payers, freshness (TOC `last_updated_on`), failures, MRF counts and bytes.
 - Payer page: every MRF file with HTTP result and size, the plans in the TOC, and schema errors
@@ -127,11 +143,17 @@ payers on demand and monthly. State persists on the `data` branch.
 ## Tests
 
 ```bash
-pytest --cov=tic_crawler
+go test -cover ./...
 ```
 
-HTTP is recorded with respx; Google APIs are faked. `tests/fixtures/toc/cms-sample.json` is the
-CMS example TOC.
+HTTP uses `httptest` servers or a fake `RoundTripper`; Google APIs are faked. `testdata/toc/cms-sample.json`
+is the CMS example TOC. CI fails if extraction, crosswalk, validation or the crawl pipeline drop
+below 80% coverage.
+
+The Go version replaced an earlier Python version in October 2026. Before the switch, both crawled
+the same payers and their manifests, registry and dashboard JSON were compared. They matched
+except for one intended difference: Go's HEAD requests do not ask for gzip, so servers that
+compress report the real file size.
 
 ## Diagrams
 

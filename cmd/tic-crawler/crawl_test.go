@@ -57,7 +57,7 @@ func (f fakeWeb) RoundTrip(r *http.Request) (*http.Response, error) {
 
 func cliEnv(t *testing.T) string {
 	t.Helper()
-	toc, err := os.ReadFile("../../tests/fixtures/toc/cms-sample.json")
+	toc, err := os.ReadFile("../../testdata/toc/cms-sample.json")
 	if err != nil {
 		t.Fatal(err)
 	}
