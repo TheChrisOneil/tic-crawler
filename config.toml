@@ -41,3 +41,21 @@ local_dir = "out"
 state_db = "state/tic.sqlite"
 sheet_name = "TiC Payer Registry"
 manifest_plan_name_cap = 50
+
+[reference]
+# CMS reference data for the price-quality join (Go `reference` and `crosswalk` commands).
+states = ["MA", "NH"]
+# Page that links the monthly NPPES full replacement file.
+nppes_index_url = "https://download.cms.gov/nppes/NPI_Files.html"
+nppes_max_bytes = 2_147_483_648
+# CMS Provider Data Catalog (data.cms.gov/provider-data) datasets: id = words its title must contain.
+# The command fails if a title no longer matches, so a reused or renamed id cannot slip through.
+provider_data_api = "https://data.cms.gov/provider-data/api/1/metastore/schemas/dataset/items/"
+[reference.datasets]
+xubh-q36u = "hospital general information"
+ynj2-r877 = "complications and deaths"
+77hc-ibv8 = "healthcare associated infections"
+dgck-syfz = "hcahps"
+632h-zaca = "unplanned hospital visits"
+yv7e-xc69 = "timely and effective care"
+27ea-46a8 = "facility affiliation"
