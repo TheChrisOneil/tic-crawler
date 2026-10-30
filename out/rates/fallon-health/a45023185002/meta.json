@@ -1,0 +1,26 @@
+{
+  "reporting_entity_name": "EyeMed Vision Care, LLC",
+  "reporting_entity_type": "Third Party",
+  "last_updated_on": "2026-09-23",
+  "version": "v2.0.0",
+  "sha256": "ee92057b368c84d91a6fd54c7ba78dc53f830e5188af756a7b1f4911f4b5a931",
+  "bytes_decompressed": 10710802,
+  "in_network_items": 70,
+  "in_network_items_kept": 8,
+  "provider_references": 31,
+  "provider_references_kept": 31,
+  "remote_references_fetched": 0,
+  "rate_rows": 8,
+  "group_rows": 301412,
+  "placeholder_rate_rows": 0,
+  "codes_found": [
+    "HCPCS:99202",
+    "HCPCS:99203",
+    "HCPCS:99204",
+    "HCPCS:99205",
+    "HCPCS:99212",
+    "HCPCS:99213",
+    "HCPCS:99214",
+    "HCPCS:99215"
+  ]
+}

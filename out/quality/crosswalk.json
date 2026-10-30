@@ -1,10 +1,10 @@
 {
   "by_method": {
-    "address": 50,
+    "address": 23,
     "affiliation": 77376,
-    "name_zip": 5
+    "name_zip": 1
   },
   "hospitals": 111,
-  "links": 77431,
-  "providers_in_states": 63012
+  "links": 77400,
+  "providers_in_states": 63327
 }
