@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/santhosh-tekuri/jsonschema/v6"
+	"github.com/santhosh-tekuri/jsonschema/v6/kind"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 
@@ -54,12 +55,16 @@ type Validator struct {
 	report       Report
 	seen         map[[32]byte]bool
 	kinds        map[string]*ErrorKind
+	order        keyOrder
 }
 
 func compile(name string, doc any) (*jsonschema.Schema, error) {
 	c := jsonschema.NewCompiler()
 	c.DefaultDraft(jsonschema.Draft7)
 	c.AssertFormat()
+	// Python jsonschema only checks "uri" when rfc3987 is installed, which the crawler never
+	// had; skip it so both tools flag the same files.
+	c.RegisterFormat(&jsonschema.Format{Name: "uri", Validate: func(any) error { return nil }})
 	if err := c.AddResource(name, doc); err != nil {
 		return nil, err
 	}
@@ -104,7 +109,7 @@ func New(version string, maxErrors int) (*Validator, error) {
 	}
 	return &Validator{item: item, header: header, maxErrors: maxErrors,
 		report: Report{PinnedVersion: version, Valid: true, Errors: []string{}},
-		seen:   map[[32]byte]bool{}, kinds: map[string]*ErrorKind{}}, nil
+		seen:   map[[32]byte]bool{}, kinds: map[string]*ErrorKind{}, order: schemaKeyOrder(raw)}, nil
 }
 
 // AddError records an error found outside the schema, such as a JSON parse error.
@@ -157,19 +162,30 @@ func path(parts []string) string {
 
 type leaf struct {
 	loc []string
+	kw  []string
 	msg string
 }
 
-func leaves(err error) []leaf {
+// leaves flattens a validation error into Python-style messages, one per failing keyword.
+// anyOf/oneOf report one error at their own location, as Python's iter_errors does.
+func (v *Validator) leaves(err error, doc any) []leaf {
 	ve, ok := err.(*jsonschema.ValidationError)
 	if !ok {
-		return []leaf{{nil, err.Error()}}
+		return []leaf{{nil, nil, err.Error()}}
 	}
 	var out []leaf
 	var walk func(*jsonschema.ValidationError)
 	walk = func(e *jsonschema.ValidationError) {
-		if len(e.Causes) == 0 {
-			out = append(out, leaf{e.InstanceLocation, e.ErrorKind.LocalizedString(printer)})
+		_, anyOf := e.ErrorKind.(*kind.AnyOf)
+		_, oneOf := e.ErrorKind.(*kind.OneOf)
+		if len(e.Causes) == 0 || anyOf || oneOf {
+			msgs := pyMessages(e, at(doc, e.InstanceLocation))
+			if msgs == nil {
+				msgs = []string{e.ErrorKind.LocalizedString(printer)}
+			}
+			for _, m := range msgs {
+				out = append(out, leaf{e.InstanceLocation, keywordPointer(e), m})
+			}
 			return
 		}
 		for _, c := range e.Causes {
@@ -177,8 +193,30 @@ func leaves(err error) []leaf {
 		}
 	}
 	walk(ve)
-	sort.SliceStable(out, func(i, j int) bool { return strings.Join(out[i].loc, "\x00") < strings.Join(out[j].loc, "\x00") })
+	sort.SliceStable(out, func(i, j int) bool {
+		a, b := out[i], out[j]
+		if lessPath(a.loc, b.loc) || lessPath(b.loc, a.loc) {
+			return lessPath(a.loc, b.loc)
+		}
+		return v.order.less(a.kw, b.kw)
+	})
 	return out
+}
+
+// lessPath orders instance paths like Python sorts absolute_path lists: indexes numerically.
+func lessPath(a, b []string) bool {
+	for i := 0; i < len(a) && i < len(b); i++ {
+		if a[i] == b[i] {
+			continue
+		}
+		x, ex := strconv.Atoi(a[i])
+		y, ey := strconv.Atoi(b[i])
+		if ex == nil && ey == nil {
+			return x < y
+		}
+		return a[i] < b[i]
+	}
+	return len(a) < len(b)
 }
 
 // toSchemaValue converts decoded JSON (json.Number numbers) into what the validator expects.
@@ -199,8 +237,9 @@ func (v *Validator) ValidateItem(index int, item any) {
 		v.add(fmt.Sprintf("reporting_structure[%d]: duplicate item (uniqueItems)", index))
 	}
 	v.seen[d] = true
-	if err := v.item.Validate(toSchemaValue(item)); err != nil {
-		for _, l := range leaves(err) {
+	doc := toSchemaValue(item)
+	if err := v.item.Validate(doc); err != nil {
+		for _, l := range v.leaves(err, doc) {
 			v.add(fmt.Sprintf("reporting_structure[%d]%s: %s", index, path(l.loc), l.msg))
 		}
 	}
@@ -220,8 +259,9 @@ func (v *Validator) ValidateHeader(h toc.GenericHeader) {
 	if ver, ok := h.Fields["version"]; ok && ver != nil {
 		v.report.FileVersion = fmt.Sprint(ver)
 	}
-	if err := v.header.Validate(toSchemaValue(h.Fields)); err != nil {
-		for _, l := range leaves(err) {
+	doc := toSchemaValue(h.Fields)
+	if err := v.header.Validate(doc); err != nil {
+		for _, l := range v.leaves(err, doc) {
 			v.add("$" + path(l.loc) + ": " + l.msg)
 		}
 	}

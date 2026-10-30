@@ -1,0 +1,152 @@
+{
+ "pinned_version": "2.2.1",
+ "file_version": "1.0.0",
+ "valid": false,
+ "error_count": 22,
+ "errors": [
+  "reporting_structure[0].in_network_files[0].location: 'not a uri' does not match '^https://'",
+  "reporting_structure[0].reporting_plans[0]: 'issuer_name' is a required property",
+  "reporting_structure[0].reporting_plans[0].plan_id_type: 'EIN' is not one of ['ein', 'hios']",
+  "reporting_structure[0].reporting_plans[1]: 'issuer_name' is a required property",
+  "reporting_structure[0].reporting_plans[1].plan_id: 2 is not of type 'string'",
+  "reporting_structure[0].reporting_plans[1].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+  "reporting_structure[0].reporting_plans[1].plan_market_type: 'Group' is not one of ['group', 'individual']",
+  "reporting_structure[1].in_network_files: [] should be non-empty",
+  "reporting_structure[1].reporting_plans: [] should be non-empty",
+  "reporting_structure[2].allowed_amount_file: 'location' is a required property",
+  "reporting_structure[2].reporting_plans[0]: 'plan_sponsor_name' is a required property",
+  "reporting_structure[2].reporting_plans[0]: 'issuer_name' is a required property",
+  "reporting_structure[3]: duplicate item (uniqueItems)",
+  "reporting_structure[3].allowed_amount_file: 'location' is a required property",
+  "reporting_structure[3].reporting_plans[0]: 'plan_sponsor_name' is a required property",
+  "reporting_structure[3].reporting_plans[0]: 'issuer_name' is a required property",
+  "reporting_structure[4]: 'reporting_plans' is a required property",
+  "reporting_structure[5].in_network_files: 'x' is not of type 'array'",
+  "reporting_structure[5].reporting_plans[0]: 'issuer_name' is a required property",
+  "reporting_structure[5].reporting_plans[0].plan_sponsor_name: None is not of type 'string'",
+  "$: 'last_updated_on' is a required property",
+  "$.reporting_entity_type: 5 is not of type 'string'"
+ ],
+ "item_count": 6,
+ "invalid_items": 6,
+ "error_kinds": [
+  {
+   "kind": "reporting_structure[*].reporting_plans[*]: 'issuer_name' is a required property",
+   "count": 5,
+   "examples": [
+    "reporting_structure[0].reporting_plans[0]",
+    "reporting_structure[0].reporting_plans[1]",
+    "reporting_structure[2].reporting_plans[0]",
+    "reporting_structure[3].reporting_plans[0]",
+    "reporting_structure[5].reporting_plans[0]"
+   ]
+  },
+  {
+   "kind": "reporting_structure[*].allowed_amount_file: 'location' is a required property",
+   "count": 2,
+   "examples": [
+    "reporting_structure[2].allowed_amount_file",
+    "reporting_structure[3].allowed_amount_file"
+   ]
+  },
+  {
+   "kind": "reporting_structure[*].reporting_plans[*]: 'plan_sponsor_name' is a required property",
+   "count": 2,
+   "examples": [
+    "reporting_structure[2].reporting_plans[0]",
+    "reporting_structure[3].reporting_plans[0]"
+   ]
+  },
+  {
+   "kind": "$.reporting_entity_type: 5 is not of type 'string'",
+   "count": 1,
+   "examples": [
+    "$.reporting_entity_type"
+   ]
+  },
+  {
+   "kind": "$: 'last_updated_on' is a required property",
+   "count": 1,
+   "examples": [
+    "$"
+   ]
+  },
+  {
+   "kind": "reporting_structure[*].in_network_files: 'x' is not of type 'array'",
+   "count": 1,
+   "examples": [
+    "reporting_structure[5].in_network_files"
+   ]
+  },
+  {
+   "kind": "reporting_structure[*].in_network_files: [] should be non-empty",
+   "count": 1,
+   "examples": [
+    "reporting_structure[1].in_network_files"
+   ]
+  },
+  {
+   "kind": "reporting_structure[*].in_network_files[*].location: 'not a uri' does not match '^https://'",
+   "count": 1,
+   "examples": [
+    "reporting_structure[0].in_network_files[0].location"
+   ]
+  },
+  {
+   "kind": "reporting_structure[*].reporting_plans: [] should be non-empty",
+   "count": 1,
+   "examples": [
+    "reporting_structure[1].reporting_plans"
+   ]
+  },
+  {
+   "kind": "reporting_structure[*].reporting_plans[*].plan_id: 2 is not of type 'string'",
+   "count": 1,
+   "examples": [
+    "reporting_structure[0].reporting_plans[1].plan_id"
+   ]
+  },
+  {
+   "kind": "reporting_structure[*].reporting_plans[*].plan_id_type: 'EIN' is not one of ['ein', 'hios']",
+   "count": 1,
+   "examples": [
+    "reporting_structure[0].reporting_plans[0].plan_id_type"
+   ]
+  },
+  {
+   "kind": "reporting_structure[*].reporting_plans[*].plan_id_type: 'HIOS' is not one of ['ein', 'hios']",
+   "count": 1,
+   "examples": [
+    "reporting_structure[0].reporting_plans[1].plan_id_type"
+   ]
+  },
+  {
+   "kind": "reporting_structure[*].reporting_plans[*].plan_market_type: 'Group' is not one of ['group', 'individual']",
+   "count": 1,
+   "examples": [
+    "reporting_structure[0].reporting_plans[1].plan_market_type"
+   ]
+  },
+  {
+   "kind": "reporting_structure[*].reporting_plans[*].plan_sponsor_name: None is not of type 'string'",
+   "count": 1,
+   "examples": [
+    "reporting_structure[5].reporting_plans[0].plan_sponsor_name"
+   ]
+  },
+  {
+   "kind": "reporting_structure[*]: 'reporting_plans' is a required property",
+   "count": 1,
+   "examples": [
+    "reporting_structure[4]"
+   ]
+  },
+  {
+   "kind": "reporting_structure[*]: duplicate item (uniqueItems)",
+   "count": 1,
+   "examples": [
+    "reporting_structure[3]"
+   ]
+  }
+ ]
+}

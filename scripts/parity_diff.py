@@ -76,6 +76,8 @@ def main(root):
     ra = {r["payer_id"]: r for r in rows(py / "registry.csv")}
     rb = {r["payer_id"]: r for r in rows(go / "registry.csv")}
     walk(ra, rb, "registry", diffs)
+    # Size and status differences go last too: they explain total_bytes mismatches.
+    notes = [d for d in diffs if " content_length:" in d or " http_status:" in d or " check_method:" in d]
     for d in diffs[:300]:
         print(d)
     # Grouped counts last, so the tail of the log (the run annotation) shows the overview.
@@ -86,6 +88,8 @@ def main(root):
         groups[key] = groups.get(key, 0) + 1
     for k, n in sorted(groups.items(), key=lambda x: -x[1])[:13]:
         print(f"  {n:6d}  {k}")
+    for d in notes[:8]:
+        print(d)
     print(f"{len(diffs)} differences")
     return 1 if diffs else 0
 
