@@ -1,0 +1,17 @@
+== go test (exit 0)
+go: downloading github.com/BurntSushi/toml v1.4.0
+go: downloading gopkg.in/yaml.v3 v3.0.1
+go: downloading github.com/spf13/cobra v1.8.1
+go: downloading github.com/spf13/pflag v1.0.5
+ok  	github.com/TheChrisOneil/tic-crawler/cmd/tic-crawler	0.015s
+ok  	github.com/TheChrisOneil/tic-crawler/internal/config	0.003s
+ok  	github.com/TheChrisOneil/tic-crawler/internal/discovery	0.009s
+ok  	github.com/TheChrisOneil/tic-crawler/internal/extract	0.022s
+ok  	github.com/TheChrisOneil/tic-crawler/internal/fetch	0.012s
+ok  	github.com/TheChrisOneil/tic-crawler/internal/model	0.004s
+ok  	github.com/TheChrisOneil/tic-crawler/internal/quality	0.013s
+ok  	github.com/TheChrisOneil/tic-crawler/internal/reference	0.013s
+ok  	github.com/TheChrisOneil/tic-crawler/internal/robots	0.003s
+ok  	github.com/TheChrisOneil/tic-crawler/internal/toc	0.004s
+== nppes (exit 1)
+error: no monthly NPPES_Data_Dissemination zip link on the NPPES files page
