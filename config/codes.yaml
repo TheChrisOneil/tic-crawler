@@ -1,0 +1,77 @@
+# Billing codes kept by `extract-rates`. Pilot list of common "shoppable" services.
+# Based on the CMS shoppable-services list in the hospital price transparency rule plus common
+# imaging and labs. Check it against the current CMS list before showing prices to consumers.
+# type: HCPCS (CPT counts as HCPCS Level I) or MS-DRG.
+codes:
+  # Evaluation and management, preventive and behavioral health
+  - {type: HCPCS, code: "99202", label: "New patient office visit, 15-29 min"}
+  - {type: HCPCS, code: "99203", label: "New patient office visit, 30-44 min"}
+  - {type: HCPCS, code: "99204", label: "New patient office visit, 45-59 min"}
+  - {type: HCPCS, code: "99205", label: "New patient office visit, 60-74 min"}
+  - {type: HCPCS, code: "99212", label: "Established patient office visit, 10-19 min"}
+  - {type: HCPCS, code: "99213", label: "Established patient office visit, 20-29 min"}
+  - {type: HCPCS, code: "99214", label: "Established patient office visit, 30-39 min"}
+  - {type: HCPCS, code: "99215", label: "Established patient office visit, 40-54 min"}
+  - {type: HCPCS, code: "99385", label: "Preventive visit, new patient, 18-39"}
+  - {type: HCPCS, code: "99386", label: "Preventive visit, new patient, 40-64"}
+  - {type: HCPCS, code: "99395", label: "Preventive visit, established patient, 18-39"}
+  - {type: HCPCS, code: "99396", label: "Preventive visit, established patient, 40-64"}
+  - {type: HCPCS, code: "90791", label: "Psychiatric diagnostic evaluation"}
+  - {type: HCPCS, code: "90834", label: "Psychotherapy, 45 min"}
+  - {type: HCPCS, code: "90837", label: "Psychotherapy, 60 min"}
+  - {type: HCPCS, code: "90847", label: "Family psychotherapy with patient"}
+  # Laboratory
+  - {type: HCPCS, code: "80048", label: "Basic metabolic panel"}
+  - {type: HCPCS, code: "80053", label: "Comprehensive metabolic panel"}
+  - {type: HCPCS, code: "80061", label: "Lipid panel"}
+  - {type: HCPCS, code: "80076", label: "Liver (hepatic) function panel"}
+  - {type: HCPCS, code: "81003", label: "Urinalysis, automated, without microscopy"}
+  - {type: HCPCS, code: "83036", label: "Hemoglobin A1c"}
+  - {type: HCPCS, code: "84153", label: "PSA (prostate specific antigen), total"}
+  - {type: HCPCS, code: "84443", label: "Thyroid stimulating hormone (TSH)"}
+  - {type: HCPCS, code: "85025", label: "Complete blood count with differential"}
+  - {type: HCPCS, code: "85610", label: "Prothrombin time"}
+  # Radiology
+  - {type: HCPCS, code: "70450", label: "CT head or brain without contrast"}
+  - {type: HCPCS, code: "70553", label: "MRI brain without and with contrast"}
+  - {type: HCPCS, code: "71046", label: "Chest X-ray, 2 views"}
+  - {type: HCPCS, code: "72148", label: "MRI lumbar spine without contrast"}
+  - {type: HCPCS, code: "73721", label: "MRI joint of lower extremity (e.g. knee) without contrast"}
+  - {type: HCPCS, code: "74177", label: "CT abdomen and pelvis with contrast"}
+  - {type: HCPCS, code: "76700", label: "Ultrasound abdomen, complete"}
+  - {type: HCPCS, code: "76805", label: "Obstetric ultrasound, after first trimester"}
+  - {type: HCPCS, code: "76830", label: "Transvaginal ultrasound"}
+  - {type: HCPCS, code: "77065", label: "Diagnostic mammography, one breast"}
+  - {type: HCPCS, code: "77066", label: "Diagnostic mammography, both breasts"}
+  - {type: HCPCS, code: "77067", label: "Screening mammography, both breasts"}
+  # Medicine and procedures
+  - {type: HCPCS, code: "93000", label: "Electrocardiogram (ECG), complete"}
+  - {type: HCPCS, code: "93306", label: "Echocardiogram, complete with Doppler"}
+  - {type: HCPCS, code: "45378", label: "Diagnostic colonoscopy"}
+  - {type: HCPCS, code: "45380", label: "Colonoscopy with biopsy"}
+  - {type: HCPCS, code: "45385", label: "Colonoscopy with lesion removal (snare)"}
+  - {type: HCPCS, code: "43235", label: "Upper GI endoscopy, diagnostic"}
+  - {type: HCPCS, code: "43239", label: "Upper GI endoscopy with biopsy"}
+  - {type: HCPCS, code: "29881", label: "Knee arthroscopy with meniscectomy"}
+  - {type: HCPCS, code: "29826", label: "Shoulder arthroscopy, decompression"}
+  - {type: HCPCS, code: "27447", label: "Total knee replacement"}
+  - {type: HCPCS, code: "27130", label: "Total hip replacement"}
+  - {type: HCPCS, code: "66984", label: "Cataract removal with lens implant"}
+  - {type: HCPCS, code: "47562", label: "Laparoscopic gallbladder removal"}
+  - {type: HCPCS, code: "49505", label: "Inguinal hernia repair, age 5+"}
+  - {type: HCPCS, code: "19120", label: "Removal of breast lesion"}
+  - {type: HCPCS, code: "42820", label: "Tonsil and adenoid removal, under age 12"}
+  - {type: HCPCS, code: "55700", label: "Prostate biopsy"}
+  - {type: HCPCS, code: "64483", label: "Epidural steroid injection, lumbar/sacral"}
+  - {type: HCPCS, code: "59400", label: "Vaginal delivery, routine obstetric care"}
+  - {type: HCPCS, code: "59510", label: "Cesarean delivery, routine obstetric care"}
+  - {type: HCPCS, code: "97110", label: "Physical therapy, therapeutic exercise"}
+  - {type: HCPCS, code: "97161", label: "Physical therapy evaluation, low complexity"}
+  # Inpatient stays (MS-DRG)
+  - {type: MS-DRG, code: "470", label: "Major hip and knee joint replacement without MCC"}
+  - {type: MS-DRG, code: "807", label: "Vaginal delivery without sterilization/D&C without CC/MCC"}
+  - {type: MS-DRG, code: "788", label: "Cesarean section without sterilization without CC/MCC"}
+  - {type: MS-DRG, code: "743", label: "Uterine and adnexa procedures for non-malignancy without CC/MCC"}
+  - {type: MS-DRG, code: "460", label: "Spinal fusion except cervical without MCC"}
+  - {type: MS-DRG, code: "473", label: "Cervical spinal fusion without CC/MCC"}
+  - {type: MS-DRG, code: "216", label: "Cardiac valve and other major cardiothoracic procedures with cardiac catheterization with MCC"}

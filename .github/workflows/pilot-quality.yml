@@ -1,0 +1,76 @@
+name: pilot-quality
+# One-carrier price and quality pilot (Go): CMS reference data for MA/NH, in-network extraction
+# for the shoppable codes, NPI-to-hospital crosswalk and the join to Care Compare measures.
+# Stays under limits.max_run_bytes (10 GB): NPPES is about 1 GB, extraction gets the rest.
+on:
+  workflow_dispatch:
+    inputs:
+      payer:
+        description: "Payer id (output folder)"
+        default: fallon-health
+      toc_url:
+        description: "TOC URL"
+        default: https://fallon.sapphiremrfhub.com/tocs/202610/2026-10-01_fallon-health_index.json
+      skip:
+        description: "Regexp; in-network file URLs to leave out"
+        default: "(?i)dental|beacon|vision"
+      max_files:
+        description: "In-network files to extract"
+        default: "2"
+  push:
+    branches: [go-rewrite]
+    paths: [.github/workflows/pilot-quality.yml]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tic-data
+  cancel-in-progress: false
+
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      PAYER: ${{ github.event.inputs.payer || 'fallon-health' }}
+      TOC_URL: ${{ github.event.inputs.toc_url || 'https://fallon.sapphiremrfhub.com/tocs/202610/2026-10-01_fallon-health_index.json' }}
+      MAX_FILES: ${{ github.event.inputs.max_files || '2' }}
+      SKIP: ${{ github.event.inputs.skip || '(?i)dental|beacon|vision' }}
+      TIC_CONTACT_EMAIL: ${{ secrets.TIC_CONTACT_EMAIL || 'chris@thechrisoneil.com' }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: scripts/step.sh "go test" go test ./...
+      - name: Restore state and outputs from the data branch
+        run: scripts/data_branch.sh restore
+      - name: Build
+        run: go build -o bin/tic-crawler ./cmd/tic-crawler
+      - name: NPPES providers in MA and NH
+        # The bulk file is sometimes offline for maintenance; the NPI Registry API and the
+        # CMS clinician file cover the join without it.
+        continue-on-error: true
+        run: scripts/step.sh nppes bin/tic-crawler reference nppes
+      - name: Care Compare datasets
+        run: scripts/step.sh provider-data bin/tic-crawler reference provider-data
+      - name: Extract shoppable-code rates
+        run: |
+          npi_args=""
+          [ -f out/reference/nppes.csv.gz ] && npi_args="--npi-file out/reference/nppes.csv.gz"
+          scripts/step.sh extract-rates bin/tic-crawler extract-rates --payer "$PAYER" --toc-url "$TOC_URL" \
+            $npi_args --skip "$SKIP" --max-files "$MAX_FILES" --max-bytes 8589934592
+      - name: Look up facility NPIs
+        run: scripts/step.sh npi-lookup bin/tic-crawler reference npi-lookup --payer "$PAYER"
+      - name: Crosswalk and price-quality join
+        run: scripts/step.sh join-quality bin/tic-crawler join-quality --payer "$PAYER"
+      - name: Summary
+        if: always()
+        run: |
+          cat out/rates/$PAYER/index.json 2>/dev/null | head -c 4000 || true
+          cat out/quality/crosswalk.json out/quality/$PAYER/summary.json 2>/dev/null | head -c 8000 || true
+      - name: Publish to data branch
+        if: always()
+        run: scripts/data_branch.sh publish "pilot quality $PAYER ${{ github.run_id }}"

@@ -2,13 +2,13 @@
 title Weekly run: crawl --all, then sync-drive
 actor "GitHub Actions" as GHA
 participant CLI
-participant StateStore as DB
-participant TocCrawlPipeline as P
-participant HttpClient as H
-participant "parse.iter_toc" as S
-participant TocValidator as V
-participant DriveAdapter as D
-participant SheetRegistry as SH
+participant "state.Store" as DB
+participant "pipeline.Run(TocCrawl)" as P
+participant "fetch.Client" as H
+participant "toc.ReadGeneric" as S
+participant "validate.Validator" as V
+participant "storage.Drive" as D
+participant "storage.SheetRegistry" as SH
 
 GHA -> CLI : discover
 CLI -> DB : save de-duplicated payers
@@ -21,10 +21,10 @@ loop each payer with a TOC URL, not done in this run, not crawled in last 6 days
   P -> S : iterate items (gzip aware)
   loop each reporting_structure item
     S --> P : item
-    P -> V : validate_item
+    P -> V : ValidateItem
     P -> P : collect unique MRF URLs + plans
   end
-  P -> V : validate_header
+  P -> V : ValidateHeader
   P -> DB : previous TOC sha256?
   alt same sha256
     P --> CLI : unchanged (no HEADs, no new files)
