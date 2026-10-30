@@ -17,7 +17,7 @@ textarea { min-height: 190px; font-family: var(--body); line-height: 1.5; }
 </head>
 <body>
 <div class="wrap">
-  <div class="concept-bar"><span><a href="../">← User designs</a> · Design concept with example data</span><span>Claim and rate below are made up for illustration</span></div>
+  <div class="concept-bar"><span><a href="../">← User designs</a> · Everbetter app concept with example data</span><span>Claim and rate below are made up for illustration</span></div>
 
   <header style="display:flex;flex-direction:column;gap:8px">
     <h1>Was I charged the right amount?</h1>
@@ -27,7 +27,7 @@ textarea { min-height: 190px; font-family: var(--body); line-height: 1.5; }
   <form class="panel" id="form" autocomplete="off">
     <h2>From your EOB</h2>
     <div class="fields">
-      <label for="plan">Plan <select id="plan"><option>BCBS Michigan PPO (example)</option></select></label>
+      <label for="plan">Plan <select id="plan"><option>Captivated Health program, PPO (example)</option></select></label>
       <label for="provider">Provider name <input id="provider" value="Riverbend Medical Center"></label>
       <label for="date">Date of service <input id="date" type="date" value="2026-09-14"></label>
     </div>
@@ -47,6 +47,14 @@ textarea { min-height: 190px; font-family: var(--body); line-height: 1.5; }
     </label>
   </section>
 
+  <section class="panel">
+    <h2>Keep a record</h2>
+    <label for="c-pod" style="flex-direction:row;align-items:flex-start;gap:10px;color:var(--fg)"><input id="c-pod" type="checkbox" checked style="width:auto">
+      <span><strong>Save this claim to my sovereign pod</strong><br><span class="small muted">Stored where only you can see it, so you can track what you paid this year.</span></span></label>
+    <label for="c-share" style="flex-direction:row;align-items:flex-start;gap:10px;color:var(--fg)"><input id="c-share" type="checkbox" style="width:auto">
+      <span><strong>Share the service, provider and allowed amount, de-identified, to improve price estimates</strong><br><span class="small muted">No name, member ID or date. You can withdraw later.</span></span></label>
+  </section>
+
   <div class="callout">
     <h3>Why the numbers can differ for good reasons</h3>
     <p class="small">The published rate may change mid-year, a modifier on the claim can change the price, and hospital visits often include a separate facility or reading fee under another code. A mismatch is a reason to ask, not proof of an error.</p>
@@ -55,7 +63,7 @@ textarea { min-height: 190px; font-family: var(--body); line-height: 1.5; }
 
 <script>
 // Example published rates (plan x provider x code). A real build reads the slim rate index.
-const RATES = {"73721": {rate: 1820, extra: 110, name: "MRI of the knee (no contrast)", file: "2026-10 in-network file, BCBS Michigan PPO"}};
+const RATES = {"73721": {rate: 1820, extra: 110, name: "MRI of the knee (no contrast)", file: "2026-10 in-network file, Captivated Health program PPO"}};
 const $ = (id) => document.getElementById(id);
 const fmt = (n) => "$" + Math.round(n).toLocaleString("en-US");
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
