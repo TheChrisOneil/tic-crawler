@@ -2,6 +2,7 @@
 package model
 
 import (
+	"encoding/json"
 	"strings"
 	"time"
 )
@@ -57,4 +58,30 @@ func RenderTocURLs(pattern string, today time.Time) []string {
 		}
 	}
 	return out
+}
+
+// PayerResult is one payer's outcome in a run. JSON names match the Python crawler's state.
+type PayerResult struct {
+	PayerID string `json:"payer_id"`
+	// ok | unchanged | failed | skipped | deferred (retried next run)
+	Status string `json:"status"`
+	// ok | manual | robots_disallow | robots_unreachable | waf_blocked | http_error | network_error
+	// | no_toc_url | too_large | parse_error
+	AccessStatus     string          `json:"access_status"`
+	TocURL           string          `json:"toc_url"`
+	TocSHA256        string          `json:"toc_sha256"`
+	TocBytes         int64           `json:"toc_bytes"`
+	TocLastUpdatedOn string          `json:"toc_last_updated_on"`
+	MrfCount         int             `json:"mrf_count"`
+	TotalBytes       int64           `json:"total_bytes"`
+	SchemaValid      *bool           `json:"schema_valid"`
+	Validation       json.RawMessage `json:"validation"`
+	Error            string          `json:"error"`
+	CrawledAt        string          `json:"crawled_at"`
+	Outputs          []string        `json:"outputs"`
+	RawBytes         int64           `json:"raw_bytes"`
+}
+
+func NewPayerResult(id string) PayerResult {
+	return PayerResult{PayerID: id, Status: "pending", Outputs: []string{}, Validation: json.RawMessage("null")}
 }
