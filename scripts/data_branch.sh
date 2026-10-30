@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Keep crawl state and catalog outputs on the `data` branch so hands-free runs build on each other
-# and the dashboard can read them. Usage: data_branch.sh restore | publish "<message>"
+# and the dashboard can read them. Usage: data_branch.sh restore | publish "<message>" | dashboard "<message>"
 set -euo pipefail
 BRANCH="${DATA_BRANCH:-data}"
 WORK="${RUNNER_TEMP:-/tmp}/tic-data"
@@ -49,5 +49,26 @@ MD
     done
     exit 1
     ;;
-  *) echo "usage: $0 restore|publish [message]" >&2; exit 2 ;;
+  dashboard)
+    # The repo is private, so Vercel serves the dashboard JSON from main:dashboard/data/.
+    msg="${2:-update dashboard data}"
+    SITE="${RUNNER_TEMP:-/tmp}/tic-site"
+    rm -rf "$SITE"
+    git clone -q --depth 1 -b "${SITE_BRANCH:-main}" "$REPO_URL" "$SITE"
+    rm -rf "$SITE/dashboard/data"; mkdir -p "$SITE/dashboard/data"
+    cp -r out/dashboard/. "$SITE/dashboard/data/"
+    cd "$SITE"
+    git config user.name "tic-crawler bot"
+    git config user.email "actions@github.com"
+    git add -A dashboard/data
+    if git diff --cached --quiet; then echo "dashboard data unchanged"; exit 0; fi
+    git commit -q -m "$msg"
+    for i in 1 2 3; do
+      if git push -q origin "HEAD:${SITE_BRANCH:-main}"; then echo "dashboard data pushed"; exit 0; fi
+      git pull -q --rebase origin "${SITE_BRANCH:-main}" || true
+      sleep $((i * 5))
+    done
+    exit 1
+    ;;
+  *) echo "usage: $0 restore|publish [message]|dashboard [message]" >&2; exit 2 ;;
 esac

@@ -47,3 +47,6 @@ jobs:
       - name: Publish to data branch
         if: always()
         run: scripts/data_branch.sh publish "dry run ${{ github.run_id }}"
+      - name: Copy dashboard data to main (served by Vercel)
+        if: always()
+        run: scripts/data_branch.sh dashboard "dashboard data: dry run ${{ github.run_id }}"

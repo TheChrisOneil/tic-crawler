@@ -1,6 +1,7 @@
 name: ci
 on:
   push:
+    paths-ignore: ["dashboard/data/**"]
   pull_request:
 jobs:
   test:

@@ -1,7 +1,8 @@
 // TiC Payer Registry dashboard. Plain JS, no build step.
-// Data comes from the `data` branch, written by the crawl and dry-run workflows.
+// Data is copied into dashboard/data/ on main by the crawl and dry-run workflows (the repo is
+// private, so the page cannot read the `data` branch directly). Repo links need GitHub access.
 const REPO = "TheChrisOneil/tic-crawler";
-const DATA = `https://raw.githubusercontent.com/${REPO}/data/out`;
+const DATA = "data";
 const BLOB = `https://github.com/${REPO}/blob/data/out`;
 const app = document.getElementById("app");
 const cache = { data: null, payers: {} };
@@ -188,7 +189,7 @@ async function payerView(id) {
         <dt>MRF files</dt><dd>${num(r.mrf_count)} · ${bytes(r.total_bytes)}</dd>
         <dt>Schema</dt><dd>${validBadge(p)} ${v.item_count ? `· ${num(v.invalid_items)} of ${num(v.item_count)} records with errors` : ""}</dd>
         <dt>Error</dt><dd>${esc(r.error) || "<span class=muted>none</span>"}</dd>
-        <dt>Downloads</dt><dd>${det.manifest_file ? `<a href="${BLOB}/${det.manifest_file}">manifest CSV</a> · <a href="${DATA}/${tocFile}">TOC (.json.gz)</a>` : "<span class=muted>none yet</span>"}</dd>
+        <dt>Downloads</dt><dd>${det.manifest_file ? `<a href="${BLOB}/${det.manifest_file}">manifest CSV</a> · <a href="${BLOB}/${tocFile}">TOC (.json.gz)</a>` : "<span class=muted>none yet</span>"}</dd>
       </dl></div>
     </div>
     <div class="tabs" role="tablist">
@@ -350,7 +351,7 @@ async function requestView() {
       <p>Ask for a health plan, issuer or TPA to be added. Within a few minutes a bot checks the landing page and TOC URL you give
       (robots.txt, bot walls, and a full parse and schema check of the TOC) and replies on the request with the result and a ready-to-paste seed entry.</p>
       <p><a class="btn" href="${newIssue}" target="_blank" rel="noopener">Open a payer request</a></p>
-      <p class="note">Requests are GitHub issues on the tic-crawler repository, so you need a GitHub account.</p>
+      <p class="note">Requests are GitHub issues on the tic-crawler repository, so you need access to the private repository. Others can email the owner.</p>
     </div>
     <h3>Open requests</h3><div id="reqs"><div class="empty">Loading…</div></div>`;
   try {
@@ -364,7 +365,7 @@ async function requestView() {
       { key: "created_at", label: "Opened", render: (i) => esc(i.created_at.slice(0, 10)) },
     ], { sort: "number", dir: -1, empty: "No requests yet." });
   } catch (e) {
-    document.getElementById("reqs").innerHTML = `<div class="empty">Could not load requests (${esc(e.message)}).</div>`;
+    document.getElementById("reqs").innerHTML = `<div class="empty">Request list is only visible to repository members.</div>`;
   }
 }
 

@@ -59,6 +59,9 @@ jobs:
       - name: Publish to data branch
         if: always()
         run: scripts/data_branch.sh publish "weekly crawl ${{ github.run_id }}"
+      - name: Copy dashboard data to main (served by Vercel)
+        if: always()
+        run: scripts/data_branch.sh dashboard "dashboard data: weekly crawl ${{ github.run_id }}"
       - name: Upload run log
         if: always()
         uses: actions/upload-artifact@v4
