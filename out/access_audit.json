@@ -1,5 +1,5 @@
 {
-  "audited_at": "2026-10-30T18:20:58Z",
+  "audited_at": "2026-11-02T15:41:57Z",
   "user_agent": "EverBetter-TiC-Crawler/1.0 (+chris@thechrisoneil.com)",
   "robots": [
     {
@@ -134,7 +134,7 @@
       "error": "",
       "server": "",
       "policy": "rules",
-      "text": "# Group SC\r\nUser-agent: *\r\nDisallow:\r\n\r\nSitemap: https://www.swhmedicare.com/sitemap.xml",
+      "text": "# Group SC\nUser-agent: *\nDisallow:",
       "wall": ""
     }
   ],
@@ -569,7 +569,7 @@
         "CCBot": true
       },
       "fetched": true,
-      "status": 200,
+      "status": 206,
       "server": "",
       "content_type": "application/json",
       "wall": "",
@@ -607,7 +607,7 @@
         "CCBot": true
       },
       "fetched": true,
-      "status": 200,
+      "status": 206,
       "server": "",
       "content_type": "application/json",
       "wall": "",

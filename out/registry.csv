@@ -3,7 +3,7 @@ aetna,Aetna Life Insurance Company,,,,,,0,0,,
 arkansas-bcbs,Arkansas Blue Cross and Blue Shield,,,,,,0,0,,
 bcbs-alabama,Blue Cross and Blue Shield of Alabama,,,,,,0,0,,
 bcbs-arizona,Blue Cross and Blue Shield of Arizona,,,,,,0,0,,
-bcbs-kansas,"Blue Cross and Blue Shield of Kansas, Inc.",,https://bcbsks.com/mrf,https://mrf.secure.bcbsks.com/api/filedownloadhttptrigger?name=table-of-contents&ext=json,2026-10-30T18:20:26Z,,0,0,,[waf_blocked] waf_blocked 403 https://mrf.secure.bcbsks.com/api/filedownloadhttptrigger?name=table-of-contents&ext=json [cloudflare_challenge]
+bcbs-kansas,"Blue Cross and Blue Shield of Kansas, Inc.",,https://bcbsks.com/mrf,https://mrf.secure.bcbsks.com/api/filedownloadhttptrigger?name=table-of-contents&ext=json,2026-11-02T15:41:31Z,,0,0,,[waf_blocked] waf_blocked 403 https://mrf.secure.bcbsks.com/api/filedownloadhttptrigger?name=table-of-contents&ext=json [cloudflare_challenge]
 bcbs-kansas-city,Blue Cross and Blue Shield of Kansas City (Blue KC),,,,,,0,0,,
 bcbs-louisiana,Louisiana Health Service & Indemnity Company (Blue Cross and Blue Shield of Louisiana),,,,,,0,0,,
 bcbs-massachusetts,Blue Cross and Blue Shield of Massachusetts,,,,,,0,0,,
