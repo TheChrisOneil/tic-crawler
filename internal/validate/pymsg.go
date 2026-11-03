@@ -203,7 +203,11 @@ func pyMessages(e *jsonschema.ValidationError, inst, schemaDoc any) []string {
 		if len(k.Properties) == 1 {
 			verb = "was"
 		}
-		return []string{fmt.Sprintf("Additional properties are not allowed (%s %s unexpected)", quoteAll(k.Properties), verb)}
+		// Python lists them in document order, which decoded JSON no longer has; sort so the
+		// message (and its error kind) is the same on every run.
+		props := append([]string(nil), k.Properties...)
+		sort.Strings(props)
+		return []string{fmt.Sprintf("Additional properties are not allowed (%s %s unexpected)", quoteAll(props), verb)}
 	case *kind.Const:
 		return []string{pyRepr(k.Want) + " was expected"}
 	case *kind.UniqueItems:
