@@ -30,7 +30,9 @@ plan_count, plan_names, plans_truncated, plan_id_types, plan_market_types, http_
 content_length, last_modified, etag, check_error`
 
 A URL can serve thousands of plans, so each row carries `plan_count` plus up to 50 distinct plan
-names (`plans_truncated` marks the cap). The full plan list stays in the stored TOC.
+names (`plans_truncated` marks the cap). `crawl` also writes the uncapped plan-to-file index to
+`out/plans/<payer_id>/<yyyy-mm-dd>.csv.gz` (one row per plan and file: plan ids, market type,
+sponsor, `file_type`, `file_id`, `file_url`), so every plan traces to its own files.
 
 ## Setup
 
@@ -70,10 +72,27 @@ tic-crawler reference nppes                    # NPPES bulk file filtered to tho
 tic-crawler extract-rates --payer P --toc-url T --codes config/codes.yaml --max-files 1
 tic-crawler reference npi-lookup --payer P     # NPI Registry API for facility NPIs NPPES lacks
 tic-crawler join-quality --payer P             # NPI -> CCN crosswalk, prices + CMS measures
+tic-crawler reference medicare                 # Medicare OPPS Addendum B + lab fee schedule ([reference.medicare])
+tic-crawler report-card --payer P              # hospital facility rates as multiples of Medicare
 ```
 
 `extract-rates` streams an in-network file and keeps only the listed billing codes (and optional
-NPI/TIN lists); a run never downloads more than `max_run_bytes` (10 GB).
+NPI/TIN lists); a run never downloads more than `max_run_bytes` (10 GB). Per payer it writes:
+
+| File | Content |
+| --- | --- |
+| `<file_id>/rates.csv.gz` | One row per rate and provider group. Added columns: `file_id`, `network_name`, `comparable_key` (code, modifiers, billing class, setting, rate kind, arrangement: only rates with the same key compare) and `flags` (`placeholder`, `not_dollar`, `expired`, `non_ffs`; empty means a usable dollar rate) |
+| `<file_id>/meta.json` | Counts, `codes_missing` (requested codes the file lacks), `flagged_rate_rows`, and `coverage` per code (usable rows, provider groups, TINs, NPIs) |
+| `plan_files.csv.gz` | Uncapped plan-to-file index from the TOC |
+| `plan_coverage.csv.gz` | Per plan: in-network files, how many were extracted, and per code the providers with a usable rate. A plan with no extracted file has an empty code row: no rate found means unknown, not "not covered" |
+
+`report-card` compares institutional (facility) rates at hospitals linked by the crosswalk (high or
+medium confidence) with Medicare: OPPS national unadjusted payment, the lab fee schedule for labs,
+and the hospital clinic visit (G0463) for office visits. Rates are deduplicated by (file, TIN,
+rate); flagged rows and rates under 0.3x or over 20x Medicare are left out and counted; a hospital
+listing the same rate for 4 or more services is marked as a likely default rate. It is a price
+benchmark, not a quality rating, and Medicare amounts are not wage-adjusted. `export-dashboard`
+copies cards to `out/dashboard/report_card/` for the dashboard's "Price report card" page.
 
 `crawl` always writes locally to `out/` and records state in `state/tic.sqlite`. `sync-drive`
 uploads only files whose SHA-256 changed since the last sync.

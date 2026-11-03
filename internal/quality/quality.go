@@ -84,7 +84,7 @@ func LoadHospitals(path string) (map[string]Hospital, error) {
 	defer closeFn()
 	col := func(names ...string) int { return c.Find(names...) }
 	ccn, name, addr, city, st, zip := col("facility_id", "provider_id", "ccn"), col("facility_name", "hospital_name"),
-		col("address"), col("citytown", "city"), col("state"), col("zip_code")
+		col("address"), col("citytown", "city_town", "city"), col("state"), col("zip_code")
 	typ, rating := col("hospital_type"), col("hospital_overall_rating")
 	if ccn < 0 || name < 0 || addr < 0 || zip < 0 {
 		return nil, errors.New("hospital general information: expected columns missing")

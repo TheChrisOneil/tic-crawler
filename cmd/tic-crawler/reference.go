@@ -8,13 +8,17 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
 	"github.com/TheChrisOneil/tic-crawler/internal/extract"
+	"github.com/TheChrisOneil/tic-crawler/internal/medicare"
 	"github.com/TheChrisOneil/tic-crawler/internal/quality"
 	"github.com/TheChrisOneil/tic-crawler/internal/reference"
+	"github.com/TheChrisOneil/tic-crawler/internal/reportcard"
 )
 
 func configPath() string {
@@ -148,7 +152,7 @@ func referenceCmd() *cobra.Command {
 			return writeJSON(filepath.Join(outDir, "provider-data.json"), metas)
 		},
 	}
-	var payer, ratesDir string
+	var payer, ratesDir, oppsSrc, clfsSrc string
 	lookup := &cobra.Command{
 		Use:   "npi-lookup",
 		Short: "Look up facility NPIs from extracted institutional rates in the NPI Registry API",
@@ -186,7 +190,67 @@ func referenceCmd() *cobra.Command {
 	lookup.Flags().StringVar(&ratesDir, "rates", "out/rates", "extract-rates output folder")
 	lookup.MarkFlagRequired("payer")
 	cmd.PersistentFlags().StringVar(&outDir, "out", "out/reference", "output folder")
-	cmd.AddCommand(nppes, pdc, lookup)
+	med := &cobra.Command{
+		Use:   "medicare",
+		Short: "Download Medicare outpatient (OPPS Addendum B) and lab (CLFS) fee schedules as price benchmarks",
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			s, err := settings()
+			if err != nil {
+				return err
+			}
+			rc, err := reference.LoadConfig(configPath())
+			if err != nil {
+				return err
+			}
+			mc := rc.Medicare
+			if mc.MaxBytes <= 0 {
+				mc.MaxBytes = 100 << 20
+			}
+			ctx := context.Background()
+			c := newClient(s)
+			read := func(src string) ([]byte, error) {
+				if !strings.HasPrefix(src, "http://") && !strings.HasPrefix(src, "https://") {
+					return os.ReadFile(src)
+				}
+				resp, err := c.Get(ctx, src)
+				if err != nil {
+					return nil, err
+				}
+				defer resp.Body.Close()
+				b, err := io.ReadAll(io.LimitReader(resp.Body, mc.MaxBytes+1))
+				if err == nil && int64(len(b)) > mc.MaxBytes {
+					err = fmt.Errorf("larger than reference.medicare.max_bytes")
+				}
+				return b, err
+			}
+			var all []medicare.Benchmark
+			for _, f := range []struct {
+				name, src, release string
+				parse              func(io.Reader, string) ([]medicare.Benchmark, error)
+			}{
+				{"OPPS", firstNonEmpty(oppsSrc, mc.OPPSURL), mc.OPPSRelease, medicare.ParseOPPS},
+				{"CLFS", firstNonEmpty(clfsSrc, mc.CLFSURL), mc.CLFSRelease, medicare.ParseCLFS},
+			} {
+				if f.src == "" {
+					return fmt.Errorf("%s: no file configured ([reference.medicare])", f.name)
+				}
+				b, err := read(f.src)
+				if err != nil {
+					return fmt.Errorf("%s %s: %w", f.name, f.src, err)
+				}
+				bs, err := medicare.ParseFile(b, f.release, f.parse)
+				if err != nil {
+					return fmt.Errorf("%s %s: %w", f.name, f.src, err)
+				}
+				fmt.Fprintf(cmd.OutOrStdout(), "%s: %d codes from %s\n", f.name, len(bs), f.src)
+				all = append(all, bs...)
+			}
+			return medicare.Write(filepath.Join(outDir, "medicare.csv.gz"), all)
+		},
+	}
+	med.Flags().StringVar(&oppsSrc, "opps", "", "OPPS Addendum B zip or CSV (URL or path); default from config")
+	med.Flags().StringVar(&clfsSrc, "clfs", "", "CLFS zip or CSV (URL or path); default from config")
+	cmd.AddCommand(nppes, pdc, lookup, med)
 	return cmd
 }
 
@@ -294,6 +358,64 @@ func joinQualityCmd() *cobra.Command {
 	f.StringVar(&refDir, "reference", "out/reference", "reference data folder")
 	f.StringVar(&ratesDir, "rates", "out/rates", "extract-rates output folder")
 	f.StringVar(&outDir, "out", "out/quality", "output folder")
+	f.StringVar(&codesPath, "codes", "config/codes.yaml", "billing code labels")
+	cmd.MarkFlagRequired("payer")
+	return cmd
+}
+
+func firstNonEmpty(v ...string) string {
+	for _, s := range v {
+		if s != "" {
+			return s
+		}
+	}
+	return ""
+}
+
+func reportCardCmd() *cobra.Command {
+	var payer, refDir, ratesDir, qualityDir, codesPath string
+	cmd := &cobra.Command{
+		Use:   "report-card",
+		Short: "Compare a payer's negotiated hospital facility rates with Medicare (multiples of Medicare)",
+		Long: `Reads extract-rates output, the join-quality crosswalk and the Medicare benchmarks from
+"reference medicare", and writes <quality>/<payer>/report_card.json. A price benchmark only,
+not a quality rating.`,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			bm, err := medicare.Load(filepath.Join(refDir, "medicare.csv.gz"))
+			if err != nil {
+				return fmt.Errorf("medicare benchmarks (run reference medicare): %w", err)
+			}
+			links, err := reportcard.LoadLinks(filepath.Join(qualityDir, "crosswalk.csv.gz"))
+			if err != nil {
+				return fmt.Errorf("crosswalk (run join-quality): %w", err)
+			}
+			hs, err := quality.LoadHospitals(filepath.Join(refDir, "provider-data", dsHospitals+".csv.gz"))
+			if err != nil {
+				return err
+			}
+			hospitals := map[string]reportcard.Hospital{}
+			for k, h := range hs {
+				hospitals[k] = reportcard.Hospital{CCN: h.CCN, Name: h.Name, City: h.City, State: h.State}
+			}
+			labels, err := loadLabels(codesPath)
+			if err != nil {
+				return err
+			}
+			card, err := reportcard.Build(payer, filepath.Join(ratesDir, payer), links, hospitals, bm, labels,
+				time.Now().UTC().Format(time.RFC3339))
+			if err != nil {
+				return err
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "%s: %d hospitals, %d codes with a Medicare benchmark, excluded %v\n",
+				payer, len(card.Hospitals), len(card.Codes), card.Excluded)
+			return reportcard.Write(filepath.Join(qualityDir, payer, "report_card.json"), card)
+		},
+	}
+	f := cmd.Flags()
+	f.StringVar(&payer, "payer", "", "payer id")
+	f.StringVar(&refDir, "reference", "out/reference", "reference data folder")
+	f.StringVar(&ratesDir, "rates", "out/rates", "extract-rates output folder")
+	f.StringVar(&qualityDir, "quality", "out/quality", "join-quality output folder (crosswalk in, card out)")
 	f.StringVar(&codesPath, "codes", "config/codes.yaml", "billing code labels")
 	cmd.MarkFlagRequired("payer")
 	return cmd

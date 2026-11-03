@@ -32,6 +32,16 @@ type Config struct {
 	NPILookupMax    int               `toml:"npi_lookup_max"`
 	ProviderDataAPI string            `toml:"provider_data_api"`
 	Datasets        map[string]string `toml:"datasets"`
+	Medicare        MedicareConfig    `toml:"medicare"`
+}
+
+// MedicareConfig names the Medicare fee schedule files used as price benchmarks.
+type MedicareConfig struct {
+	OPPSURL     string `toml:"opps_url"`
+	OPPSRelease string `toml:"opps_release"`
+	CLFSURL     string `toml:"clfs_url"`
+	CLFSRelease string `toml:"clfs_release"`
+	MaxBytes    int64  `toml:"max_bytes"`
 }
 
 func LoadConfig(path string) (Config, error) {

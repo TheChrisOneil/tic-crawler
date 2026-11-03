@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -58,6 +59,13 @@ func exportDashboardCmd() *cobra.Command {
 				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "dashboard data written to %s\n", dest)
+			n, err := export.ReportCards(s.LocalDir)
+			if err != nil {
+				return fmt.Errorf("report cards: %w", err)
+			}
+			if n > 0 {
+				fmt.Fprintf(cmd.OutOrStdout(), "%d price report cards written to %s\n", n, filepath.Join(dest, "report_card"))
+			}
 			return nil
 		},
 	}

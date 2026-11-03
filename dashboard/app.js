@@ -381,6 +381,7 @@ async function route() {
     else if (name === "errors") await errorsView();
     else if (name === "access") await accessView();
     else if (name === "request") await requestView();
+    else if (name === "report-card") await reportCardView(arg && decodeURIComponent(arg));
     else await overview();
   } catch (e) {
     app.innerHTML = `<div class="empty">Could not load data: ${esc(e.message)}.<br>The first crawl may not have published yet.</div>`;

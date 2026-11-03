@@ -64,3 +64,16 @@ yv7e-xc69 = "timely and effective care"
 27ea-46a8 = "facility affiliation"
 # Doctors and Clinicians National Downloadable File: clinician NPIs, practice addresses, states.
 mj5m-pzi6 = "national downloadable file"
+# Medicare fee schedules used as price benchmarks (`reference medicare`, `report-card`).
+# Update each quarter. The CMS pages link these through a license page (apps/ama/license.asp);
+# the files themselves are at /files/zip/. Neither amount is wage-adjusted.
+[reference.medicare]
+# Hospital outpatient (OPPS) Addendum B: national unadjusted payment rate by HCPCS.
+# Page: https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient-pps/quarterly-addenda-updates
+opps_url = "https://www.cms.gov/files/zip/October-2026-OPPS-Addendum-B.zip"
+opps_release = "OPPS Addendum B, October 2026"
+# Clinical Laboratory Fee Schedule: national limit amount by HCPCS.
+# Page: https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files
+clfs_url = "https://www.cms.gov/files/zip/26clabq4.zip"
+clfs_release = "CLFS 26CLABQ4 (October 2026)"
+max_bytes = 104_857_600

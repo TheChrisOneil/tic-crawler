@@ -1,0 +1,47 @@
+name: medicare-benchmarks
+# Checks the Medicare fee schedule download and the price report card against the pilot data on
+# the data branch. Read-only: it publishes nothing, and uploads the results as a run artifact.
+on:
+  workflow_dispatch:
+    inputs:
+      payer:
+        description: "Payer id with extracted rates on the data branch"
+        default: fallon-health
+  push:
+    branches: [go-rewrite, claude/project-thread-6si36l]
+    paths: [.github/workflows/medicare-benchmarks.yml, internal/medicare/**, internal/reportcard/**]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PAYER: ${{ github.event.inputs.payer || 'fallon-health' }}
+      TIC_CONTACT_EMAIL: ${{ secrets.TIC_CONTACT_EMAIL }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: go test ./internal/medicare/ ./internal/reportcard/ ./internal/extract/ ./internal/toc/
+      - run: go build -o bin/tic-crawler ./cmd/tic-crawler
+      - name: Restore pilot outputs from the data branch
+        run: scripts/data_branch.sh restore
+      - name: Medicare benchmarks
+        run: scripts/step.sh medicare bin/tic-crawler reference medicare
+      - name: Medicare amounts for pilot codes
+        run: scripts/step.sh medicare-codes bash -c "zcat out/reference/medicare.csv.gz | grep -E '^(73721|74177|70450|45378|77067|80053|80061|85025|G0463),'; zcat out/reference/medicare.csv.gz | wc -l"
+      - name: Report card
+        run: scripts/step.sh report-card bin/tic-crawler report-card --payer "$PAYER"
+      - name: Report card summary
+        run: scripts/step.sh summary python3 scripts/report_card_summary.py "out/quality/$PAYER/report_card.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: report-card
+          path: |
+            out/reference/medicare.csv.gz
+            out/quality/${{ env.PAYER }}/report_card.json

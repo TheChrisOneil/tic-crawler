@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -98,5 +99,27 @@ func TestBuild(t *testing.T) {
 	json.Unmarshal(b, &detail)
 	if detail["manifest_file"] != "manifests/a/2026-02-01.csv" || len(detail["rows"].([]any)) != 3 {
 		t.Errorf("detail %v %v", detail["manifest_file"], detail["rows"])
+	}
+}
+
+func TestReportCards(t *testing.T) {
+	out := t.TempDir()
+	os.MkdirAll(filepath.Join(out, "quality", "fallon-health"), 0o755)
+	card := `{"payer_id":"fallon-health","payer_name":"Fallon Health","generated_at":"2026-11-03T00:00:00Z","hospitals":[{},{}],"codes":[{}]}`
+	os.WriteFile(filepath.Join(out, "quality", "fallon-health", "report_card.json"), []byte(card), 0o644)
+	n, err := ReportCards(out)
+	if err != nil || n != 1 {
+		t.Fatal(n, err)
+	}
+	b, _ := os.ReadFile(filepath.Join(out, "dashboard", "report_card", "fallon-health.json"))
+	if string(b) != card {
+		t.Fatalf("copy: %s", b)
+	}
+	b, _ = os.ReadFile(filepath.Join(out, "dashboard", "report_card", "index.json"))
+	if !strings.Contains(string(b), `"payer_name":"Fallon Health"`) || !strings.Contains(string(b), `"hospitals":2`) {
+		t.Fatalf("index: %s", b)
+	}
+	if _, err := os.Stat(filepath.Join(out, "dashboard", "data.json")); err == nil {
+		t.Fatal("ReportCards must not write data.json")
 	}
 }

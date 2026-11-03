@@ -66,11 +66,21 @@ jobs:
         run: scripts/step.sh npi-lookup bin/tic-crawler reference npi-lookup --payer "$PAYER"
       - name: Crosswalk and price-quality join
         run: scripts/step.sh join-quality bin/tic-crawler join-quality --payer "$PAYER"
+      - name: Medicare benchmarks (OPPS Addendum B, CLFS)
+        run: scripts/step.sh medicare bin/tic-crawler reference medicare
+      - name: Price report card (multiples of Medicare)
+        run: scripts/step.sh report-card bin/tic-crawler report-card --payer "$PAYER"
+      - name: Dashboard JSON
+        run: bin/tic-crawler export-dashboard
       - name: Summary
         if: always()
         run: |
           cat out/rates/$PAYER/index.json 2>/dev/null | head -c 4000 || true
           cat out/quality/crosswalk.json out/quality/$PAYER/summary.json 2>/dev/null | head -c 8000 || true
+          head -c 3000 out/quality/$PAYER/report_card.json 2>/dev/null || true
       - name: Publish to data branch
         if: always()
         run: scripts/data_branch.sh publish "pilot quality $PAYER ${{ github.run_id }}"
+      - name: Publish dashboard data (report card)
+        if: success()
+        run: scripts/data_branch.sh dashboard "dashboard data from pilot quality ${{ github.run_id }}"

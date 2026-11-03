@@ -79,3 +79,12 @@ Read this before changing the code.
 - Root `.txt` file name and format are placeholders until checked against the final rule text.
 - Several national carriers (UHC, Aetna, Humana, Anthem, Cigna) render TOC links with JavaScript
   or block bots; their seeds need a TOC URL found by hand.
+
+## Price report card
+- Rate rows carry `file_id`, `network_name`, `comparable_key` and `flags` (appended columns; readers
+  look columns up by name). Only compare rates with the same `comparable_key`; only unflagged rows
+  are usable dollar rates.
+- "No rate found" is unknown, not "not covered" (`plan_coverage.csv.gz`, `codes_missing`).
+- `report-card` is a price benchmark versus Medicare (OPPS national unadjusted, CLFS for labs,
+  G0463 for office visits), facility rates only, deduplicated by TIN. Not a quality rating; keep
+  it labeled that way. Medicare files are set in `[reference.medicare]` and change each quarter.

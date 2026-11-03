@@ -107,3 +107,13 @@ details summary { cursor: pointer; }
   .top, main { padding-left: 16px; padding-right: 16px; }
   .clip { max-width: 220px; }
 }
+
+/* Price report card */
+.rc-cell { font: inherit; font-variant-numeric: tabular-nums; border: 0; border-radius: 4px; padding: 2px 6px;
+  color: var(--ink); cursor: pointer; min-width: 3.2em; text-align: right; background: transparent; }
+.rc-cell:hover, .rc-cell:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+details.panel summary { cursor: pointer; }
+details.panel li { margin: 4px 0; }
+.toolbar label { display: inline-flex; gap: 6px; align-items: center; max-width: 100%; }
+.toolbar select { max-width: 100%; text-overflow: ellipsis; }
+#rc-file { max-width: min(420px, 70vw); }
