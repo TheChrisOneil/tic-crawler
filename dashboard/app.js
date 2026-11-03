@@ -49,7 +49,7 @@ async function getJSON(url) {
 }
 async function loadData() {
   if (!cache.data) {
-    cache.data = await getJSON(`${DATA}/dashboard/data.json`);
+    cache.data = await getJSON(`${DATA}/data.json`);
     const g = cache.data.generated_at;
     document.getElementById("generated").textContent =
       `Data generated ${g.replace("T", " ").replace("Z", " UTC")} · schema v${cache.data.schema_version} · stale after ${cache.data.stale_threshold_days} days`;
@@ -57,7 +57,7 @@ async function loadData() {
   return cache.data;
 }
 async function loadPayer(id) {
-  if (!cache.payers[id]) cache.payers[id] = await getJSON(`${DATA}/dashboard/payers/${encodeURIComponent(id)}.json`);
+  if (!cache.payers[id]) cache.payers[id] = await getJSON(`${DATA}/payers/${encodeURIComponent(id)}.json`);
   return cache.payers[id];
 }
 
