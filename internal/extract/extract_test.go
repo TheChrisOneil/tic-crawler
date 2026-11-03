@@ -129,3 +129,71 @@ func TestMalformed(t *testing.T) {
 		t.Fatal("want error")
 	}
 }
+
+func TestDerivedColumnsAndCoverage(t *testing.T) {
+	dir, m := run(t, Options{Codes: codes("HCPCS:73721", "HCPCS:99213", "HCPCS:70553"), FileID: "abc123def456", Today: "2026-11-03"})
+	recs := readGz(t, filepath.Join(dir, "rates.csv.gz"))
+	col := map[string]int{}
+	for i, h := range recs[0] {
+		col[h] = i
+	}
+	for _, h := range []string{"file_id", "network_name", "comparable_key", "flags", "provider_group", "placeholder"} {
+		if _, ok := col[h]; !ok {
+			t.Fatalf("missing column %s in %v", h, recs[0])
+		}
+	}
+	byRate := map[string][]string{}
+	for _, r := range recs[1:] {
+		if r[col["file_id"]] != "abc123def456" {
+			t.Fatalf("file_id = %q", r[col["file_id"]])
+		}
+		byRate[r[col["negotiated_rate"]]+"/"+r[col["provider_group"]]] = r
+	}
+	mri := byRate["1250.5/1"]
+	if mri == nil || mri[col["network_name"]] != "PPO" || mri[col["flags"]] != "" ||
+		mri[col["comparable_key"]] != "HCPCS:73721||institutional|outpatient|dollar|ffs" {
+		t.Fatalf("MRI row: %v", mri)
+	}
+	if r := byRate["98.12/1"]; r == nil || r[col["comparable_key"]] != "HCPCS:99213|25|professional|both|dollar|ffs" {
+		t.Fatalf("modifier row: %v", r)
+	}
+	if r := byRate["0.01/1"]; r == nil || r[col["flags"]] != "placeholder" {
+		t.Fatalf("placeholder row: %v", r)
+	}
+	if r := byRate["85/1"]; r == nil || r[col["flags"]] != "not_dollar" || !strings.HasSuffix(r[col["comparable_key"]], "|percentage|ffs") {
+		t.Fatalf("percentage row: %v", r)
+	}
+	if len(m.CodesMissing) != 1 || m.CodesMissing[0] != "HCPCS:70553" {
+		t.Fatalf("codes_missing = %v", m.CodesMissing)
+	}
+	var visit *CodeCoverage
+	for i := range m.Coverage {
+		if m.Coverage[i].Code == "HCPCS:99213" {
+			visit = &m.Coverage[i]
+		}
+	}
+	// Usable 99213 rates: 98.12 (groups 1, 2), 120 (inline) and 77 (remote group 3).
+	if visit == nil || visit.ProviderGroups != 4 || visit.TINs != 4 || visit.NPIs != 5 || visit.UsableRows != 4 {
+		t.Fatalf("99213 coverage = %+v", visit)
+	}
+	if m.FlaggedRows["placeholder"] != 2 || m.FlaggedRows["not_dollar"] != 2 {
+		t.Fatalf("flagged = %v", m.FlaggedRows)
+	}
+}
+
+func TestRowFlags(t *testing.T) {
+	cases := []struct {
+		rate, typ, exp, arr, want string
+	}{
+		{"100", "negotiated", "9999-12-31", "ffs", ""},
+		{"100", "negotiated", "2026-01-31", "ffs", "expired"},
+		{"100", "per diem", "9999-12-31", "bundle", "not_dollar|non_ffs"},
+		{"999999", "fee schedule", "", "", "placeholder"},
+		{"abc", "derived", "", "ffs", "placeholder"},
+	}
+	for _, c := range cases {
+		if got := strings.Join(RowFlags(c.rate, c.typ, c.exp, c.arr, "2026-11-03"), "|"); got != c.want {
+			t.Errorf("RowFlags(%v) = %q, want %q", c, got, c.want)
+		}
+	}
+}

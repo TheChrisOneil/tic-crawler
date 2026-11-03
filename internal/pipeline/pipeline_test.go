@@ -135,6 +135,20 @@ func TestCrawlWritesTOCAndManifest(t *testing.T) {
 		}
 		io.Copy(io.Discard, zr)
 		gzf.Close()
+		// The uncapped plan-to-file index sits beside the manifest (not listed in Outputs).
+		pf, err := os.Open(filepath.Join(out, "plans", "acme", today.Format("2006-01-02")+".csv.gz"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		pz, err := gzip.NewReader(pf)
+		if err != nil {
+			t.Fatal(err)
+		}
+		prow, _ := csv.NewReader(pz).ReadAll()
+		pf.Close()
+		if len(prow) < 2 || prow[0][7] != "file_id" {
+			t.Fatalf("plan index: %v", prow)
+		}
 		// A second run with the same TOC is unchanged.
 		p.State.RecordResult("run1", r)
 		heads := s.heads.Load()

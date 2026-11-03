@@ -26,7 +26,7 @@ func main() {
 		SilenceErrors: true,
 	}
 	root.PersistentFlags().StringVar(&cfgPath, "config", "", "config file (default $TIC_CONFIG or config.toml)")
-	root.AddCommand(extractRatesCmd(), referenceCmd(), joinQualityCmd(), exportDashboardCmd(),
+	root.AddCommand(extractRatesCmd(), referenceCmd(), joinQualityCmd(), reportCardCmd(), exportDashboardCmd(),
 		discoverCmd(), crawlCmd(), verifySeedsCmd(), auditAccessCmd(), probeCmd(), syncDriveCmd(), reportCmd())
 	if err := root.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, "error:", err)

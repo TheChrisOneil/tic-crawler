@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"compress/gzip"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,6 +13,24 @@ import (
 	"strings"
 	"testing"
 )
+
+func readGzCSV(t *testing.T, path string) [][]string {
+	t.Helper()
+	f, err := os.Open(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	zr, err := gzip.NewReader(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	recs, err := csv.NewReader(zr).ReadAll()
+	if err != nil {
+		t.Fatal(err)
+	}
+	return recs
+}
 
 func TestExtractRatesFromTOC(t *testing.T) {
 	inNet, err := os.ReadFile("../../internal/extract/testdata/in-network.json")
@@ -27,7 +46,9 @@ func TestExtractRatesFromTOC(t *testing.T) {
 		case "/toc.json":
 			fmt.Fprintf(w, `{"reporting_entity_name":"X","reporting_entity_type":"issuer","version":"2.0.0",
 			  "reporting_structure":[{"reporting_plans":[{"plan_name":"P","plan_id_type":"EIN","plan_id":"1","plan_market_type":"group"}],
-			  "in_network_files":[{"description":"d","location":"%s/in.json.gz"}]}]}`, srv.URL)
+			  "in_network_files":[{"description":"d","location":"%s/in.json.gz"}]},
+			  {"reporting_plans":[{"plan_name":"Q HMO","plan_id_type":"EIN","plan_id":"2","plan_market_type":"group"}],
+			  "in_network_files":[{"description":"other","location":"%s/other.json"}]}]}`, srv.URL, srv.URL)
 		case "/in.json.gz":
 			if gz.Len() == 0 {
 				zw := gzip.NewWriter(&gz)
@@ -62,11 +83,26 @@ func TestExtractRatesFromTOC(t *testing.T) {
 		Files []fileResult `json:"files"`
 	}
 	json.Unmarshal(b, &idx)
-	if len(idx.Files) != 1 || idx.Files[0].Status != "ok" || idx.Files[0].PlanCount != 1 || idx.Files[0].Meta.ItemsKept != 1 {
+	if len(idx.Files) != 2 || idx.Files[1].Status != "not_tried" || idx.Files[0].Status != "ok" || idx.Files[0].PlanCount != 1 || idx.Files[0].Meta.ItemsKept != 1 {
 		t.Fatalf("%s", b)
 	}
 	if !strings.HasPrefix(out.String(), "ok ") {
 		t.Fatal(out.String())
+	}
+	// Every plan is in the uncapped index, and coverage says which plans have no extracted file.
+	pf := readGzCSV(t, filepath.Join(dir, "p", "plan_files.csv.gz"))
+	if len(pf) != 3 || pf[2][2] != "Q HMO" || pf[1][7] != idx.Files[0].Dir {
+		t.Fatalf("plan_files: %v", pf)
+	}
+	cov := readGzCSV(t, filepath.Join(dir, "p", "plan_coverage.csv.gz"))
+	got := map[string]string{}
+	for _, r := range cov[1:] {
+		got[r[2]+"/"+r[6]] = r[4] + "," + r[5] + "," + r[7]
+	}
+	// P: 1 file, extracted; 99213 has usable rates for NPIs 1234567893, 1111111111, 2222222222, 1999999999
+	// (the remote group resolves to no providers here). Q: its only file was not extracted.
+	if got["P/HCPCS:99213"] != "1,1,4" || got["Q HMO/"] != "1,0," || len(got) != 2 {
+		t.Fatalf("plan_coverage: %v", cov)
 	}
 	// A budget smaller than the file skips it by size.
 	cmd = extractRatesCmd()

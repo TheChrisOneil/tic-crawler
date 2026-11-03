@@ -45,6 +45,22 @@ type Options struct {
 	// FetchRemote resolves provider_references given by URL (location), as older files do.
 	FetchRemote func(url string) (io.ReadCloser, error)
 	TempDir     string
+	// FileID tags every rate row with the file it came from (toc.FileID of the file URL), so
+	// a rate can be traced back to the plans that reference that file.
+	FileID string
+	// Today (YYYY-MM-DD) marks rows whose expiration_date has passed. Empty skips the check.
+	Today string
+}
+
+// CodeCoverage says how much of one requested billing code a file actually covers. A code
+// with no usable rate for a provider is unknown for that provider, not "not covered".
+type CodeCoverage struct {
+	Code           string `json:"code"`
+	RateRows       int    `json:"rate_rows"`
+	UsableRows     int    `json:"usable_rows"` // dollar rates with no flags
+	ProviderGroups int    `json:"provider_groups"`
+	TINs           int    `json:"tins"`
+	NPIs           int    `json:"npis"`
 }
 
 type Meta struct {
@@ -63,7 +79,11 @@ type Meta struct {
 	RateRows            int               `json:"rate_rows"`
 	GroupRows           int               `json:"group_rows"`
 	PlaceholderRows     int               `json:"placeholder_rate_rows"`
+	FlaggedRows         map[string]int    `json:"flagged_rate_rows,omitempty"`
 	CodesFound          []string          `json:"codes_found"`
+	CodesMissing        []string          `json:"codes_missing,omitempty"`
+	Coverage            []CodeCoverage    `json:"coverage,omitempty"`
+	FileID              string            `json:"file_id,omitempty"`
 }
 
 type tin struct {
@@ -100,9 +120,72 @@ type negotiatedRate struct {
 	NegotiatedPrices   []price         `json:"negotiated_prices"`
 }
 
-var RateHeader = []string{"billing_code_type", "billing_code", "billing_code_type_version", "negotiation_arrangement",
+// tmpHeader is the layout of the temporary candidate rows; finish adds the derived columns.
+var tmpHeader = []string{"billing_code_type", "billing_code", "billing_code_type_version", "negotiation_arrangement",
 	"name", "negotiated_type", "negotiated_rate", "billing_class", "setting", "service_code", "billing_code_modifier",
 	"expiration_date", "provider_group", "placeholder"}
+
+// RateHeader is the rates.csv.gz layout. Readers look columns up by name, so new columns go
+// at the end and existing ones are never renamed.
+//   - file_id: toc.FileID of the source file (join to plan_files.csv.gz for its plans).
+//   - network_name: the provider group's network names, "|"-joined.
+//   - comparable_key: rates with the same key can be compared; see ComparableKey.
+//   - flags: "|"-joined reasons to leave a row out of price statistics; see RowFlags.
+var RateHeader = append(append([]string{}, tmpHeader...), "file_id", "network_name", "comparable_key", "flags")
+
+// RateKind groups negotiated_type values: only "dollar" rates compare with a case price.
+// "percentage" is a percent of billed charges and "per diem" a daily rate.
+func RateKind(negotiatedType string) string {
+	switch strings.ToLower(strings.TrimSpace(negotiatedType)) {
+	case "negotiated", "fee schedule", "derived":
+		return "dollar"
+	case "percentage":
+		return "percentage"
+	case "per diem":
+		return "per_diem"
+	}
+	return "other"
+}
+
+// ComparableKey is code | modifiers | billing class | setting | rate kind | arrangement.
+// A professional fee, a facility fee, a -26 read and a percentage-of-charges rate for the
+// same code are different prices and get different keys.
+func ComparableKey(codeType, code, modifiers, billingClass, setting, negotiatedType, arrangement string) string {
+	var mods []string
+	for _, m := range strings.Split(modifiers, "|") {
+		if m = strings.ToUpper(strings.TrimSpace(m)); m != "" {
+			mods = append(mods, m)
+		}
+	}
+	sort.Strings(mods)
+	arr := strings.ToLower(strings.TrimSpace(arrangement))
+	if arr == "" {
+		arr = "ffs"
+	}
+	return strings.Join([]string{CodeKey(codeType, code), strings.Join(mods, "+"), strings.ToLower(strings.TrimSpace(billingClass)),
+		strings.ToLower(strings.TrimSpace(setting)), RateKind(negotiatedType), arr}, "|")
+}
+
+// RowFlags lists why a row should stay out of price statistics:
+// placeholder (0, a cent, 999999-style), not_dollar (percentage, per diem, other),
+// expired (expiration_date before today) and non_ffs (bundle or capitation: the rate covers
+// more than this one code). Unflagged rows are usable dollar rates.
+func RowFlags(rate, negotiatedType, expiration, arrangement, today string) []string {
+	var f []string
+	if v, err := strconv.ParseFloat(strings.TrimSpace(rate), 64); err != nil || IsPlaceholder(v) {
+		f = append(f, "placeholder")
+	}
+	if RateKind(negotiatedType) != "dollar" {
+		f = append(f, "not_dollar")
+	}
+	if today != "" && len(expiration) >= 10 && expiration[:10] < today {
+		f = append(f, "expired")
+	}
+	if a := strings.ToLower(strings.TrimSpace(arrangement)); a != "" && a != "ffs" {
+		f = append(f, "non_ffs")
+	}
+	return f
+}
 
 var GroupHeader = []string{"provider_group", "npi", "tin_type", "tin_value", "business_name", "network_name"}
 
@@ -121,6 +204,9 @@ type extractor struct {
 	remote     map[string]string // provider_group_id -> location URL
 	usedRefs   map[string]bool   // refs used by candidate rows
 	codesFound map[string]bool
+	refNets    map[string]string          // provider_group -> network names
+	refTINs    map[string]map[string]bool // provider_group -> kept TINs
+	refNPIs    map[string]map[string]bool // provider_group -> kept NPIs
 }
 
 func digits(s string) string {
@@ -165,7 +251,17 @@ func (x *extractor) writeGroups(key string, groups []providerGroup, networks []s
 			continue
 		}
 		kept = true
+		if x.refTINs[key] == nil {
+			x.refTINs[key], x.refNPIs[key] = map[string]bool{}, map[string]bool{}
+		}
+		x.refTINs[key][strings.ToLower(g.TIN.Type)+":"+digits(g.TIN.Value)] = true
+		if len(networks) > 0 {
+			x.refNets[key] = strings.Join(networks, "|")
+		}
 		for _, n := range npis {
+			if n != "" {
+				x.refNPIs[key][n] = true
+			}
 			x.groups.Write([]string{key, n, strings.ToLower(g.TIN.Type), g.TIN.Value, g.TIN.BusinessName, strings.Join(networks, "|")})
 			x.meta.GroupRows++
 		}
@@ -194,7 +290,9 @@ func Run(r io.Reader, opt Options, outDir string) (*Meta, error) {
 		opt: opt, dec: json.NewDecoder(bufio.NewReaderSize(counter, 1<<20)), meta: &Meta{Plan: map[string]string{}},
 		groups: gw, tmp: csv.NewWriter(tmpBuf), keptRefs: map[string]bool{}, remote: map[string]string{},
 		usedRefs: map[string]bool{}, codesFound: map[string]bool{},
+		refNets: map[string]string{}, refTINs: map[string]map[string]bool{}, refNPIs: map[string]map[string]bool{},
 	}
+	x.meta.FileID = opt.FileID
 	x.dec.UseNumber()
 	gw.Write(GroupHeader)
 	if err := x.top(); err != nil {
@@ -224,6 +322,12 @@ func Run(r io.Reader, opt Options, outDir string) (*Meta, error) {
 		x.meta.CodesFound = append(x.meta.CodesFound, k)
 	}
 	sort.Strings(x.meta.CodesFound)
+	for k := range opt.Codes {
+		if !x.codesFound[k] {
+			x.meta.CodesMissing = append(x.meta.CodesMissing, k)
+		}
+	}
+	sort.Strings(x.meta.CodesMissing)
 	b, _ := json.MarshalIndent(x.meta, "", "  ")
 	return x.meta, os.WriteFile(outDir+"/meta.json", append(b, '\n'), 0o644)
 }
@@ -270,7 +374,13 @@ func (x *extractor) finish(tmp *os.File, path string) error {
 	}
 	w.Write(RateHeader)
 	rd := csv.NewReader(bufio.NewReaderSize(tmp, 1<<20))
-	rd.FieldsPerRecord = len(RateHeader)
+	rd.FieldsPerRecord = len(tmpHeader)
+	type cov struct {
+		rows, usable int
+		groups       map[string]bool
+		tins, npis   map[string]bool
+	}
+	covs := map[string]*cov{}
 	for {
 		rec, err := rd.Read()
 		if errors.Is(err, io.EOF) {
@@ -283,11 +393,48 @@ func (x *extractor) finish(tmp *os.File, path string) error {
 		if !x.keptRefs[rec[12]] {
 			continue
 		}
-		w.Write(rec)
+		flags := RowFlags(rec[6], rec[5], rec[11], rec[3], x.opt.Today)
+		w.Write(append(rec, x.opt.FileID, x.refNets[rec[12]],
+			ComparableKey(rec[0], rec[1], rec[10], rec[7], rec[8], rec[5], rec[3]), strings.Join(flags, "|")))
 		x.meta.RateRows++
 		if rec[13] == "1" {
 			x.meta.PlaceholderRows++
 		}
+		for _, f := range flags {
+			if x.meta.FlaggedRows == nil {
+				x.meta.FlaggedRows = map[string]int{}
+			}
+			x.meta.FlaggedRows[f]++
+		}
+		ck := CodeKey(rec[0], rec[1])
+		c := covs[ck]
+		if c == nil {
+			c = &cov{groups: map[string]bool{}, tins: map[string]bool{}, npis: map[string]bool{}}
+			covs[ck] = c
+		}
+		c.rows++
+		if len(flags) == 0 {
+			c.usable++
+			if !c.groups[rec[12]] {
+				c.groups[rec[12]] = true
+				for t := range x.refTINs[rec[12]] {
+					c.tins[t] = true
+				}
+				for n := range x.refNPIs[rec[12]] {
+					c.npis[n] = true
+				}
+			}
+		}
+	}
+	keys := make([]string, 0, len(covs))
+	for k := range covs {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		c := covs[k]
+		x.meta.Coverage = append(x.meta.Coverage, CodeCoverage{Code: k, RateRows: c.rows, UsableRows: c.usable,
+			ProviderGroups: len(c.groups), TINs: len(c.tins), NPIs: len(c.npis)})
 	}
 	return closeFn()
 }

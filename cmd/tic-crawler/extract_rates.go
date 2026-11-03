@@ -2,9 +2,7 @@ package main
 
 import (
 	"context"
-	"crypto/sha256"
 	"encoding/csv"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -142,7 +141,7 @@ never stored. The run stops before downloading more than limits.max_run_bytes.`,
 			if err != nil {
 				return err
 			}
-			opt := extract.Options{Codes: codes}
+			opt := extract.Options{Codes: codes, Today: time.Now().UTC().Format("2006-01-02")}
 			if npiFile != "" {
 				set, err := loadColumn(npiFile, "npi")
 				if err != nil {
@@ -196,8 +195,16 @@ never stored. The run stops before downloading more than limits.max_run_bytes.`,
 					return err
 				}
 				col := toc.NewCollector(s.ManifestPlanNameCap)
-				_, err = toc.Read(r, func(it toc.Item) error { col.Add(it); return nil })
+				pf, err := toc.NewPlanFileWriter(filepath.Join(outDir, payer, "plan_files.csv.gz"))
+				if err != nil {
+					resp.Body.Close()
+					return err
+				}
+				_, err = toc.Read(r, func(it toc.Item) error { col.Add(it); pf.Add(it); return nil })
 				resp.Body.Close()
+				if cerr := pf.Close(); err == nil {
+					err = cerr
+				}
 				if err != nil {
 					return fmt.Errorf("TOC: %w", err)
 				}
@@ -240,8 +247,8 @@ never stored. The run stops before downloading more than limits.max_run_bytes.`,
 					results = append(results, res)
 					continue
 				}
-				sum := sha256.Sum256([]byte(e.URL))
-				res.Dir = hex.EncodeToString(sum[:])[:12]
+				res.Dir = toc.FileID(e.URL)
+				opt.FileID = res.Dir
 				start := time.Now()
 				meta, n, err := extractOne(ctx, client, e.URL, opt, filepath.Join(base, res.Dir), maxBytes-spent)
 				spent += n
@@ -268,6 +275,11 @@ never stored. The run stops before downloading more than limits.max_run_bytes.`,
 			b, _ := json.MarshalIndent(idx, "", "  ")
 			if err := os.WriteFile(filepath.Join(base, "index.json"), append(b, '\n'), 0o644); err != nil {
 				return err
+			}
+			if tocURL != "" {
+				if err := writePlanCoverage(base, results); err != nil {
+					return fmt.Errorf("plan coverage: %w", err)
+				}
 			}
 			if done == 0 {
 				return errors.New("no file extracted; see index.json")
@@ -313,4 +325,110 @@ func (b *budgetReader) lastErr() error {
 		return errBudget
 	}
 	return nil
+}
+
+// PlanCoverageHeader is the layout of plan_coverage.csv.gz: for each plan in the TOC, how many
+// of its in-network files were extracted, and for each billing code how many providers (NPIs)
+// have a usable dollar rate. providers_with_rate is the most found in any one of the plan's
+// extracted files (a lower bound for the plan). A plan with no extracted file has one row with
+// an empty code, so "no rate" is never mistaken for "not covered".
+var PlanCoverageHeader = []string{"plan_id_type", "plan_id", "plan_name", "plan_market_type", "in_network_files",
+	"files_extracted", "code", "providers_with_rate", "tins_with_rate"}
+
+func writePlanCoverage(base string, results []fileResult) error {
+	type covKey struct{ file, code string }
+	cov := map[covKey]extract.CodeCoverage{}
+	extracted := map[string]bool{}
+	codesByFile := map[string][]string{}
+	for _, r := range results {
+		if r.Status != "ok" || r.Meta == nil {
+			continue
+		}
+		extracted[r.Dir] = true
+		for _, c := range r.Meta.Coverage {
+			cov[covKey{r.Dir, c.Code}] = c
+		}
+		codesByFile[r.Dir] = append(append([]string{}, r.Meta.CodesFound...), r.Meta.CodesMissing...)
+	}
+	f, err := os.Open(filepath.Join(base, "plan_files.csv.gz"))
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	gr, err := toc.MaybeGunzip(f)
+	if err != nil {
+		return err
+	}
+	cr := csv.NewReader(gr)
+	cr.FieldsPerRecord = len(toc.PlanFilesHeader)
+	if _, err := cr.Read(); err != nil {
+		return err
+	}
+	type plan struct {
+		row   []string
+		files []string
+	}
+	plans := map[string]*plan{}
+	var order []string
+	for {
+		rec, err := cr.Read()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		if rec[6] != "in-network" {
+			continue
+		}
+		k := rec[0] + "\x00" + rec[1] + "\x00" + rec[2]
+		p := plans[k]
+		if p == nil {
+			p = &plan{row: rec[:4]}
+			plans[k] = p
+			order = append(order, k)
+		}
+		p.files = append(p.files, rec[7])
+	}
+	w, err := toc.NewGzCSV(filepath.Join(base, "plan_coverage.csv.gz"), PlanCoverageHeader)
+	if err != nil {
+		return err
+	}
+	for _, k := range order {
+		p := plans[k]
+		seen := map[string]bool{}
+		var ext []string
+		for _, fid := range p.files {
+			if !seen[fid] {
+				seen[fid] = true
+				if extracted[fid] {
+					ext = append(ext, fid)
+				}
+			}
+		}
+		head := append(append([]string{}, p.row...), strconv.Itoa(len(seen)), strconv.Itoa(len(ext)))
+		if len(ext) == 0 {
+			w.Write(append(head, "", "", ""))
+			continue
+		}
+		best := map[string]extract.CodeCoverage{}
+		var codes []string
+		for _, fid := range ext {
+			for _, code := range codesByFile[fid] {
+				c, ok := best[code]
+				if !ok {
+					codes = append(codes, code)
+				}
+				if fc := cov[covKey{fid, code}]; !ok || fc.NPIs > c.NPIs {
+					best[code] = fc
+				}
+			}
+		}
+		sort.Strings(codes)
+		for _, code := range codes {
+			c := best[code]
+			w.Write(append(append([]string{}, head...), code, strconv.Itoa(c.NPIs), strconv.Itoa(c.TINs)))
+		}
+	}
+	return w.Close()
 }

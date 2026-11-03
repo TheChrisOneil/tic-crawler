@@ -460,6 +460,12 @@ func (p *TocCrawl) WriteOutputs(c *Context) error {
 		return err
 	}
 	c.Result.Outputs = []string{tocRel, manRel}
+	// Uncapped plan-to-file index. Not listed in Outputs, so the dashboard JSON is unchanged.
+	// A TOC that doesn't decode as the CMS layout is already reported by validation.
+	if f, err := os.Open(c.TocPath); err == nil {
+		toc.WritePlanFiles(f, filepath.Join(p.OutDir, "plans", pid, day+".csv.gz"))
+		f.Close()
+	}
 	return nil
 }
 
