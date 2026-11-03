@@ -12,7 +12,11 @@ htmlcov/
 .pytest_cache/
 .ruff_cache/
 dist/
-state/
+/state/
 out/
 raw/
 *.sqlite
+
+# Go
+/tic-crawler-go
+/bin/

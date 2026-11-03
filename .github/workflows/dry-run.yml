@@ -29,21 +29,21 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-go@v5
         with:
-          python-version: "3.12"
-      - run: pip install -e ".[dev]"
-      - run: pytest -q
+          go-version-file: go.mod
+      - run: go build -o bin/tic-crawler ./cmd/tic-crawler
+      - run: go test ./...
       - run: scripts/data_branch.sh restore
-      - run: tic-crawler discover --source seed
+      - run: bin/tic-crawler discover --source seed
       - name: Crawl
         run: |
           args=""
           for p in $PAYERS; do args="$args --payer $p"; done
-          tic-crawler crawl $args
-      - run: tic-crawler audit-access
-      - run: tic-crawler export-dashboard
-      - run: tic-crawler report
+          bin/tic-crawler crawl $args
+      - run: bin/tic-crawler audit-access
+      - run: bin/tic-crawler export-dashboard
+      - run: bin/tic-crawler report
       - name: Publish to data branch
         if: always()
         run: scripts/data_branch.sh publish "dry run ${{ github.run_id }}"

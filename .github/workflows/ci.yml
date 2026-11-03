@@ -8,11 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-go@v5
         with:
-          python-version: "3.12"
-      - run: pip install -e ".[dev]"
-      - run: ruff check src tests
-      - run: pytest --cov=tic_crawler --cov-report=term
-      - name: Coverage gate on parse and validate
-        run: pytest -q --cov=tic_crawler.parse --cov=tic_crawler.validate --cov-fail-under=80
+          go-version-file: go.mod
+      - name: gofmt
+        run: test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
+      - run: go vet ./...
+      - run: go test -coverprofile=cover.out ./...
+      - name: Coverage gate on extraction, crosswalk, validation and TOC parsing
+        run: |
+          go test -cover ./internal/extract ./internal/quality ./internal/validate ./internal/pipeline | tee cov.txt
+          awk '/coverage:/ { sub("%","",$5); if ($5+0 < 80) { print "below 80%: " $2; bad=1 } } END { exit bad }' cov.txt

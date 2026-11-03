@@ -1,0 +1,14 @@
+{"reporting_entity_name": "X", "reporting_entity_type": 5, "version": "1.0.0", "extra": 1,
+ "reporting_structure": [
+  {"reporting_plans": [{"plan_name": "A", "plan_id_type": "EIN", "plan_id": "1", "plan_market_type": "group"},
+                       {"plan_name": "B", "plan_id_type": "HIOS", "plan_id": 2, "plan_market_type": "Group"}],
+   "in_network_files": [{"description": "d", "location": "not a uri"}]},
+  {"reporting_plans": [], "in_network_files": []},
+  {"reporting_plans": [{"plan_name": "C", "plan_id_type": "ein", "plan_id": "1", "plan_market_type": "individual"}],
+   "allowed_amount_file": {"description": "x"}},
+  {"reporting_plans": [{"plan_name": "C", "plan_id_type": "ein", "plan_id": "1", "plan_market_type": "individual"}],
+   "allowed_amount_file": {"description": "x"}},
+  {"in_network_files": [{"description": "d", "location": "https://a/b"}], "zzz": "it's"},
+  {"reporting_plans": [{"plan_name": "D", "plan_id_type": "ein", "plan_id": "1", "plan_market_type": "group",
+     "plan_sponsor_name": null}], "in_network_files": "x"}
+ ]}

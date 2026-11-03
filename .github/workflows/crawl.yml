@@ -29,10 +29,10 @@ jobs:
       GOOGLE_APPLICATION_CREDENTIALS: /tmp/tic-sa.json
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-go@v5
         with:
-          python-version: "3.12"
-      - run: pip install -e .
+          go-version-file: go.mod
+      - run: go build -o bin/tic-crawler ./cmd/tic-crawler
       - name: Restore state and outputs from the data branch
         run: scripts/data_branch.sh restore
       - name: Write service account key
@@ -42,20 +42,20 @@ jobs:
         run: |
           umask 077
           printf '%s' "$SA_JSON" > "$GOOGLE_APPLICATION_CREDENTIALS"
-      - run: tic-crawler discover
+      - run: bin/tic-crawler discover
       - name: Crawl
         run: |
           if [ -n "${{ github.event.inputs.payer }}" ]; then
-            tic-crawler crawl --payer "${{ github.event.inputs.payer }}"
+            bin/tic-crawler crawl --payer "${{ github.event.inputs.payer }}"
           else
-            tic-crawler crawl --all
+            bin/tic-crawler crawl --all
           fi
       - name: Sync to Drive
         if: env.TIC_DRIVE_FOLDER_ID != ''
-        run: tic-crawler sync-drive
-      - run: tic-crawler audit-access
-      - run: tic-crawler export-dashboard
-      - run: tic-crawler report
+        run: bin/tic-crawler sync-drive
+      - run: bin/tic-crawler audit-access
+      - run: bin/tic-crawler export-dashboard
+      - run: bin/tic-crawler report
       - name: Publish to data branch
         if: always()
         run: scripts/data_branch.sh publish "weekly crawl ${{ github.run_id }}"

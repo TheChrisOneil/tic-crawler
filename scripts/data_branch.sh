@@ -29,7 +29,7 @@ case "${1:-}" in
     cp -r out/. "$WORK/out/"
     # Raw MRFs never go here; keep the branch small by dropping very large stored TOCs.
     rm -rf "$WORK/out/raw"
-    find "$WORK/out" -name '*.json.gz' -size +50M -print -delete
+    find "$WORK/out" -type f -size +50M -print -delete
     cat > "$WORK/README.md" <<'MD'
 # tic-crawler data branch
 

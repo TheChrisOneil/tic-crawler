@@ -14,18 +14,23 @@ Read this before changing the code.
 
 ## Spec
 - CMS price-transparency-guide v2.2.1 (commit 66898bb, 2026-04). The TOC schema is structurally
-  unchanged since v2.0.0. Schemas are vendored in `src/tic_crawler/schemas/v2.2.1/`; to move to a
-  new version, vendor the new folder and change `[schema].version` in `config.toml`.
+  unchanged since v2.0.0. Schemas are embedded from `internal/schemas/v2.2.1/`; to move to a
+  new version, add the new folder there and change `[schema].version` in `config.toml`.
 - CMS-9882-F (finalized 2026-10): quarterly updates from 2027-03-06; footer link and root `.txt`
   file from 2027-09-06. The TOC stays optional, so some payers have none.
 
 ## Design
-- Layout: `discovery, fetch, parse, validate, storage, cli` as specified, plus `models, config,
-  state, pipeline` to keep modules focused.
-- Patterns: Strategy for discovery sources (`DiscoverySource`, auto-registered on subclassing)
-  and storage backends (`StorageBackend`, `RawStore`); Adapter for Drive, Sheets and GCS;
-  Template Method for the crawl (`CrawlPipeline.run` fixes the order; `TocCrawlPipeline`,
-  `RawDownloadPipeline` fill in steps).
+- Language: Go (one static binary, `cmd/tic-crawler`, cobra). It replaced the Python version in
+  October 2026 after a side-by-side crawl matched; keep outputs (manifests, state JSON, dashboard
+  JSON, validation messages) byte-compatible with what the dashboard and data branch already hold.
+- Layout: `internal/` packages `discovery, fetch, robots, toc, validate, storage, state, pipeline,
+  model, config, audit, export`, plus `extract, reference, quality` for the price and quality pilot.
+- Patterns: Strategy for discovery sources (`discovery.Source`, added with `discovery.Register`)
+  and storage backends (`storage.Backend`, `RawStore`); Adapter for Drive, Sheets and GCS;
+  Template Method for the crawl (`pipeline.Run` fixes the order; `TocCrawl`, `RawDownload` and
+  `Probe` fill in the `Steps`).
+- Validation messages follow Python jsonschema 4.x wording and order (`internal/validate/pymsg.go`),
+  and the `uri` format is not checked, so error kinds stay comparable across runs.
 - Streaming validation: the TOC schema is split into an item schema and a header schema so
   multi-GB TOCs never load into memory. `uniqueItems` is checked with item hashes.
 - Manifest grain: one row per unique MRF URL, with plan_count and up to 50 plan names.
@@ -41,8 +46,9 @@ Read this before changing the code.
 ## Dashboard and data branch
 - `dashboard/` is plain HTML/JS on Vercel (team TechNexusClarity, project `tic-crawler`, root
   `dashboard`). It reads JSON from the `data` branch at runtime; keep it build-free.
-- `export-dashboard` is the only producer of `out/dashboard/`. Change the JSON shape there and in
-  `dashboard/app.js` together.
+- `export-dashboard` (`internal/export`) is the only producer of `out/dashboard/`. Change the JSON
+  shape there and in `dashboard/app.js` together. Workflows copy it to `main:dashboard/data/`,
+  which Vercel serves (the repo can be private).
 - robots.txt: retried with backoff; only a persistent 5xx/429/network failure counts as disallow
   (RFC 9309), and the reason is recorded so the dashboard can tell "unreachable" from "disallowed".
 - Access outcomes are typed (`PayerResult.access_status`): ok, manual, robots_disallow,
@@ -57,6 +63,15 @@ Read this before changing the code.
 - `seeds/payers.yaml` entries carry `verified_by` (`page_fetch`, `http`, `none`). Do not invent
   URLs; check them with `tic-crawler verify-seeds` and record the result.
 - One entry per TOC when a payer publishes several.
+
+## Price and quality pilot
+- `extract-rates` keeps only `config/codes.yaml` codes; a run stops at `max_run_bytes`. Prices are
+  summarized per code and billing class, dollar types only (percentage and per diem are counted, not
+  averaged).
+- Crosswalk NPI -> CCN records `method` (address, name_zip, affiliation) on every link. The NPPES
+  bulk page was in maintenance in October 2026; the NPI Registry API is the fallback (3,000 lookups
+  per run).
+- The rating method waits for owner approval before any rating code is written.
 
 ## Known gaps
 - Exchange PUF URL and column names in `config.toml`/`ExchangePufSource` need checking against
