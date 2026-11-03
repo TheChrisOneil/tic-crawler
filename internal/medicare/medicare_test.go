@@ -81,3 +81,36 @@ func TestParseFileFromNestedZip(t *testing.T) {
 		t.Fatal("want error for a CSV without the expected header")
 	}
 }
+
+func TestParseFileFromXLSX(t *testing.T) {
+	var x bytes.Buffer
+	zw := zip.NewWriter(&x)
+	w, _ := zw.Create("xl/sharedStrings.xml")
+	w.Write([]byte(`<sst><si><t>HCPCS Code</t></si><si><t>Short Descriptor</t></si><si><t>SI</t></si><si><t>APC</t></si>` +
+		`<si><t>Payment Rate</t></si><si><r><t>Mri jnt </t></r><r><t>lwr</t></r></si><si><t>Q3</t></si></sst>`))
+	w, _ = zw.Create("xl/worksheets/sheet1.xml")
+	w.Write([]byte(`<worksheet><sheetData>` +
+		`<row r="1"><c r="A1" t="inlineStr"><is><t>Addendum B notice</t></is></c></row>` +
+		`<row r="3"><c r="A3" t="s"><v>0</v></c><c r="B3" t="s"><v>1</v></c><c r="C3" t="s"><v>2</v></c><c r="D3" t="s"><v>3</v></c><c r="F3" t="s"><v>4</v></c></row>` +
+		`<row r="4"><c r="A4" t="inlineStr"><is><t>73721</t></is></c><c r="B4" t="s"><v>5</v></c><c r="C4" t="s"><v>6</v></c><c r="D4"><v>5523</v></c><c r="F4"><v>245.1</v></c></row>` +
+		`</sheetData></worksheet>`))
+	zw.Close()
+	var outer bytes.Buffer
+	zw = zip.NewWriter(&outer)
+	w, _ = zw.Create("October 2026 Addendum B.xlsx")
+	w.Write(x.Bytes())
+	w, _ = zw.Create("notes.pdf")
+	w.Write([]byte("%PDF"))
+	zw.Close()
+	bs, err := ParseFile(outer.Bytes(), "r", ParseOPPS)
+	if err != nil || len(bs) != 1 || bs[0].Amount != 245.1 || bs[0].Description != "Mri jnt lwr" || bs[0].APC != "5523" {
+		t.Fatalf("%+v %v", bs, err)
+	}
+	var empty bytes.Buffer
+	zw = zip.NewWriter(&empty)
+	w, _ = zw.Create("notes.pdf")
+	zw.Close()
+	if _, err := ParseFile(empty.Bytes(), "r", ParseOPPS); err == nil || !strings.Contains(err.Error(), "notes.pdf") {
+		t.Fatalf("want error listing contents, got %v", err)
+	}
+}

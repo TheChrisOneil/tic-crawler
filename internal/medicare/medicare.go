@@ -160,17 +160,21 @@ func ParseCLFS(r io.Reader, release string) ([]Benchmark, error) {
 	return out, nil
 }
 
-// CSVsFromZip returns the CSV files inside a zip, looking one level into nested zips, largest
-// first. CMS packs the same table as CSV, XLSX and TXT; only the CSVs are used.
+// CSVsFromZip returns the tables inside a zip as CSV, looking one level into nested zips:
+// CSV files first (largest first), then XLSX worksheets converted to CSV. CMS packs the same
+// table as CSV, XLSX or both, varying by file and quarter.
 func CSVsFromZip(data []byte) ([][]byte, error) {
 	zr, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
 	if err != nil {
 		return nil, err
 	}
-	var out [][]byte
+	var csvs, sheets [][]byte
+	var names []string
 	for _, f := range zr.File {
+		names = append(names, f.Name)
 		name := strings.ToLower(f.Name)
-		if !strings.HasSuffix(name, ".csv") && !strings.HasSuffix(name, ".zip") {
+		isCSV, isXLSX, isZip := strings.HasSuffix(name, ".csv"), strings.HasSuffix(name, ".xlsx"), strings.HasSuffix(name, ".zip")
+		if !isCSV && !isXLSX && !isZip {
 			continue
 		}
 		rc, err := f.Open()
@@ -182,19 +186,25 @@ func CSVsFromZip(data []byte) ([][]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		if strings.HasSuffix(name, ".zip") {
+		switch {
+		case isZip:
 			inner, err := CSVsFromZip(b)
 			if err != nil {
 				return nil, fmt.Errorf("%s: %w", f.Name, err)
 			}
-			out = append(out, inner...)
-			continue
+			csvs = append(csvs, inner...)
+		case isXLSX:
+			if c, err := xlsxToCSV(b); err == nil {
+				sheets = append(sheets, c)
+			} // an unreadable workbook is skipped; the error below lists what the zip holds
+		default:
+			csvs = append(csvs, b)
 		}
-		out = append(out, b)
 	}
-	sort.SliceStable(out, func(i, j int) bool { return len(out[i]) > len(out[j]) })
+	sort.SliceStable(csvs, func(i, j int) bool { return len(csvs[i]) > len(csvs[j]) })
+	out := append(csvs, sheets...)
 	if len(out) == 0 {
-		return nil, errors.New("no CSV file in the zip")
+		return nil, fmt.Errorf("no CSV or XLSX file in the zip (has: %s)", strings.Join(names, ", "))
 	}
 	return out, nil
 }
