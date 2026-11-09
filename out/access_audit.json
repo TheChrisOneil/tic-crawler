@@ -1,615 +1,6 @@
 {
-  "audited_at": "2026-11-03T17:57:21Z",
-  "probes": [
-    {
-      "payer_id": "bcbs-kansas",
-      "role": "landing",
-      "url": "https://bcbsks.com/mrf",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 200,
-      "server": "cloudflare",
-      "content_type": "text/html; charset=utf-8",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "bcbs-kansas",
-      "role": "toc",
-      "url": "https://mrf.secure.bcbsks.com/api/filedownloadhttptrigger?name=table-of-contents\u0026ext=json",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": false,
-        "GPTBot": false,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 403,
-      "server": "cloudflare",
-      "content_type": "text/html; charset=UTF-8",
-      "wall": "cloudflare_challenge",
-      "error": "",
-      "verdict": "bot_wall"
-    },
-    {
-      "payer_id": "bcbs-michigan-employer",
-      "role": "landing",
-      "url": "https://www.bcbsm.com/mrf",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 200,
-      "server": "",
-      "content_type": "text/html;charset=utf-8",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "bcbs-michigan-employer",
-      "role": "toc",
-      "url": "https://bcbsm.sapphiremrfhub.com/tocs/current/blue_cross_blue_shield_of_michigan_employer",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 206,
-      "server": "AmazonS3",
-      "content_type": "binary/octet-stream",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "bcbs-michigan-employer",
-      "role": "mrf_sample",
-      "url": "https://bcbsm.sapphiremrfhub.com/mrfs/202611/2026-10-01_BCBSMI_Blue-Cross-Blue-Shield-of-Michigan-Traditional_allowed-amounts.json.gz",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 206,
-      "server": "AmazonS3",
-      "content_type": "binary/octet-stream",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "bcbs-michigan-employer",
-      "role": "mrf_sample",
-      "url": "https://bcbsmi.mrf.bcbs.com/2022-09_378_49B0_in-network-rates_01_of_01.json.gz?\u0026Expires=1666122639\u0026Signature=YOEYI9T71OxrCViKQHAfMKk8pyjsn-PApY6uxWBSLru4UtmT3aMOgffp~Kd~H9T7VWvdtpdY8c4qTa5j-0ltrVbTS76BkAO9wySJ1YKN4zjwWnh~YqifiHkV9wVYeLkNDgohIdCplTLMkgaTPEiBVXusq-Qpd80ipBIg5yzQhQzMKQ7PWnd8ZjIah6x4h1cwXJwnuUztbvr6tKmd8vvQ5uvjdW-OVyM8kxAdutCPeBu3ibSUm9AiL-uGIs7kNuuL8Z~7LOEa8bTGhSPJeTNdUima1es9FnZLitN21nkQQVyn0oZ6FTCuFvo-N0JeNmzp5oxYrrdAZwLZ62EP5DmCyg__\u0026Key-Pair-Id=K27TQMT39R1C8A",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 403,
-      "server": "CloudFront",
-      "content_type": "text/xml",
-      "wall": "",
-      "error": "",
-      "verdict": "http_error"
-    },
-    {
-      "payer_id": "bcbs-michigan-group",
-      "role": "landing",
-      "url": "https://www.bcbsm.com/mrf",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 200,
-      "server": "",
-      "content_type": "text/html;charset=utf-8",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "bcbs-michigan-group",
-      "role": "toc",
-      "url": "https://bcbsm.sapphiremrfhub.com/tocs/current/blue_cross_blue_shield_of_michigan",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 206,
-      "server": "AmazonS3",
-      "content_type": "binary/octet-stream",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "bcbs-michigan-group",
-      "role": "mrf_sample",
-      "url": "https://bcbsm.sapphiremrfhub.com/mrfs/202611/2026-10-01_BCBSMI_Blue-Cross-Blue-Shield-of-Michigan_allowed-amounts.json.gz",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 206,
-      "server": "AmazonS3",
-      "content_type": "binary/octet-stream",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "bcbs-michigan-group",
-      "role": "mrf_sample",
-      "url": "https://bcbsmi.mrf.bcbs.com/2026-11_020_02I0_in-network-rates_1_of_2.json.gz?\u0026Expires=1797861651\u0026Signature=qLhivemhfQ8YVOkh~rHYuraCK1qchBlWVn2QnWmcoa1zk7VU08lypGIBiyk10Py3JaLkxZvjvkUwkDs0NLN3yEuPFpoYWAr2UZBt3nPsfzQF2Ph~GzluJ2NFgtESh8W8AF5w0xlQk~8Syr2gcUvB5el6eFgVSYSS6baiHfMZOW65~rLYUk-7~z9SPt1OlSndBORKPOpJPDGOsNdAQcwnDbStrXBD6IzaahDHRwcug3h1m3OI8z80yOdWmRlhNZxFhZbHmn5mIKCS7IfbLtx19tesPpgkViy0WXd8VQwIlbsA9YxGIKm4PtTdvPX4A6PY8cCztKnlsRIJjTwhwk5L3w__\u0026Key-Pair-Id=K27TQMT39R1C8A",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 206,
-      "server": "AmazonS3",
-      "content_type": "application/x-gzip",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "bcbs-mississippi",
-      "role": "landing",
-      "url": "https://www.bcbsms.com/about-us/transparency-in-coverage",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 200,
-      "server": "",
-      "content_type": "text/html; charset=utf-8",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "bcbs-mississippi",
-      "role": "toc",
-      "url": "https://tcr.bcbsms.com/Table_of_Contents/Local_TOC.json",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 206,
-      "server": "",
-      "content_type": "application/json",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "bcbs-mississippi",
-      "role": "mrf_sample",
-      "url": "https://tcr.bcbsms.com/230_local_out-of-network-rates.json.gz",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 206,
-      "server": "",
-      "content_type": "application/x-gzip",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "bcbs-mississippi",
-      "role": "mrf_sample",
-      "url": "https://bcbsms.mrf.bcbs.com/2026-10_020_02E0_in-network-rates_1_of_2.json.gz?\u0026Expires=1795269681\u0026Signature=tTsT1~JjTBq7VRgm3eM7Uns~-qf2YeouS9GQyz8JVSclXbTLpuVchpgXNHMVfORyJr~duIUCRV~8jQBExX-ONfx18VSXYOJGbacJqurIkLPpRskWe3DDU7zUOoNrYxQAcTVhdCEBNhT7e~C9n85T4fdx5-uZTruffKFQptSHbwxN8OODBj8m~bJQpmfuVK4K2YkIt69hVCWLFiGPWm65c-2IFi598xB6tkFHVK9AhT6P5715H9-PhsQSxIDVqUoeBtVNJK9ZDvnNvHqn8rfOyZNdt1hciXQUWMawCaybKS8puwwpZeGkN2gqu6mr4qH~4VI~omUDupRWqOCKExLn8w__\u0026Key-Pair-Id=K27TQMT39R1C8A",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 206,
-      "server": "AmazonS3",
-      "content_type": "application/gzip",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "bcbs-mississippi-state-employees",
-      "role": "landing",
-      "url": "https://www.bcbsms.com/about-us/transparency-in-coverage",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 200,
-      "server": "",
-      "content_type": "text/html; charset=utf-8",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "bcbs-mississippi-state-employees",
-      "role": "toc",
-      "url": "https://tcr.bcbsms.com/Table_of_Contents/State_TOC.json",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 206,
-      "server": "",
-      "content_type": "application/json",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "bcbs-mississippi-state-employees",
-      "role": "mrf_sample",
-      "url": "https://tcr.bcbsms.com/230_state_out-of-network-rates.json.gz",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 206,
-      "server": "",
-      "content_type": "application/x-gzip",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "bcbs-mississippi-state-employees",
-      "role": "mrf_sample",
-      "url": "https://bcbsms.mrf.bcbs.com/2026-10_020_02E0_in-network-rates_1_of_2.json.gz?\u0026Expires=1795269681\u0026Signature=tTsT1~JjTBq7VRgm3eM7Uns~-qf2YeouS9GQyz8JVSclXbTLpuVchpgXNHMVfORyJr~duIUCRV~8jQBExX-ONfx18VSXYOJGbacJqurIkLPpRskWe3DDU7zUOoNrYxQAcTVhdCEBNhT7e~C9n85T4fdx5-uZTruffKFQptSHbwxN8OODBj8m~bJQpmfuVK4K2YkIt69hVCWLFiGPWm65c-2IFi598xB6tkFHVK9AhT6P5715H9-PhsQSxIDVqUoeBtVNJK9ZDvnNvHqn8rfOyZNdt1hciXQUWMawCaybKS8puwwpZeGkN2gqu6mr4qH~4VI~omUDupRWqOCKExLn8w__\u0026Key-Pair-Id=K27TQMT39R1C8A",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 206,
-      "server": "AmazonS3",
-      "content_type": "application/gzip",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "bcbs-north-carolina",
-      "role": "landing",
-      "url": "https://www.bcbsnc.com/policies-best-practices/machine-readable-files",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 200,
-      "server": "",
-      "content_type": "text/html; charset=utf-8",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "centene-ambetter",
-      "role": "landing",
-      "url": "https://www.centene.com/price-transparency-files.html",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 200,
-      "server": "",
-      "content_type": "text/html;charset=utf-8",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "centene-ambetter",
-      "role": "mrf_sample",
-      "url": "https://www.centene.com/content/dam/centene/Centene%20Corporate/json/DOCUMENT/2026-09-28_centene-management-company-llc_ambetter-al_allowed-amounts.json",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 206,
-      "server": "",
-      "content_type": "application/json",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "centene-fidelis",
-      "role": "landing",
-      "url": "https://www.centene.com/price-transparency-files.html",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 200,
-      "server": "",
-      "content_type": "text/html;charset=utf-8",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "centene-fidelis",
-      "role": "mrf_sample",
-      "url": "https://www.centene.com/content/dam/centene/Centene%20Corporate/json/DOCUMENT/2026-09-28_centene-management-company-llc_fidelis-es_allowed-amounts.json",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 206,
-      "server": "",
-      "content_type": "application/json",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "centene-health-net",
-      "role": "landing",
-      "url": "https://www.centene.com/price-transparency-files.html",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 200,
-      "server": "",
-      "content_type": "text/html;charset=utf-8",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "centene-health-net",
-      "role": "mrf_sample",
-      "url": "https://www.centene.com/content/dam/centene/Centene%20Corporate/json/DOCUMENT/2026-09-30_centene-management-company-llc_healthnet-ca_allowed-amounts.json",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 206,
-      "server": "",
-      "content_type": "application/json",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "cigna",
-      "role": "landing",
-      "url": "https://www.cigna.com/legal/compliance/machine-readable-files",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 200,
-      "server": "",
-      "content_type": "text/html; charset=utf-8",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "elevance-anthem",
-      "role": "landing",
-      "url": "https://www.anthem.com/ca/machine-readable-file/search",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 200,
-      "server": "AkamaiNetStorage",
-      "content_type": "text/html",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "hcsc",
-      "role": "landing",
-      "url": "https://www.bcbsok.com/member/policy-forms/machine-readable-file",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 200,
-      "server": "",
-      "content_type": "text/html; charset=UTF-8",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "kaiser-colorado",
-      "role": "landing",
-      "url": "https://healthy.kaiserpermanente.org/front-door/machine-readable-co-federal",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 200,
-      "server": "",
-      "content_type": "text/html; charset=UTF-8",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "molina",
-      "role": "landing",
-      "url": "https://www.molinahealthcare.com/marketplace/oh/en-us/About/compinfo/PricingTransparency",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 404,
-      "server": "",
-      "content_type": "text/html; charset=utf-8",
-      "wall": "",
-      "error": "",
-      "verdict": "http_error"
-    },
-    {
-      "payer_id": "qualchoice",
-      "role": "landing",
-      "url": "https://www.centene.com/price-transparency-files.html",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 200,
-      "server": "",
-      "content_type": "text/html;charset=utf-8",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    },
-    {
-      "payer_id": "qualchoice",
-      "role": "mrf_sample",
-      "url": "https://www.centene.com/content/dam/centene/Centene%20Corporate/json/DOCUMENT/2026-09-28_centene-management-company-llc_qualchoice_allowed-amounts.json",
-      "robots_allows_us": true,
-      "robots_allows": {
-        "*": true,
-        "CCBot": true,
-        "GPTBot": true,
-        "Googlebot": true
-      },
-      "fetched": true,
-      "status": 206,
-      "server": "",
-      "content_type": "application/json",
-      "wall": "",
-      "error": "",
-      "verdict": "accessible"
-    }
-  ],
+  "audited_at": "2026-11-09T16:09:20Z",
+  "user_agent": "EverBetter-TiC-Crawler/1.0 (+chris@thechrisoneil.com)",
   "robots": [
     {
       "origin": "https://bcbsks.com",
@@ -635,7 +26,7 @@
       "error": "",
       "server": "",
       "policy": "rules",
-      "text": "# Maintained by: H. Benton / blocking pages engines should no index / updated Oct. 30, 2026\r\n# SHARED RULES: User-agent goes before rules. \r\n# * is the fallback for bots without a named group. Avoid separate bot groups unless their policy differs. \r\n# Folder prefix for URLs will block its descendants/child pages.\r\n\r\n# Block internal, staging, portal, select group, and unpublished DAM paths\r\nUser-agent: *\r\nDisallow: /content/dam/public/mpr-unpublished-pdfs/\r\nDisallow: /content/dam/public/administrative/\r\nDisallow: /content/dam/memberportal/\r\nDisallow: /content/dam/member_portal/\r\nDisallow: /content/dam/member_portal_it/\r\nDisallow: /content/dam/microsites/ford-team-members/documents\r\nDisallow: /content/dam/microsites/salaried-fca-usa-llc/documents\r\nDisallow: /content/dam/microsites/uaw-trust/documents\r\nDisallow: /content/dam/microsites/university-of-michigan/2025\r\nDisallow: /content/dam/microsites/university-of-michigan/2026\r\nDisallow: /content/dam/microsites/bricktown/administrative\r\nDisallow: /content/dam/microsites/mpsers/documents\r\nDisallow: /content/dam/public/shared-assets/\r\nDisallow: /content/dam/public/*/temp/\r\nDisallow: /_p/\r\nDisallow: /agentom/\r\nDisallow: /index/common/bug-test-page.html\r\n\r\n# Block pages and PDFs\r\nDisallow: /_hrBlock/\r\nDisallow: /agents/resources/aep-materials/\r\nDisallow: /agents/help/faqs.html\r\nDisallow: /agents/help/faqs/department-of-labor-faq/\r\nDisallow: /agents/help/faqs/hipaa-faq/\r\nDisallow: /bcn-benefits-summary/request-form/confirmation/\r\nDisallow: /benefits/blue-cross-complete.html\r\nDisallow: /benefits/healthy-michigan.html\r\nDisallow: /benefits/michild.html\r\nDisallow: /benefits/special-health-care-services.html\r\nDisallow: /campaign/coffee/\r\nDisallow: /campaign/penske/\r\nDisallow: /content/dam/microsites/blue-cross-complete/bcc-provider-*\r\nDisallow: /content/dam/microsites/corpcomm/\r\nDisallow: /content/dam/microsites/corpcomm/provider/BCNPN/Assets/\r\nDisallow: /content/dam/microsites/corpcomm/provider/the_record/Assets/\r\nDisallow: /content/dam/microsites/corpcomm/provider/the_record/\r\nDisallow: /content/dam/microsites/corpcomm/provider/dental-care-news/\r\nDisallow: /content/dam/microsites/corpcomm/provider/HPU/\r\nDisallow: /content/dam/microsites/Healthy%20Safety%20Net/covid-19-report.pdf\r\nDisallow: /content/dam/microsites/medicare/documents/\r\nDisallow: /content/dam/microsites/medicare/excel/\r\nDisallow: /content/dam/microsites/uaw-trust/coronavirus-anxiety.pdf\r\nDisallow: /content/dam/microsites/Updates/alternate-hospitals.pdf\r\nDisallow: /content/dam/microsites/win-by-losing-uaw-ford/\r\nDisallow: /content/dam/public/Agents/Documents/\r\nDisallow: /amslibs/content/dam/public/agents/documents/\r\nDisallow: /content/dam/public/Archive/BCBSM/pdf/2006_custom_formulary.pdf\r\nDisallow: /content/dam/public/Archive/BCBSM/pdf/MedImpact_Payer_Sheet.pdf\r\nDisallow: /content/dam/public/Archive/BCBSM/pdf/MiBOQI-2012-Fact-Sheet.pdf\r\nDisallow: /content/dam/public/Archive/BCBSM/pdf/standard_med_request_form.pdf\r\nDisallow: /content/dam/public/Common/Documents/reimburse.pdf\r\nDisallow: /content/dam/public/Consumer/Documents/about-us/board-materials.pdf\r\nDisallow: /content/dam/public/Consumer/Documents/help/documents-forms/\r\nDisallow: /content/dam/public/Consumer/Documents/help/faqs/priorauth-medical-drug-list.pdf\r\nDisallow: /content/dam/public/consumer/forms-documents/request-for-applications.pdf\r\nDisallow: /content/dam/public/employers/content-fragments/\r\nDisallow: /content/dam/public/Employers/Documents/\r\nDisallow: /content/dam/public/employers/documents/\r\nDisallow: /content/dam/public/glidepath/network-descriptions/docs/\r\nDisallow: /content/dam/public/marketplace/json/\r\nDisallow: /content/dam/public/one-fusion/\r\nDisallow: /content/dam/public/Providers/Documents/\r\nDisallow: /content/dam/public/Providers/portal/\r\nDisallow: /content/dam/public/secured/\r\nDisallow: /content/dam/public/secured/find-a-doctor/frequently-asked-questions.pdf\r\nDisallow: /content/dam/public/shared/documents/billing-cost-share-waivers.pdf\r\nDisallow: /content/dam/public/shared/documents/compact-login-page/\r\nDisallow: /content/dam/public/shared/documents/coronavirus/\r\nDisallow: /content/dam/public/shared/documents/excel/plan-benefits/2020/ibu-plan-details-2020.xls\r\nDisallow: /content/microsites/bcn-flu-shot/\r\nDisallow: /content/microsites/bcn-tobacco-survey/\r\nDisallow: /content/microsites/blue-365/\r\nDisallow: /content/microsites/blue-cross-blue-shield-of-michigan-news/\r\nDisallow: /content/microsites/blue-cross-complete/en/index.html\r\nDisallow: /content/microsites/blue-dental-shop.html\r\nDisallow: /content/microsites/blue-dental-shop/\r\nDisallow: /content/microsites/bug-test.html\r\nDisallow: /content/microsites/bug-test/en/home.html\r\nDisallow: /content/microsites/bug-test-OLD.html\r\nDisallow: /content/microsites/campaigns/en/bcbsm_app/app_redirect\r\nDisallow: /content/microsites/campaigns/wellness/assessment.html\r\nDisallow: /content/microsites/charity/en/\r\nDisallow: /content/microsites/charity/\r\nDisallow: /content/microsites/charity-disclaimer/\r\nDisallow: /content/microsites/cobrowse/en/index.html\r\nDisallow: /content/microsites/denso/en/index.html\r\nDisallow: /content/microsites/direct-enrollment-form/\r\nDisallow: /content/microsites/discounts/\r\nDisallow: /content/microsites/doctors-and-hospitals-network/en/index.html\r\nDisallow: /content/microsites/fcacare/\r\nDisallow: /content/microsites/find-care/en/24-7-online-health-care-part-1-video-transcript.html\r\nDisallow: /content/microsites/find-care/en/index.html\r\nDisallow: /content/microsites/ford/\r\nDisallow: /microsites/ford/\r\nDisallow: /ford-team-members/index/\r\nDisallow: /content/microsites/glidepath-benefits/english/glidepath-benefits.html\r\nDisallow: /content/microsites/gm/\r\nDisallow: /microsites/gm/\r\nDisallow: /content/microsites/bricktowncapital/contact/\r\nDisallow: /content/public/en/index/health-insurance-101/basics/\r\nDisallow: /content/public/en/index/members/online-account/\r\nDisallow: /content/microsites/gm/en/\r\nDisallow: /content/microsites/gm/\r\nDisallow: /content/microsites/group-to-individual/\r\nDisallow: /content/microsites/guide/en/index.html\r\nDisallow: /content/microsites/medicare/en/index/2014-plans/\r\nDisallow: /content/microsites/medicare/en/index/common/medicare-responsive-layouts\r\nDisallow: /content/microsites/medicare/en/index/drug-management-therapy.shtml\r\nDisallow: /content/microsites/medicare/en/index/help/faqs/works/test.html\r\nDisallow: /content/microsites/medicare/en/index/help/forms-documents/\r\nDisallow: /content/microsites/medicare/index/help/forms-documents/\r\nDisallow: /content/microsites/medicare/en/index/member-extras.shtml\r\nDisallow: /content/microsites/medicare/en/index/silversneakers.shtml\r\nDisallow: /content/microsites/medicare-advantage-eob-guide/english/index.html\r\nDisallow: /content/microsites/medicare-advantage-ppo/en/pop-quiz.html\r\nDisallow: /content/microsites/my-medicare/en/index.html\r\nDisallow: /content/microsites/som/en/Forms.html \r\nDisallow: /content/microsites/som/en/Forms/state-health-plan-disabled-dependent-application.html\r\nDisallow: /content/microsites/suppliers/en/help/faqs/diversity-faq/\r\nDisallow: /content/microsites/suppliers/help/faqs/diversity-faq/\r\nDisallow: /content/microsites/uawtrust/\r\nDisallow: /content/public/en/index/health-insurance-help/faqs/\r\nDisallow: /content/public/en/index/health-insurance-help/faqs/topics/other-topics/what-is-subrogation/thank-you.html\r\nDisallow: /content/public/index/health-insurance-help/faqs/topics/\r\nDisallow: /content/public/en/index/health-insurance-help/glossary.html\r\nDisallow: /content/public/en/index/health-insurance-help/glossary/\r\nDisallow: /content/public/en/index/healthy-living/tips/national-health-observances.html\r\nDisallow: /content/public/en/index/healthy-living/tips/national-health-observances/\r\nDisallow: /content/public/en/index/plans/michigan-health-insurance/bronze/\r\nDisallow: /content/public/en/index/plans/michigan-health-insurance/modals/find-plan.html\r\nDisallow: /content/public/en/index/plans/michigan-health-insurance/platinum/premie",
+      "text": "# Maintained by: H. Benton / blocking pages engines should no index / updated Nov. 6, 2026\r\n# SHARED RULES: User-agent goes before rules. \r\n# * is the fallback for bots without a named group. Avoid separate bot groups unless their policy differs. \r\n# Folder prefix for URLs will block its descendants/child pages.\r\n\r\n# Block internal, staging, portal, select group, and unpublished DAM paths\r\nUser-agent: *\r\nDisallow: /content/dam/public/mpr-unpublished-pdfs/\r\nDisallow: /content/dam/public/administrative/\r\nDisallow: /content/dam/memberportal/\r\nDisallow: /content/dam/member_portal/\r\nDisallow: /content/dam/member_portal_it/\r\nDisallow: /content/dam/microsites/ford-team-members/documents\r\nDisallow: /content/dam/microsites/salaried-fca-usa-llc/documents\r\nDisallow: /content/dam/microsites/uaw-trust/documents\r\nDisallow: /content/dam/microsites/university-of-michigan/2025\r\nDisallow: /content/dam/microsites/university-of-michigan/2026\r\nDisallow: /content/dam/microsites/bricktown/administrative\r\nDisallow: /content/dam/microsites/mpsers/documents\r\nDisallow: /content/dam/public/shared-assets/\r\nDisallow: /content/dam/public/*/temp/\r\nDisallow: /_p/\r\nDisallow: /agentom/\r\nDisallow: /index/common/bug-test-page.html\r\n\r\n# Block pages and PDFs\r\nDisallow: /_hrBlock/\r\nDisallow: /agents/resources/aep-materials/\r\nDisallow: /agents/help/faqs.html\r\nDisallow: /agents/help/faqs/department-of-labor-faq/\r\nDisallow: /agents/help/faqs/hipaa-faq/\r\nDisallow: /bcn-benefits-summary/request-form/confirmation/\r\nDisallow: /benefits/blue-cross-complete.html\r\nDisallow: /benefits/healthy-michigan.html\r\nDisallow: /benefits/michild.html\r\nDisallow: /benefits/special-health-care-services.html\r\nDisallow: /campaign/coffee/\r\nDisallow: /campaign/penske/\r\nDisallow: /content/dam/microsites/blue-cross-complete/bcc-provider-*\r\nDisallow: /content/dam/microsites/corpcomm/\r\nDisallow: /content/dam/microsites/corpcomm/provider/BCNPN/Assets/\r\nDisallow: /content/dam/microsites/corpcomm/provider/the_record/Assets/\r\nDisallow: /content/dam/microsites/corpcomm/provider/the_record/\r\nDisallow: /content/dam/microsites/corpcomm/provider/dental-care-news/\r\nDisallow: /content/dam/microsites/corpcomm/provider/HPU/\r\nDisallow: /content/dam/microsites/Healthy%20Safety%20Net/covid-19-report.pdf\r\nDisallow: /content/dam/microsites/medicare/documents/\r\nDisallow: /content/dam/microsites/medicare/excel/\r\nDisallow: /content/dam/microsites/uaw-trust/coronavirus-anxiety.pdf\r\nDisallow: /content/dam/microsites/Updates/alternate-hospitals.pdf\r\nDisallow: /content/dam/microsites/win-by-losing-uaw-ford/\r\nDisallow: /content/dam/public/Agents/Documents/\r\nDisallow: /amslibs/content/dam/public/agents/documents/\r\nDisallow: /content/dam/public/Archive/BCBSM/pdf/2006_custom_formulary.pdf\r\nDisallow: /content/dam/public/Archive/BCBSM/pdf/MedImpact_Payer_Sheet.pdf\r\nDisallow: /content/dam/public/Archive/BCBSM/pdf/MiBOQI-2012-Fact-Sheet.pdf\r\nDisallow: /content/dam/public/Archive/BCBSM/pdf/standard_med_request_form.pdf\r\nDisallow: /content/dam/public/Common/Documents/reimburse.pdf\r\nDisallow: /content/dam/public/Consumer/Documents/about-us/board-materials.pdf\r\nDisallow: /content/dam/public/Consumer/Documents/help/documents-forms/\r\nDisallow: /content/dam/public/Consumer/Documents/help/faqs/priorauth-medical-drug-list.pdf\r\nDisallow: /content/dam/public/consumer/forms-documents/request-for-applications.pdf\r\nDisallow: /content/dam/public/employers/content-fragments/\r\nDisallow: /content/dam/public/Employers/Documents/\r\nDisallow: /content/dam/public/employers/documents/\r\nDisallow: /content/dam/public/glidepath/network-descriptions/docs/\r\nDisallow: /content/dam/public/marketplace/json/\r\nDisallow: /content/dam/public/one-fusion/\r\nDisallow: /content/dam/public/Providers/Documents/\r\nDisallow: /content/dam/public/Providers/portal/\r\nDisallow: /content/dam/public/secured/\r\nDisallow: /content/dam/public/secured/find-a-doctor/frequently-asked-questions.pdf\r\nDisallow: /content/dam/public/shared/documents/billing-cost-share-waivers.pdf\r\nDisallow: /content/dam/public/shared/documents/compact-login-page/\r\nDisallow: /content/dam/public/shared/documents/coronavirus/\r\nDisallow: /content/dam/public/shared/documents/excel/plan-benefits/2020/ibu-plan-details-2020.xls\r\nDisallow: /content/microsites/bcn-flu-shot/\r\nDisallow: /content/microsites/bcn-tobacco-survey/\r\nDisallow: /content/microsites/blue-365/\r\nDisallow: /content/microsites/blue-cross-blue-shield-of-michigan-news/\r\nDisallow: /content/microsites/blue-cross-complete/en/index.html\r\nDisallow: /content/microsites/blue-dental-shop.html\r\nDisallow: /content/microsites/blue-dental-shop/\r\nDisallow: /content/microsites/bug-test.html\r\nDisallow: /content/microsites/bug-test/en/home.html\r\nDisallow: /content/microsites/bug-test-OLD.html\r\nDisallow: /content/microsites/campaigns/en/bcbsm_app/app_redirect\r\nDisallow: /content/microsites/campaigns/wellness/assessment.html\r\nDisallow: /content/microsites/charity/en/\r\nDisallow: /content/microsites/charity/\r\nDisallow: /content/microsites/charity-disclaimer/\r\nDisallow: /content/microsites/cobrowse/en/index.html\r\nDisallow: /content/microsites/denso/en/index.html\r\nDisallow: /content/microsites/direct-enrollment-form/\r\nDisallow: /content/microsites/discounts/\r\nDisallow: /content/microsites/doctors-and-hospitals-network/en/index.html\r\nDisallow: /content/microsites/fcacare/\r\nDisallow: /content/microsites/find-care/en/24-7-online-health-care-part-1-video-transcript.html\r\nDisallow: /content/microsites/find-care/en/index.html\r\nDisallow: /content/microsites/ford/\r\nDisallow: /content/microsites/welcome-ibu/\r\nDisallow: /microsites/ford/\r\nDisallow: /ford-team-members/index/\r\nDisallow: /content/microsites/glidepath-benefits/english/glidepath-benefits.html\r\nDisallow: /content/microsites/gm/\r\nDisallow: /microsites/gm/\r\nDisallow: /content/microsites/bricktowncapital/contact/\r\nDisallow: /content/public/en/index/health-insurance-101/basics/\r\nDisallow: /content/public/en/index/members/online-account/\r\nDisallow: /content/microsites/gm/en/\r\nDisallow: /content/microsites/gm/\r\nDisallow: /content/microsites/group-to-individual/\r\nDisallow: /content/microsites/guide/en/index.html\r\nDisallow: /content/microsites/medicare/en/index/2014-plans/\r\nDisallow: /content/microsites/medicare/en/index/common/medicare-responsive-layouts\r\nDisallow: /content/microsites/medicare/en/index/drug-management-therapy.shtml\r\nDisallow: /content/microsites/medicare/en/index/help/faqs/works/test.html\r\nDisallow: /content/microsites/medicare/en/index/help/forms-documents/\r\nDisallow: /content/microsites/medicare/index/help/forms-documents/\r\nDisallow: /content/microsites/medicare/en/index/member-extras.shtml\r\nDisallow: /content/microsites/medicare/en/index/silversneakers.shtml\r\nDisallow: /content/microsites/medicare-advantage-eob-guide/english/index.html\r\nDisallow: /content/microsites/medicare-advantage-ppo/en/pop-quiz.html\r\nDisallow: /content/microsites/my-medicare/en/index.html\r\nDisallow: /content/microsites/som/en/Forms.html \r\nDisallow: /content/microsites/som/en/Forms/state-health-plan-disabled-dependent-application.html\r\nDisallow: /content/microsites/suppliers/en/help/faqs/diversity-faq/\r\nDisallow: /content/microsites/suppliers/help/faqs/diversity-faq/\r\nDisallow: /content/microsites/uawtrust/\r\nDisallow: /content/public/en/index/health-insurance-help/faqs/\r\nDisallow: /content/public/en/index/health-insurance-help/faqs/topics/other-topics/what-is-subrogation/thank-you.html\r\nDisallow: /content/public/index/health-insurance-help/faqs/topics/\r\nDisallow: /content/public/en/index/health-insurance-help/glossary.html\r\nDisallow: /content/public/en/index/health-insurance-help/glossary/\r\nDisallow: /content/public/en/index/healthy-living/tips/national-health-observances.html\r\nDisallow: /content/public/en/index/healthy-living/tips/national-health-observances/\r\nDisallow: /content/public/en/index/plans/michigan-health-insurance/bronze/\r\nDisallow: /content/public/en/index/plans/michigan-health-insurance/modals/find-plan.html\r\nDisallow: /content/public/en/index/plan",
       "wall": ""
     },
     {
@@ -743,9 +134,618 @@
       "error": "",
       "server": "",
       "policy": "rules",
-      "text": "# Group SC\r\nUser-agent: *\r\nDisallow:\r\n\r\nSitemap: https://www.hellomolina.com/sitemap.xml",
+      "text": "User-agent: *\r\nDisallow: /members/*/mem\r\nDisallow: /-/media/Molina/PublicWebsite/PDF/\r\nDisallow: /providers/*/duals\r\nDisallow: /providers/*/medicare\r\nDisallow: /providers/*/medicaid\r\nDisallow: /marketplace/az/*\r\nDisallow: /marketplace/ca/*\r\nDisallow: /marketplace/fl/*\r\nDisallow: /marketplace/ga/*\r\nDisallow: /marketplace/ia/*\r\nDisallow: /marketplace/id/*\r\nDisallow: /marketplace/il/*\r\nDisallow: /marketplace/ky/*\r\nDisallow: /marketplace/ma/*\r\nDisallow: /marketplace/mi/*\r\nDisallow: /marketplace/ms/*\r\nDisallow: /marketplace/ne/*\r\nDisallow: /marketplace/nm/*\r\nDisallow: /marketplace/nv/*\r\nDisallow: /marketplace/ny/*\r\nDisallow: /marketplace/oh/*\r\nDisallow: /marketplace/sc/*\r\nDisallow: /marketplace/tx/*\r\nDisallow: /marketplace/ut/*\r\nDisallow: /marketplace/va/*\r\nDisallow: /marketplace/wa/*\r\nDisallow: /marketplace/wi/*\r\n\r\nSitemap: https://www.molinahealthcare.com/sitemap.xml",
       "wall": ""
     }
   ],
-  "user_agent": "EverBetter-TiC-Crawler/1.0 (+chris@thechrisoneil.com)"
+  "probes": [
+    {
+      "payer_id": "bcbs-kansas",
+      "role": "landing",
+      "url": "https://bcbsks.com/mrf",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 200,
+      "server": "cloudflare",
+      "content_type": "text/html; charset=utf-8",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "bcbs-kansas",
+      "role": "toc",
+      "url": "https://mrf.secure.bcbsks.com/api/filedownloadhttptrigger?name=table-of-contents&ext=json",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": false,
+        "CCBot": false
+      },
+      "fetched": true,
+      "status": 403,
+      "server": "cloudflare",
+      "content_type": "text/html; charset=UTF-8",
+      "wall": "cloudflare_challenge",
+      "error": "",
+      "verdict": "bot_wall"
+    },
+    {
+      "payer_id": "bcbs-michigan-employer",
+      "role": "landing",
+      "url": "https://www.bcbsm.com/mrf",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 200,
+      "server": "",
+      "content_type": "text/html;charset=utf-8",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "bcbs-michigan-employer",
+      "role": "toc",
+      "url": "https://bcbsm.sapphiremrfhub.com/tocs/current/blue_cross_blue_shield_of_michigan_employer",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "AmazonS3",
+      "content_type": "binary/octet-stream",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "bcbs-michigan-employer",
+      "role": "mrf_sample",
+      "url": "https://bcbsm.sapphiremrfhub.com/mrfs/202611/2026-10-01_BCBSMI_Blue-Cross-Blue-Shield-of-Michigan-Traditional_allowed-amounts.json.gz",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "AmazonS3",
+      "content_type": "binary/octet-stream",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "bcbs-michigan-employer",
+      "role": "mrf_sample",
+      "url": "https://bcbsmi.mrf.bcbs.com/2022-09_378_49B0_in-network-rates_01_of_01.json.gz?&Expires=1666122639&Signature=YOEYI9T71OxrCViKQHAfMKk8pyjsn-PApY6uxWBSLru4UtmT3aMOgffp~Kd~H9T7VWvdtpdY8c4qTa5j-0ltrVbTS76BkAO9wySJ1YKN4zjwWnh~YqifiHkV9wVYeLkNDgohIdCplTLMkgaTPEiBVXusq-Qpd80ipBIg5yzQhQzMKQ7PWnd8ZjIah6x4h1cwXJwnuUztbvr6tKmd8vvQ5uvjdW-OVyM8kxAdutCPeBu3ibSUm9AiL-uGIs7kNuuL8Z~7LOEa8bTGhSPJeTNdUima1es9FnZLitN21nkQQVyn0oZ6FTCuFvo-N0JeNmzp5oxYrrdAZwLZ62EP5DmCyg__&Key-Pair-Id=K27TQMT39R1C8A",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 403,
+      "server": "CloudFront",
+      "content_type": "text/xml",
+      "wall": "",
+      "error": "",
+      "verdict": "http_error"
+    },
+    {
+      "payer_id": "bcbs-michigan-group",
+      "role": "landing",
+      "url": "https://www.bcbsm.com/mrf",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 200,
+      "server": "",
+      "content_type": "text/html;charset=utf-8",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "bcbs-michigan-group",
+      "role": "toc",
+      "url": "https://bcbsm.sapphiremrfhub.com/tocs/current/blue_cross_blue_shield_of_michigan",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "AmazonS3",
+      "content_type": "binary/octet-stream",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "bcbs-michigan-group",
+      "role": "mrf_sample",
+      "url": "https://bcbsm.sapphiremrfhub.com/mrfs/202611/2026-10-01_BCBSMI_Blue-Cross-Blue-Shield-of-Michigan_allowed-amounts.json.gz",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "AmazonS3",
+      "content_type": "binary/octet-stream",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "bcbs-michigan-group",
+      "role": "mrf_sample",
+      "url": "https://bcbsmi.mrf.bcbs.com/2026-11_020_02I0_in-network-rates_1_of_2.json.gz?&Expires=1797861651&Signature=qLhivemhfQ8YVOkh~rHYuraCK1qchBlWVn2QnWmcoa1zk7VU08lypGIBiyk10Py3JaLkxZvjvkUwkDs0NLN3yEuPFpoYWAr2UZBt3nPsfzQF2Ph~GzluJ2NFgtESh8W8AF5w0xlQk~8Syr2gcUvB5el6eFgVSYSS6baiHfMZOW65~rLYUk-7~z9SPt1OlSndBORKPOpJPDGOsNdAQcwnDbStrXBD6IzaahDHRwcug3h1m3OI8z80yOdWmRlhNZxFhZbHmn5mIKCS7IfbLtx19tesPpgkViy0WXd8VQwIlbsA9YxGIKm4PtTdvPX4A6PY8cCztKnlsRIJjTwhwk5L3w__&Key-Pair-Id=K27TQMT39R1C8A",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "AmazonS3",
+      "content_type": "application/x-gzip",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "bcbs-mississippi",
+      "role": "landing",
+      "url": "https://www.bcbsms.com/about-us/transparency-in-coverage",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 200,
+      "server": "",
+      "content_type": "text/html; charset=utf-8",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "bcbs-mississippi",
+      "role": "toc",
+      "url": "https://tcr.bcbsms.com/Table_of_Contents/Local_TOC.json",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "",
+      "content_type": "application/json",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "bcbs-mississippi",
+      "role": "mrf_sample",
+      "url": "https://tcr.bcbsms.com/230_local_out-of-network-rates.json.gz",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "",
+      "content_type": "application/x-gzip",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "bcbs-mississippi",
+      "role": "mrf_sample",
+      "url": "https://bcbsms.mrf.bcbs.com/2026-10_020_02E0_in-network-rates_1_of_2.json.gz?&Expires=1795269681&Signature=tTsT1~JjTBq7VRgm3eM7Uns~-qf2YeouS9GQyz8JVSclXbTLpuVchpgXNHMVfORyJr~duIUCRV~8jQBExX-ONfx18VSXYOJGbacJqurIkLPpRskWe3DDU7zUOoNrYxQAcTVhdCEBNhT7e~C9n85T4fdx5-uZTruffKFQptSHbwxN8OODBj8m~bJQpmfuVK4K2YkIt69hVCWLFiGPWm65c-2IFi598xB6tkFHVK9AhT6P5715H9-PhsQSxIDVqUoeBtVNJK9ZDvnNvHqn8rfOyZNdt1hciXQUWMawCaybKS8puwwpZeGkN2gqu6mr4qH~4VI~omUDupRWqOCKExLn8w__&Key-Pair-Id=K27TQMT39R1C8A",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "AmazonS3",
+      "content_type": "application/gzip",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "bcbs-mississippi-state-employees",
+      "role": "landing",
+      "url": "https://www.bcbsms.com/about-us/transparency-in-coverage",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 200,
+      "server": "",
+      "content_type": "text/html; charset=utf-8",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "bcbs-mississippi-state-employees",
+      "role": "toc",
+      "url": "https://tcr.bcbsms.com/Table_of_Contents/State_TOC.json",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "",
+      "content_type": "application/json",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "bcbs-mississippi-state-employees",
+      "role": "mrf_sample",
+      "url": "https://tcr.bcbsms.com/230_state_out-of-network-rates.json.gz",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "",
+      "content_type": "application/x-gzip",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "bcbs-mississippi-state-employees",
+      "role": "mrf_sample",
+      "url": "https://bcbsms.mrf.bcbs.com/2026-10_020_02E0_in-network-rates_1_of_2.json.gz?&Expires=1795269681&Signature=tTsT1~JjTBq7VRgm3eM7Uns~-qf2YeouS9GQyz8JVSclXbTLpuVchpgXNHMVfORyJr~duIUCRV~8jQBExX-ONfx18VSXYOJGbacJqurIkLPpRskWe3DDU7zUOoNrYxQAcTVhdCEBNhT7e~C9n85T4fdx5-uZTruffKFQptSHbwxN8OODBj8m~bJQpmfuVK4K2YkIt69hVCWLFiGPWm65c-2IFi598xB6tkFHVK9AhT6P5715H9-PhsQSxIDVqUoeBtVNJK9ZDvnNvHqn8rfOyZNdt1hciXQUWMawCaybKS8puwwpZeGkN2gqu6mr4qH~4VI~omUDupRWqOCKExLn8w__&Key-Pair-Id=K27TQMT39R1C8A",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "AmazonS3",
+      "content_type": "application/gzip",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "bcbs-north-carolina",
+      "role": "landing",
+      "url": "https://www.bcbsnc.com/policies-best-practices/machine-readable-files",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 200,
+      "server": "",
+      "content_type": "text/html; charset=utf-8",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "centene-ambetter",
+      "role": "landing",
+      "url": "https://www.centene.com/price-transparency-files.html",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 200,
+      "server": "",
+      "content_type": "text/html;charset=utf-8",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "centene-ambetter",
+      "role": "mrf_sample",
+      "url": "https://www.centene.com/content/dam/centene/Centene%20Corporate/json/DOCUMENT/2026-09-28_centene-management-company-llc_ambetter-al_allowed-amounts.json",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "",
+      "content_type": "application/json",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "centene-fidelis",
+      "role": "landing",
+      "url": "https://www.centene.com/price-transparency-files.html",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 200,
+      "server": "",
+      "content_type": "text/html;charset=utf-8",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "centene-fidelis",
+      "role": "mrf_sample",
+      "url": "https://www.centene.com/content/dam/centene/Centene%20Corporate/json/DOCUMENT/2026-09-28_centene-management-company-llc_fidelis-es_allowed-amounts.json",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "",
+      "content_type": "application/json",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "centene-health-net",
+      "role": "landing",
+      "url": "https://www.centene.com/price-transparency-files.html",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 200,
+      "server": "",
+      "content_type": "text/html;charset=utf-8",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "centene-health-net",
+      "role": "mrf_sample",
+      "url": "https://www.centene.com/content/dam/centene/Centene%20Corporate/json/DOCUMENT/2026-09-30_centene-management-company-llc_healthnet-ca_allowed-amounts.json",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "",
+      "content_type": "application/json",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "cigna",
+      "role": "landing",
+      "url": "https://www.cigna.com/legal/compliance/machine-readable-files",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 200,
+      "server": "",
+      "content_type": "text/html; charset=utf-8",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "elevance-anthem",
+      "role": "landing",
+      "url": "https://www.anthem.com/ca/machine-readable-file/search",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 200,
+      "server": "AkamaiNetStorage",
+      "content_type": "text/html",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "hcsc",
+      "role": "landing",
+      "url": "https://www.bcbsok.com/member/policy-forms/machine-readable-file",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 200,
+      "server": "",
+      "content_type": "text/html; charset=UTF-8",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "kaiser-colorado",
+      "role": "landing",
+      "url": "https://healthy.kaiserpermanente.org/front-door/machine-readable-co-federal",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 200,
+      "server": "",
+      "content_type": "text/html; charset=UTF-8",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "molina",
+      "role": "landing",
+      "url": "https://www.molinahealthcare.com/marketplace/oh/en-us/About/compinfo/PricingTransparency",
+      "robots_allows_us": false,
+      "robots_allows": {
+        "*": false,
+        "Googlebot": false,
+        "GPTBot": false,
+        "CCBot": false
+      },
+      "fetched": false,
+      "status": null,
+      "server": "",
+      "content_type": "",
+      "wall": "",
+      "error": "",
+      "verdict": "robots_blocked"
+    },
+    {
+      "payer_id": "qualchoice",
+      "role": "landing",
+      "url": "https://www.centene.com/price-transparency-files.html",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 200,
+      "server": "",
+      "content_type": "text/html;charset=utf-8",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    },
+    {
+      "payer_id": "qualchoice",
+      "role": "mrf_sample",
+      "url": "https://www.centene.com/content/dam/centene/Centene%20Corporate/json/DOCUMENT/2026-09-28_centene-management-company-llc_qualchoice_allowed-amounts.json",
+      "robots_allows_us": true,
+      "robots_allows": {
+        "*": true,
+        "Googlebot": true,
+        "GPTBot": true,
+        "CCBot": true
+      },
+      "fetched": true,
+      "status": 206,
+      "server": "",
+      "content_type": "application/json",
+      "wall": "",
+      "error": "",
+      "verdict": "accessible"
+    }
+  ]
 }

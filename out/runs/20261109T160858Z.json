@@ -1,0 +1,48 @@
+{
+  "args": {
+    "force": false,
+    "payers": [
+      "bcbs-kansas",
+      "bcbs-michigan-employer",
+      "bcbs-michigan-group",
+      "bcbs-mississippi",
+      "bcbs-mississippi-state-employees",
+      "centene-ambetter",
+      "centene-fidelis",
+      "centene-health-net",
+      "qualchoice"
+    ],
+    "raw": false
+  },
+  "finished_at": "2026-11-09T16:08:59Z",
+  "results": [
+    {
+      "access_status": "waf_blocked",
+      "crawled_at": "2026-11-09T16:08:58Z",
+      "error": "waf_blocked 403 https://mrf.secure.bcbsks.com/api/filedownloadhttptrigger?name=table-of-contents&ext=json [cloudflare_challenge]",
+      "mrf_count": 0,
+      "outputs": [],
+      "payer_id": "bcbs-kansas",
+      "raw_bytes": 0,
+      "schema_valid": null,
+      "status": "failed",
+      "toc_bytes": 0,
+      "toc_last_updated_on": "",
+      "toc_sha256": "",
+      "toc_url": "",
+      "total_bytes": 0,
+      "validation": null
+    }
+  ],
+  "run_id": "20261109T160858Z",
+  "schema_version": "2.2.1",
+  "summary": {
+    "by_status": {
+      "failed": 1
+    },
+    "mrf_bytes": 0,
+    "mrf_urls": 0,
+    "payers": 1,
+    "toc_bytes": 0
+  }
+}
