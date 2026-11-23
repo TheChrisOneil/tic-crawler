@@ -1,5 +1,5 @@
 {
-  "audited_at": "2026-11-16T15:38:59Z",
+  "audited_at": "2026-11-23T18:16:58Z",
   "user_agent": "EverBetter-TiC-Crawler/1.0 (+chris@thechrisoneil.com)",
   "robots": [
     {
@@ -134,7 +134,7 @@
       "error": "",
       "server": "",
       "policy": "rules",
-      "text": "User-agent: *\r\nDisallow: /members/*/mem\r\nDisallow: /-/media/Molina/PublicWebsite/PDF/\r\nDisallow: /providers/*/duals\r\nDisallow: /providers/*/medicare\r\nDisallow: /providers/*/medicaid\r\nDisallow: /marketplace/az/*\r\nDisallow: /marketplace/ca/*\r\nDisallow: /marketplace/fl/*\r\nDisallow: /marketplace/ga/*\r\nDisallow: /marketplace/ia/*\r\nDisallow: /marketplace/id/*\r\nDisallow: /marketplace/il/*\r\nDisallow: /marketplace/ky/*\r\nDisallow: /marketplace/ma/*\r\nDisallow: /marketplace/mi/*\r\nDisallow: /marketplace/ms/*\r\nDisallow: /marketplace/ne/*\r\nDisallow: /marketplace/nm/*\r\nDisallow: /marketplace/nv/*\r\nDisallow: /marketplace/ny/*\r\nDisallow: /marketplace/oh/*\r\nDisallow: /marketplace/sc/*\r\nDisallow: /marketplace/tx/*\r\nDisallow: /marketplace/ut/*\r\nDisallow: /marketplace/va/*\r\nDisallow: /marketplace/wa/*\r\nDisallow: /marketplace/wi/*\r\n\r\nSitemap: https://www.molinahealthcare.com/sitemap.xml",
+      "text": "User-agent: *\r\nDisallow: /members/*/mem\r\nDisallow: /-/media/Molina/PublicWebsite/PDF/\r\nDisallow: /marketplace/az/*\r\nDisallow: /marketplace/ca/*\r\nDisallow: /marketplace/fl/*\r\nDisallow: /marketplace/ga/*\r\nDisallow: /marketplace/ia/*\r\nDisallow: /marketplace/id/*\r\nDisallow: /marketplace/il/*\r\nDisallow: /marketplace/ky/*\r\nDisallow: /marketplace/ma/*\r\nDisallow: /marketplace/mi/*\r\nDisallow: /marketplace/ms/*\r\nDisallow: /marketplace/ne/*\r\nDisallow: /marketplace/nm/*\r\nDisallow: /marketplace/nv/*\r\nDisallow: /marketplace/ny/*\r\nDisallow: /marketplace/oh/*\r\nDisallow: /marketplace/sc/*\r\nDisallow: /marketplace/tx/*\r\nDisallow: /marketplace/ut/*\r\nDisallow: /marketplace/va/*\r\nDisallow: /marketplace/wa/*\r\nDisallow: /marketplace/wi/*\r\n\r\nSitemap: https://www.molinahealthcare.com/sitemap.xml",
       "wall": ""
     }
   ],
@@ -389,7 +389,7 @@
     {
       "payer_id": "bcbs-mississippi",
       "role": "mrf_sample",
-      "url": "https://bcbsms.mrf.bcbs.com/2026-10_020_02E0_in-network-rates_1_of_2.json.gz?&Expires=1795269681&Signature=tTsT1~JjTBq7VRgm3eM7Uns~-qf2YeouS9GQyz8JVSclXbTLpuVchpgXNHMVfORyJr~duIUCRV~8jQBExX-ONfx18VSXYOJGbacJqurIkLPpRskWe3DDU7zUOoNrYxQAcTVhdCEBNhT7e~C9n85T4fdx5-uZTruffKFQptSHbwxN8OODBj8m~bJQpmfuVK4K2YkIt69hVCWLFiGPWm65c-2IFi598xB6tkFHVK9AhT6P5715H9-PhsQSxIDVqUoeBtVNJK9ZDvnNvHqn8rfOyZNdt1hciXQUWMawCaybKS8puwwpZeGkN2gqu6mr4qH~4VI~omUDupRWqOCKExLn8w__&Key-Pair-Id=K27TQMT39R1C8A",
+      "url": "https://bcbsms.mrf.bcbs.com/2026-11_020_02E0_in-network-rates_1_of_2.json.gz?&Expires=1797861651&Signature=1YdUpKg1E6Ra7Xcl3KIfVV8kZcrufkj1c-Zpn9JbhjW8Ba42W0hdhFkG16r06YQ-d87cF3j-~llbwopm3otWHkKAWhaOmxoDUyVt747Wssf5rImwjXkPTBgR1WVJqp30-GSaPlRVVBW3Dk617LmEFtNh9Fu-~HPAVoPTfY6ztatDHnYNS5oHZcVlpudlO48KbD8qiNXhtzl~zDDK62IrDvTBlmiT4n1bQWgPRaPqr2mmWs6AQH6ItoHiSFhqEsdh3GC4NksnvgmXZsLjY5wH3d5OLzfAIgH73shmmaXmgru4xeqQFm5qLpPzvDMazuML7oyJKOPDiFN02L5a8gse~Q__&Key-Pair-Id=K27TQMT39R1C8A",
       "robots_allows_us": true,
       "robots_allows": {
         "*": true,
@@ -400,7 +400,7 @@
       "fetched": true,
       "status": 206,
       "server": "AmazonS3",
-      "content_type": "application/gzip",
+      "content_type": "application/x-gzip",
       "wall": "",
       "error": "",
       "verdict": "accessible"
@@ -465,7 +465,7 @@
     {
       "payer_id": "bcbs-mississippi-state-employees",
       "role": "mrf_sample",
-      "url": "https://bcbsms.mrf.bcbs.com/2026-10_020_02E0_in-network-rates_1_of_2.json.gz?&Expires=1795269681&Signature=tTsT1~JjTBq7VRgm3eM7Uns~-qf2YeouS9GQyz8JVSclXbTLpuVchpgXNHMVfORyJr~duIUCRV~8jQBExX-ONfx18VSXYOJGbacJqurIkLPpRskWe3DDU7zUOoNrYxQAcTVhdCEBNhT7e~C9n85T4fdx5-uZTruffKFQptSHbwxN8OODBj8m~bJQpmfuVK4K2YkIt69hVCWLFiGPWm65c-2IFi598xB6tkFHVK9AhT6P5715H9-PhsQSxIDVqUoeBtVNJK9ZDvnNvHqn8rfOyZNdt1hciXQUWMawCaybKS8puwwpZeGkN2gqu6mr4qH~4VI~omUDupRWqOCKExLn8w__&Key-Pair-Id=K27TQMT39R1C8A",
+      "url": "https://bcbsms.mrf.bcbs.com/2026-11_020_02E0_in-network-rates_1_of_2.json.gz?&Expires=1797861651&Signature=1YdUpKg1E6Ra7Xcl3KIfVV8kZcrufkj1c-Zpn9JbhjW8Ba42W0hdhFkG16r06YQ-d87cF3j-~llbwopm3otWHkKAWhaOmxoDUyVt747Wssf5rImwjXkPTBgR1WVJqp30-GSaPlRVVBW3Dk617LmEFtNh9Fu-~HPAVoPTfY6ztatDHnYNS5oHZcVlpudlO48KbD8qiNXhtzl~zDDK62IrDvTBlmiT4n1bQWgPRaPqr2mmWs6AQH6ItoHiSFhqEsdh3GC4NksnvgmXZsLjY5wH3d5OLzfAIgH73shmmaXmgru4xeqQFm5qLpPzvDMazuML7oyJKOPDiFN02L5a8gse~Q__&Key-Pair-Id=K27TQMT39R1C8A",
       "robots_allows_us": true,
       "robots_allows": {
         "*": true,
@@ -476,7 +476,7 @@
       "fetched": true,
       "status": 206,
       "server": "AmazonS3",
-      "content_type": "application/gzip",
+      "content_type": "application/x-gzip",
       "wall": "",
       "error": "",
       "verdict": "accessible"
@@ -531,7 +531,7 @@
         "CCBot": true
       },
       "fetched": true,
-      "status": 200,
+      "status": 206,
       "server": "",
       "content_type": "application/json",
       "wall": "",
@@ -569,7 +569,7 @@
         "CCBot": true
       },
       "fetched": true,
-      "status": 200,
+      "status": 206,
       "server": "",
       "content_type": "application/json",
       "wall": "",
@@ -607,7 +607,7 @@
         "CCBot": true
       },
       "fetched": true,
-      "status": 200,
+      "status": 206,
       "server": "",
       "content_type": "application/json",
       "wall": "",
@@ -684,7 +684,7 @@
       },
       "fetched": true,
       "status": 200,
-      "server": "Apache",
+      "server": "",
       "content_type": "text/html; charset=UTF-8",
       "wall": "",
       "error": "",
@@ -740,7 +740,7 @@
         "CCBot": true
       },
       "fetched": true,
-      "status": 200,
+      "status": 206,
       "server": "",
       "content_type": "application/json",
       "wall": "",
